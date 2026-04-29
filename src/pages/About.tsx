@@ -86,7 +86,8 @@ function CustomHero() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 1.0, ease: [0.2, 0.8, 0.2, 1] }}
-          className="font-couture font-normal text-6xl md:text-8xl lg:text-[8.5vw] leading-[0.96] tracking-[-0.005em] text-ivory max-w-6xl"
+          className="font-couture font-normal text-6xl md:text-8xl lg:text-[8.5vw] leading-[0.94] tracking-[0.005em] text-ivory max-w-6xl"
+          style={{ fontFeatureSettings: '"liga", "dlig", "swsh"' }}
         >
           Small studio.{" "}
           <span className="gold italic">Outsized firepower.</span>
@@ -180,8 +181,11 @@ function PremiseSection() {
 
         <GlowCard>
           <div className="grid grid-cols-12 gap-6 md:gap-10 items-center">
-            <div className="col-span-12 md:col-span-3 flex justify-center md:justify-start">
+            <div className="col-span-12 md:col-span-3 flex flex-col items-center md:items-start gap-4">
               <Robot />
+              <span className="font-mono text-[9px] uppercase tracking-[0.32em] text-gold/70">
+                ◆ Amara · AI assistant
+              </span>
             </div>
 
             <div className="col-span-12 md:col-span-1 hidden md:flex flex-col justify-center items-center gap-2.5">
@@ -760,7 +764,7 @@ function ProcessMarquee() {
           className="flex gap-5 md:gap-6 px-6 md:px-10 will-change-transform"
           animate={{ x: ["0%", "-50%"] }}
           transition={{
-            duration: 55,
+            duration: 38,
             repeat: Infinity,
             ease: "linear",
           }}
