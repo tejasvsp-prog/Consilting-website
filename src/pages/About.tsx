@@ -80,7 +80,7 @@ export default function About() {
             <span className="gold italic">Outsized firepower.</span>
           </>
         }
-        subtitle="Founded to close the gaps the rest of the industry leaves wide open. From neighborhood operators to national corporations, we help businesses grow online — search, websites, maintenance, and Meta ads — on a single accountable team."
+        subtitle="Founded recently to close the gaps the rest of the industry leaves wide open — and shredding the competition since. From neighborhood operators to national corporations, Amara Digital helps businesses grow online with the firepower of a hundred-person agency on a single accountable team."
       />
 
       {/* Tight integrated story — replaces the long 3-paragraph block */}
@@ -105,17 +105,19 @@ export default function About() {
                 <p>
                   Amara Digital was founded to close the gaps the rest of the
                   industry leaves wide open. A small senior team running the
-                  output of a hundred-person agency — nothing handed off,
-                  nothing watered down, nothing billed that doesn't ship.
+                  firepower of a hundred-person agency — nothing handed off,
+                  nothing watered down, nothing billed that doesn't ship. The
+                  result is a studio that's been shredding the competition
+                  since launch.
                 </p>
               </Reveal>
               <Reveal delay={0.32}>
                 <p>
-                  We work with operators of every size, from neighborhood
-                  restaurants to multi-state corporations. Same studio. Same
-                  standard. We help you grow online by treating your P&amp;L
-                  like our own — and we've been outpacing larger agencies
-                  doing it.
+                  We help everyone — from one-location operators to
+                  multi-state corporations — grow online by treating your
+                  P&amp;L like our own. Same studio, same standard, whether
+                  you're trying to fill tables on Wednesday nights or scale a
+                  national brand into nine figures.
                 </p>
               </Reveal>
             </div>
@@ -224,8 +226,13 @@ function WhyCard({
   );
 }
 
-/* 3D gift box — base + lid + emerging icon + glow.
-   Sized at ~120px, centered above the heading.
+/* 3D gift box — base + lid + emerging nature icon + sparkle burst.
+   Sized at ~160px, sits above the card heading. Sequence on reveal:
+     1) Box jiggles in place for a beat (anticipation)
+     2) Lid hinges back rotateX(-120) with overshoot
+     3) Sparkle particles burst radially out of the open lid
+     4) Nature icon rises out of the base and bobs gently
+   A gold halo behind everything breathes the whole time.
 */
 function GiftBox({
   Icon,
@@ -236,84 +243,141 @@ function GiftBox({
   open: boolean;
   delay: number;
 }) {
+  // 12 sparkles fired radially when the lid pops
+  const sparkles = Array.from({ length: 12 }).map((_, i) => {
+    const angle = (i / 12) * Math.PI * 2 + (Math.random() - 0.5) * 0.3;
+    const distance = 60 + Math.random() * 40;
+    return {
+      x: Math.cos(angle) * distance,
+      y: Math.sin(angle) * distance - 10, // bias slightly upward
+      size: 2 + Math.random() * 2.5,
+      d: Math.random() * 0.15,
+    };
+  });
+
   return (
     <div
-      className="relative w-28 h-28 mb-10"
-      style={{ perspective: "700px" }}
+      className="relative w-36 h-36 md:w-40 md:h-40 mb-10"
+      style={{ perspective: "900px" }}
     >
-      {/* Pulsing aura behind everything */}
+      {/* Pulsing halo behind everything */}
       <motion.span
         aria-hidden
         animate={
           open
-            ? { opacity: [0.15, 0.5, 0.15], scale: [0.9, 1.15, 0.9] }
+            ? { opacity: [0.2, 0.55, 0.2], scale: [0.9, 1.18, 0.9] }
             : { opacity: 0 }
         }
         transition={{
           duration: 3.2,
           repeat: Infinity,
-          delay: delay + 0.4,
+          delay: delay + 0.6,
           ease: "easeInOut",
         }}
-        className="absolute inset-0 rounded-full bg-gold/40 blur-2xl"
+        className="absolute inset-0 rounded-full bg-gold/45 blur-2xl"
       />
 
-      {/* Box base — bottom 60% */}
-      <div className="absolute inset-x-0 bottom-0 h-[62%] rounded-md border border-gold/60 bg-gradient-to-b from-gold/15 to-gold/5 shadow-[inset_0_-4px_12px_rgba(212,176,97,0.15)]" />
-
-      {/* Box base inner shadow ring (gives depth) */}
-      <div className="absolute inset-x-1 bottom-1 h-[58%] rounded-md border border-gold/15" />
-
-      {/* Lid — top 36%. Hinges open from top edge. */}
+      {/* Anticipation jiggle wrapper — shakes briefly before the lid pops */}
       <motion.div
-        initial={{ rotateX: 0, y: 0 }}
-        animate={open ? { rotateX: -118, y: -2 } : { rotateX: 0, y: 0 }}
-        transition={{
-          duration: 1.0,
-          delay,
-          ease: [0.34, 1.4, 0.5, 1],
-        }}
-        style={{
-          transformOrigin: "top center",
-          transformStyle: "preserve-3d",
-        }}
-        className="absolute inset-x-0 top-[8%] h-[36%] rounded-md border border-gold/70 bg-gradient-to-b from-gold/40 to-gold/15 shadow-[0_2px_8px_rgba(0,0,0,0.4)]"
-      >
-        {/* Gold ribbon across the lid */}
-        <span className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-1.5 bg-gold/80" />
-        <span className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1.5 bg-gold/80" />
-      </motion.div>
-
-      {/* The emerging nature icon — sits inside the box; rises and grows */}
-      <motion.div
-        initial={{ y: 30, opacity: 0, scale: 0.4, rotate: -8 }}
         animate={
           open
-            ? { y: -18, opacity: 1, scale: 1, rotate: 0 }
-            : { y: 30, opacity: 0, scale: 0.4, rotate: -8 }
+            ? { x: [0, -3, 3, -2, 2, 0], rotate: [0, -1.5, 1.5, -1, 1, 0] }
+            : { x: 0, rotate: 0 }
+        }
+        transition={{ duration: 0.5, delay, ease: "easeInOut" }}
+        className="absolute inset-0"
+      >
+        {/* Box base — bottom 60% */}
+        <div className="absolute inset-x-0 bottom-0 h-[62%] rounded-md border-2 border-gold bg-gradient-to-b from-gold/20 to-gold/5 shadow-[inset_0_-6px_16px_rgba(212,176,97,0.18)]" />
+
+        {/* Inner ring on the base for depth */}
+        <div className="absolute inset-x-2 bottom-2 h-[58%] rounded-md border border-gold/20" />
+
+        {/* Cross ribbon on the base only */}
+        <span className="absolute left-1/2 -translate-x-1/2 bottom-0 h-[62%] w-2 bg-gold/60" />
+
+        {/* Lid — top 36%. Hinges open from top edge with overshoot. */}
+        <motion.div
+          initial={{ rotateX: 0, y: 0 }}
+          animate={open ? { rotateX: -120, y: -3 } : { rotateX: 0, y: 0 }}
+          transition={{
+            duration: 1.0,
+            delay: delay + 0.5,
+            ease: [0.34, 1.6, 0.5, 1],
+          }}
+          style={{
+            transformOrigin: "top center",
+            transformStyle: "preserve-3d",
+          }}
+          className="absolute inset-x-0 top-[6%] h-[36%] rounded-md border-2 border-gold bg-gradient-to-b from-gold/55 to-gold/20 shadow-[0_4px_14px_rgba(0,0,0,0.5)]"
+        >
+          {/* Cross ribbon on the lid */}
+          <span className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-2 bg-gold/85" />
+          <span className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-2 bg-gold/85" />
+          {/* Bow knot in the center */}
+          <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-sm bg-gold" />
+        </motion.div>
+      </motion.div>
+
+      {/* Sparkle burst — fires radially out of the lid the moment it pops */}
+      <div className="absolute inset-0 pointer-events-none">
+        {sparkles.map((s, i) => (
+          <motion.span
+            key={i}
+            aria-hidden
+            initial={{ x: 0, y: 0, opacity: 0, scale: 0 }}
+            animate={
+              open
+                ? {
+                    x: [0, 0, s.x],
+                    y: [0, 0, s.y],
+                    opacity: [0, 0, 1, 0],
+                    scale: [0, 0, 1, 0.4],
+                  }
+                : { opacity: 0 }
+            }
+            transition={{
+              duration: 1.4,
+              times: [0, 0.4, 0.55, 1],
+              delay: delay + 0.6 + s.d,
+              ease: [0.2, 0.5, 0.3, 1],
+            }}
+            className="absolute left-1/2 top-1/2 rounded-full bg-gold"
+            style={{ width: s.size, height: s.size }}
+          />
+        ))}
+      </div>
+
+      {/* The emerging nature icon — rises out of the base */}
+      <motion.div
+        initial={{ y: 36, opacity: 0, scale: 0.35, rotate: -10 }}
+        animate={
+          open
+            ? { y: -22, opacity: 1, scale: 1, rotate: 0 }
+            : { y: 36, opacity: 0, scale: 0.35, rotate: -10 }
         }
         transition={{
-          duration: 1.0,
-          delay: delay + 0.4,
-          ease: [0.2, 1.4, 0.4, 1],
+          duration: 1.1,
+          delay: delay + 0.8,
+          ease: [0.2, 1.5, 0.4, 1],
         }}
         className="absolute inset-x-0 top-0 flex items-center justify-center"
         style={{ height: "100%" }}
       >
-        {/* Continuous gentle bob once revealed */}
+        {/* Continuous gentle bob + sway once revealed */}
         <motion.div
           animate={
             open
-              ? { y: [0, -3, 0], rotate: [-1, 1, -1] }
+              ? { y: [0, -4, 0], rotate: [-1.5, 1.5, -1.5] }
               : { y: 0 }
           }
           transition={{
-            duration: 3.5,
+            duration: 3.6,
             repeat: Infinity,
-            delay: delay + 1.2,
+            delay: delay + 1.6,
             ease: "easeInOut",
           }}
-          className="text-gold drop-shadow-[0_0_18px_rgba(212,176,97,0.6)]"
+          className="text-gold drop-shadow-[0_0_22px_rgba(212,176,97,0.75)]"
         >
           <Icon />
         </motion.div>
