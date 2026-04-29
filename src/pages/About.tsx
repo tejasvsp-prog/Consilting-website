@@ -10,31 +10,31 @@ const whyUs: {
   n: string;
   t: string;
   d: string;
-  Icon: () => JSX.Element;
+  Visual: (props: { active: boolean }) => JSX.Element;
 }[] = [
   {
     n: "I",
     t: "Senior engineers, in the room",
     d: "Decade-plus engineers and strategists. No interns. No offshored execution. The people who pitch you do the work.",
-    Icon: TreeIcon,
+    Visual: CoreVisual,
   },
   {
     n: "II",
     t: "Modern stack, future-proof",
     d: "React, Next.js, TypeScript, Tailwind, headless CMS. The same tools the world's best product teams ship on.",
-    Icon: PeakIcon,
+    Visual: StackVisual,
   },
   {
     n: "III",
     t: "Best-in-class integrations",
     d: "Stripe, HubSpot, Salesforce, Sanity, Segment, GA4, Klaviyo — wired up properly, server-side, day one.",
-    Icon: SunIcon,
+    Visual: NetworkVisual,
   },
   {
     n: "IV",
     t: "Years of cross-industry experience",
     d: "DTC, healthcare, B2B SaaS, hospitality, nonprofits, professional services. We've seen your funnel before.",
-    Icon: WaveIcon,
+    Visual: TimelineVisual,
   },
 ];
 
@@ -500,23 +500,36 @@ function Grid3D() {
   );
 }
 
-/* WhyCard with mouse-tracking 3D tilt + the existing gift-box scene. */
+/* WhyCard — completely new animation. Each card has:
+   - A unique animated SVG visualization (CPU pulse, tech stack,
+     network nodes, timeline) instead of the gift box
+   - A gold scan beam that sweeps top-to-bottom on a 5s loop
+   - A circuit-style dotted grid background that fades in
+   - Mouse-tracking 3D tilt + glow on hover
+   - 'Boot up' reveal that draws the visualization in sequence
+*/
 function WhyCard({
   item,
   index,
 }: {
-  item: { n: string; t: string; d: string; Icon: () => JSX.Element };
+  item: {
+    n: string;
+    t: string;
+    d: string;
+    Visual: (props: { active: boolean }) => JSX.Element;
+  };
   index: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
   const [tilt, setTilt] = useState({ rx: 0, ry: 0 });
+  const [hover, setHover] = useState(false);
 
   function onMove(e: React.MouseEvent<HTMLDivElement>) {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
     const y = (e.clientY - rect.top) / rect.height;
-    setTilt({ rx: (y - 0.5) * -8, ry: (x - 0.5) * 10 });
+    setTilt({ rx: (y - 0.5) * -7, ry: (x - 0.5) * 9 });
   }
 
   return (
@@ -530,207 +543,371 @@ function WhyCard({
         ease: [0.2, 0.8, 0.2, 1],
       }}
       onMouseMove={onMove}
-      onMouseLeave={() => setTilt({ rx: 0, ry: 0 })}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => {
+        setTilt({ rx: 0, ry: 0 });
+        setHover(false);
+      }}
       style={{
         transform: `perspective(1100px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)`,
         transition: "transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1)",
         transformStyle: "preserve-3d",
       }}
-      className="card p-8 md:p-12 relative overflow-hidden bg-midnight/95 backdrop-blur"
+      className="relative overflow-hidden rounded-2xl border border-gold/15 hover:border-gold/45 bg-midnight/95 transition-colors duration-300"
     >
-      <GiftBox
-        Icon={item.Icon}
-        open={inView}
-        delay={index * 0.12 + 0.3}
+      {/* Circuit dot-grid background */}
+      <div
+        aria-hidden
+        className="absolute inset-0 opacity-[0.18]"
+        style={{
+          backgroundImage:
+            "radial-gradient(rgba(212,176,97,0.55) 1px, transparent 1px)",
+          backgroundSize: "22px 22px",
+        }}
       />
-      <h3 className="font-display font-light text-3xl md:text-4xl text-ivory leading-[1.05] tracking-[-0.01em] mb-4">
-        {item.t}
-      </h3>
-      <p className="text-ivory/55 text-sm leading-relaxed max-w-md">
-        {item.d}
-      </p>
+
+      {/* Gold scan beam — sweeps top to bottom on a 5s loop, phase-offset */}
+      <motion.span
+        aria-hidden
+        initial={{ y: "-50%", opacity: 0 }}
+        animate={
+          inView
+            ? { y: ["-50%", "120%"], opacity: [0, 0.85, 0] }
+            : { y: "-50%", opacity: 0 }
+        }
+        transition={{
+          duration: 5,
+          repeat: Infinity,
+          delay: index * 0.6 + 1.0,
+          ease: "linear",
+          times: [0, 0.5, 1],
+        }}
+        className="pointer-events-none absolute inset-x-0 h-32 z-[1]"
+        style={{
+          background:
+            "linear-gradient(to bottom, transparent 0%, rgba(212,176,97,0.18) 35%, rgba(212,176,97,0.55) 50%, rgba(212,176,97,0.18) 65%, transparent 100%)",
+          mixBlendMode: "screen",
+        }}
+      />
+
+      {/* Hover glow */}
+      <motion.div
+        aria-hidden
+        animate={{ opacity: hover ? 1 : 0 }}
+        transition={{ duration: 0.4 }}
+        className="pointer-events-none absolute inset-0 rounded-2xl"
+        style={{
+          boxShadow:
+            "inset 0 0 60px rgba(212,176,97,0.18), 0 0 40px rgba(212,176,97,0.18)",
+        }}
+      />
+
+      <div className="relative z-[2] p-8 md:p-12">
+        {/* Top: numeral + label */}
+        <div className="flex items-center justify-between mb-8">
+          <motion.span
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={inView ? { opacity: 1, scale: 1 } : {}}
+            transition={{ delay: index * 0.12 + 0.2, duration: 0.6 }}
+            className="font-display italic text-gold text-2xl"
+          >
+            {item.n}.
+          </motion.span>
+          <span className="font-mono text-[9px] uppercase tracking-[0.32em] text-ivory/35">
+            ◆ MODULE 0{Number(item.n === "I") + Number(item.n === "II") * 2 + Number(item.n === "III") * 3 + Number(item.n === "IV") * 4}
+          </span>
+        </div>
+
+        {/* The animated visualization */}
+        <div className="mb-10 h-32 md:h-36 flex items-center justify-center">
+          <item.Visual active={inView} />
+        </div>
+
+        <h3 className="font-display font-light text-3xl md:text-4xl text-ivory leading-[1.05] tracking-[-0.01em] mb-4">
+          {item.t}
+        </h3>
+        <p className="text-ivory/55 text-sm leading-relaxed max-w-md">
+          {item.d}
+        </p>
+      </div>
     </motion.div>
   );
 }
 
-/* Gift box (kept) ─────────────────────────────────────────────── */
-function GiftBox({
-  Icon,
-  open,
-  delay,
-}: {
-  Icon: () => JSX.Element;
-  open: boolean;
-  delay: number;
-}) {
-  const sparkles = Array.from({ length: 12 }).map((_, i) => {
-    const angle = (i / 12) * Math.PI * 2 + (Math.random() - 0.5) * 0.3;
-    const distance = 60 + Math.random() * 40;
-    return {
-      x: Math.cos(angle) * distance,
-      y: Math.sin(angle) * distance - 10,
-      size: 2 + Math.random() * 2.5,
-      d: Math.random() * 0.15,
-    };
-  });
+/* ─────────────────────────────────────────────────────────────────
+   Per-card animated visualizations. Each is built from primitive
+   SVG + framer-motion. They convey the card's idea visually:
+     I.   Engineers   →  Pulsing CPU core with concentric rings
+     II.  Stack       →  Layered horizontal bars (the tech stack)
+     III. Integrations→  Central node + radiating connections w/
+                          traveling data dots
+     IV.  Experience  →  Sequential timeline bars rising in turn
+   ───────────────────────────────────────────────────────────── */
+
+function CoreVisual({ active }: { active: boolean }) {
   return (
-    <div
-      className="relative w-36 h-36 md:w-40 md:h-40 mb-10"
-      style={{ perspective: "900px" }}
-    >
-      <motion.span
-        aria-hidden
-        animate={
-          open
-            ? { opacity: [0.2, 0.55, 0.2], scale: [0.9, 1.18, 0.9] }
-            : { opacity: 0 }
-        }
-        transition={{
-          duration: 3.2,
-          repeat: Infinity,
-          delay: delay + 0.6,
-          ease: "easeInOut",
-        }}
-        className="absolute inset-0 rounded-full bg-gold/45 blur-2xl"
-      />
-      <motion.div
-        animate={
-          open
-            ? { x: [0, -3, 3, -2, 2, 0], rotate: [0, -1.5, 1.5, -1, 1, 0] }
-            : { x: 0, rotate: 0 }
-        }
-        transition={{ duration: 0.5, delay, ease: "easeInOut" }}
-        className="absolute inset-0"
-      >
-        <div className="absolute inset-x-0 bottom-0 h-[62%] rounded-md border-2 border-gold bg-gradient-to-b from-gold/20 to-gold/5 shadow-[inset_0_-6px_16px_rgba(212,176,97,0.18)]" />
-        <div className="absolute inset-x-2 bottom-2 h-[58%] rounded-md border border-gold/20" />
-        <span className="absolute left-1/2 -translate-x-1/2 bottom-0 h-[62%] w-2 bg-gold/60" />
-        <motion.div
-          initial={{ rotateX: 0, y: 0 }}
-          animate={open ? { rotateX: -120, y: -3 } : { rotateX: 0, y: 0 }}
+    <svg viewBox="0 0 160 120" className="w-full h-full max-w-[180px]">
+      {/* Outer rings */}
+      {[1, 2, 3].map((r, i) => (
+        <motion.circle
+          key={r}
+          cx="80"
+          cy="60"
+          r={20 + i * 14}
+          fill="none"
+          stroke="#D4B061"
+          strokeOpacity={0.4 - i * 0.1}
+          strokeWidth="1"
+          initial={{ scale: 0, opacity: 0 }}
+          animate={active ? { scale: [0.6, 1.1, 1], opacity: [0, 0.7, 0.4] } : {}}
           transition={{
-            duration: 1.0,
-            delay: delay + 0.5,
-            ease: [0.34, 1.6, 0.5, 1],
-          }}
-          style={{ transformOrigin: "top center", transformStyle: "preserve-3d" }}
-          className="absolute inset-x-0 top-[6%] h-[36%] rounded-md border-2 border-gold bg-gradient-to-b from-gold/55 to-gold/20 shadow-[0_4px_14px_rgba(0,0,0,0.5)]"
-        >
-          <span className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-2 bg-gold/85" />
-          <span className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-2 bg-gold/85" />
-          <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-sm bg-gold" />
-        </motion.div>
-      </motion.div>
-      <div className="absolute inset-0 pointer-events-none">
-        {sparkles.map((s, i) => (
-          <motion.span
-            key={i}
-            aria-hidden
-            initial={{ x: 0, y: 0, opacity: 0, scale: 0 }}
-            animate={
-              open
-                ? {
-                    x: [0, 0, s.x],
-                    y: [0, 0, s.y],
-                    opacity: [0, 0, 1, 0],
-                    scale: [0, 0, 1, 0.4],
-                  }
-                : { opacity: 0 }
-            }
-            transition={{
-              duration: 1.4,
-              times: [0, 0.4, 0.55, 1],
-              delay: delay + 0.6 + s.d,
-              ease: [0.2, 0.5, 0.3, 1],
-            }}
-            className="absolute left-1/2 top-1/2 rounded-full bg-gold"
-            style={{ width: s.size, height: s.size }}
-          />
-        ))}
-      </div>
-      <motion.div
-        initial={{ y: 36, opacity: 0, scale: 0.35, rotate: -10 }}
-        animate={
-          open
-            ? { y: -22, opacity: 1, scale: 1, rotate: 0 }
-            : { y: 36, opacity: 0, scale: 0.35, rotate: -10 }
-        }
-        transition={{
-          duration: 1.1,
-          delay: delay + 0.8,
-          ease: [0.2, 1.5, 0.4, 1],
-        }}
-        className="absolute inset-x-0 top-0 flex items-center justify-center"
-        style={{ height: "100%" }}
-      >
-        <motion.div
-          animate={
-            open ? { y: [0, -4, 0], rotate: [-1.5, 1.5, -1.5] } : { y: 0 }
-          }
-          transition={{
-            duration: 3.6,
+            duration: 2.4,
             repeat: Infinity,
-            delay: delay + 1.6,
+            delay: i * 0.5,
+            ease: "easeOut",
+          }}
+          style={{ transformOrigin: "80px 60px" }}
+        />
+      ))}
+      {/* Cardinal nodes */}
+      {[
+        [80, 26],
+        [124, 60],
+        [80, 94],
+        [36, 60],
+      ].map(([cx, cy], i) => (
+        <motion.circle
+          key={i}
+          cx={cx}
+          cy={cy}
+          r="2.4"
+          fill="#D4B061"
+          initial={{ opacity: 0 }}
+          animate={active ? { opacity: [0.3, 1, 0.3] } : {}}
+          transition={{
+            duration: 1.8,
+            repeat: Infinity,
+            delay: i * 0.25,
             ease: "easeInOut",
           }}
-          className="text-gold drop-shadow-[0_0_22px_rgba(212,176,97,0.75)]"
+        />
+      ))}
+      {/* Core circle */}
+      <circle cx="80" cy="60" r="13" fill="#0B0A09" stroke="#D4B061" strokeWidth="2" />
+      <motion.circle
+        cx="80"
+        cy="60"
+        r="6"
+        fill="#D4B061"
+        initial={{ opacity: 0.4 }}
+        animate={active ? { opacity: [0.4, 1, 0.4], scale: [0.85, 1.1, 0.85] } : {}}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        style={{ transformOrigin: "80px 60px" }}
+      />
+    </svg>
+  );
+}
+
+function StackVisual({ active }: { active: boolean }) {
+  const layers = [
+    { y: 28, label: "REACT" },
+    { y: 50, label: "NEXT" },
+    { y: 72, label: "TS" },
+    { y: 94, label: "TAILWIND" },
+  ];
+  return (
+    <svg viewBox="0 0 200 120" className="w-full h-full max-w-[220px]">
+      {layers.map((l, i) => (
+        <motion.g
+          key={i}
+          initial={{ opacity: 0, x: -30 }}
+          animate={active ? { opacity: 1, x: 0 } : {}}
+          transition={{
+            delay: 0.3 + (3 - i) * 0.15,
+            duration: 0.7,
+            ease: [0.2, 0.8, 0.2, 1],
+          }}
         >
-          <Icon />
-        </motion.div>
-      </motion.div>
-    </div>
-  );
-}
-
-/* Nature icons (kept) ─────────────────────────────────────────── */
-function TreeIcon() {
-  return (
-    <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
-      <path d="M24 6 L34 18 H14 Z" fill="currentColor" opacity="0.95" />
-      <path d="M24 14 L36 28 H12 Z" fill="currentColor" opacity="0.85" />
-      <path d="M24 22 L38 38 H10 Z" fill="currentColor" opacity="0.95" />
-      <rect x="22" y="36" width="4" height="8" fill="currentColor" />
-    </svg>
-  );
-}
-function PeakIcon() {
-  return (
-    <svg width="46" height="44" viewBox="0 0 48 48" fill="none">
-      <path d="M4 38 L18 14 L28 28 L34 22 L44 38 Z" fill="currentColor" opacity="0.9" />
-      <path d="M14 22 L18 14 L22 22 L20 24 L18 22 L16 24 Z" fill="#0b0a09" opacity="0.55" />
-      <circle cx="36" cy="14" r="4" fill="currentColor" opacity="0.75" />
-    </svg>
-  );
-}
-function SunIcon() {
-  return (
-    <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
-      <circle cx="24" cy="24" r="8" fill="currentColor" />
-      {Array.from({ length: 8 }).map((_, i) => {
-        const a = (i * Math.PI) / 4;
-        const x1 = 24 + Math.cos(a) * 13;
-        const y1 = 24 + Math.sin(a) * 13;
-        const x2 = 24 + Math.cos(a) * 21;
-        const y2 = 24 + Math.sin(a) * 21;
-        return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />;
-      })}
-    </svg>
-  );
-}
-function WaveIcon() {
-  return (
-    <svg width="46" height="40" viewBox="0 0 48 40" fill="none">
-      <path d="M2 20 Q12 8 24 20 T46 20" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" fill="none" />
-      <path d="M2 28 Q12 16 24 28 T46 28" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" fill="none" opacity="0.7" />
-      <path d="M2 12 Q12 0 24 12 T46 12" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" fill="none" opacity="0.5" />
+          <rect
+            x="20"
+            y={l.y - 8}
+            width="160"
+            height="14"
+            rx="2"
+            fill="#0B0A09"
+            stroke="#D4B061"
+            strokeOpacity={0.5 + i * 0.12}
+            strokeWidth="1.4"
+          />
+          {/* Bar fill that pulses */}
+          <motion.rect
+            x="20"
+            y={l.y - 8}
+            width="160"
+            height="14"
+            rx="2"
+            fill="#D4B061"
+            initial={{ opacity: 0 }}
+            animate={active ? { opacity: [0, 0.18, 0] } : {}}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              delay: 1 + i * 0.3,
+              ease: "easeInOut",
+            }}
+          />
+          <text
+            x="28"
+            y={l.y + 1}
+            fill="#D4B061"
+            fontFamily="JetBrains Mono, monospace"
+            fontSize="6.5"
+            letterSpacing="2"
+            opacity="0.85"
+          >
+            {l.label}
+          </text>
+          {/* Status dot */}
+          <circle cx="170" cy={l.y - 1} r="2" fill="#D4B061" />
+        </motion.g>
+      ))}
     </svg>
   );
 }
 
-/* ─── Process — right-to-left marquee, no bottom CTAs ──────────── */
+function NetworkVisual({ active }: { active: boolean }) {
+  const peripherals = [
+    [30, 20],
+    [120, 16],
+    [170, 60],
+    [150, 100],
+    [70, 110],
+    [12, 70],
+  ] as const;
+  const center = [90, 60] as const;
+  return (
+    <svg viewBox="0 0 200 120" className="w-full h-full max-w-[220px]">
+      {/* Connection lines + traveling dots */}
+      {peripherals.map(([x, y], i) => (
+        <g key={i}>
+          <motion.line
+            x1={center[0]}
+            y1={center[1]}
+            x2={x}
+            y2={y}
+            stroke="#D4B061"
+            strokeOpacity="0.35"
+            strokeWidth="1"
+            initial={{ pathLength: 0 }}
+            animate={active ? { pathLength: 1 } : {}}
+            transition={{
+              delay: 0.4 + i * 0.08,
+              duration: 0.8,
+              ease: "easeOut",
+            }}
+          />
+          {/* Data dot traveling along the line */}
+          <motion.circle
+            r="2"
+            fill="#D4B061"
+            initial={{ opacity: 0 }}
+            animate={
+              active
+                ? {
+                    cx: [center[0], x],
+                    cy: [center[1], y],
+                    opacity: [0, 1, 0],
+                  }
+                : {}
+            }
+            transition={{
+              duration: 2.2,
+              repeat: Infinity,
+              delay: 1.5 + i * 0.35,
+              ease: "linear",
+            }}
+          />
+        </g>
+      ))}
+      {/* Peripheral nodes */}
+      {peripherals.map(([x, y], i) => (
+        <motion.circle
+          key={`p-${i}`}
+          cx={x}
+          cy={y}
+          r="3.5"
+          fill="#0B0A09"
+          stroke="#D4B061"
+          strokeWidth="1.4"
+          initial={{ scale: 0, opacity: 0 }}
+          animate={active ? { scale: 1, opacity: 1 } : {}}
+          transition={{ delay: 0.6 + i * 0.08, duration: 0.5 }}
+          style={{ transformOrigin: `${x}px ${y}px` }}
+        />
+      ))}
+      {/* Center hub */}
+      <circle cx={center[0]} cy={center[1]} r="9" fill="#0B0A09" stroke="#D4B061" strokeWidth="2" />
+      <motion.circle
+        cx={center[0]}
+        cy={center[1]}
+        r="4"
+        fill="#D4B061"
+        initial={{ opacity: 0.5 }}
+        animate={active ? { opacity: [0.5, 1, 0.5], scale: [0.85, 1.1, 0.85] } : {}}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        style={{ transformOrigin: `${center[0]}px ${center[1]}px` }}
+      />
+    </svg>
+  );
+}
+
+function TimelineVisual({ active }: { active: boolean }) {
+  const bars = [22, 36, 18, 50, 30, 64, 42, 78, 55, 92];
+  return (
+    <svg viewBox="0 0 200 120" className="w-full h-full max-w-[220px]">
+      {/* Baseline */}
+      <line x1="10" y1="100" x2="190" y2="100" stroke="#D4B061" strokeOpacity="0.4" strokeWidth="1" />
+      {/* Bars rising sequentially */}
+      {bars.map((h, i) => (
+        <motion.rect
+          key={i}
+          x={14 + i * 17}
+          width="9"
+          rx="1.5"
+          fill="#D4B061"
+          initial={{ y: 100, height: 0, opacity: 0.25 }}
+          animate={
+            active
+              ? { y: 100 - h, height: h, opacity: 1 }
+              : { y: 100, height: 0, opacity: 0.25 }
+          }
+          transition={{
+            delay: 0.4 + i * 0.07,
+            duration: 0.7,
+            ease: [0.2, 0.8, 0.2, 1],
+          }}
+        />
+      ))}
+      {/* Trend line drawing on top */}
+      <motion.path
+        d={`M ${14} ${100 - bars[0]} ${bars
+          .map((h, i) => `L ${14 + i * 17 + 4.5} ${100 - h}`)
+          .join(" ")}`}
+        stroke="#F2EAD7"
+        strokeOpacity="0.85"
+        strokeWidth="1.2"
+        fill="none"
+        initial={{ pathLength: 0 }}
+        animate={active ? { pathLength: 1 } : {}}
+        transition={{ delay: 1.2, duration: 1.2, ease: "easeOut" }}
+      />
+    </svg>
+  );
+}
+
+/* ─── Process — two chatbots + right-to-left marquee ──────────── */
 
 function ProcessMarquee() {
-  // Two copies of the steps for a seamless loop
   const track = [...steps, ...steps];
 
   return (
@@ -742,10 +919,30 @@ function ProcessMarquee() {
           </p>
         </Reveal>
         <Reveal delay={0.1}>
-          <h2 className="font-display font-light text-5xl md:text-7xl leading-[0.98] tracking-[-0.015em] max-w-4xl">
+          <h2 className="font-display font-light text-5xl md:text-7xl leading-[0.98] tracking-[-0.015em] max-w-4xl mb-16 md:mb-20">
             Five moves.{" "}
             <span className="gold italic">Always in motion.</span>
           </h2>
+        </Reveal>
+
+        {/* Two chatbots conversing about the process */}
+        <Reveal delay={0.2}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-6 lg:gap-12 mb-4">
+            <ChatBot
+              variant="atlas"
+              side="left"
+              question="Where do we start?"
+              answer="By listening. Every engagement opens with a real conversation about your goals."
+              mouthDelay={0}
+            />
+            <ChatBot
+              variant="nova"
+              side="right"
+              question="And after launch?"
+              answer="We compound. Every month the system gets sharper, faster, cheaper to run."
+              mouthDelay={2.5}
+            />
+          </div>
         </Reveal>
       </div>
 
@@ -774,7 +971,6 @@ function ProcessMarquee() {
               key={i}
               className="card shrink-0 w-72 md:w-[26rem] p-7 md:p-9 relative group"
             >
-              {/* Step number with pulsing halo */}
               <div className="relative inline-flex items-center gap-4 mb-7">
                 <span className="relative">
                   <motion.span
@@ -802,7 +998,6 @@ function ProcessMarquee() {
               </h3>
               <p className="text-ivory/60 text-sm leading-relaxed">{s.d}</p>
 
-              {/* Subtle gold corner accent */}
               <span
                 aria-hidden
                 className="absolute top-0 right-0 h-px w-1/3 bg-gradient-to-l from-gold to-transparent"
@@ -812,5 +1007,185 @@ function ProcessMarquee() {
         </motion.div>
       </div>
     </section>
+  );
+}
+
+/* ─── ChatBot — small robot with a lip-sync mouth + speech bubble ─ */
+
+function ChatBot({
+  variant,
+  side,
+  question,
+  answer,
+  mouthDelay,
+}: {
+  variant: "atlas" | "nova";
+  side: "left" | "right";
+  question: string;
+  answer: string;
+  mouthDelay: number;
+}) {
+  const flip = side === "right";
+
+  return (
+    <div
+      className={`flex items-stretch gap-4 md:gap-5 ${
+        flip ? "md:flex-row-reverse" : ""
+      }`}
+    >
+      <div className="shrink-0 flex flex-col items-center gap-2">
+        <SmallRobot variant={variant} mouthDelay={mouthDelay} />
+        <span className="font-mono text-[8.5px] uppercase tracking-[0.32em] text-gold/70">
+          ◆ {variant === "atlas" ? "Atlas" : "Nova"}
+        </span>
+      </div>
+
+      {/* Comic-style connector circles */}
+      <div className="hidden md:flex flex-col justify-center items-center gap-1.5 shrink-0">
+        {[0, 1, 2].map((i) => (
+          <motion.span
+            key={i}
+            className="rounded-full bg-midnight border border-gold"
+            style={{ width: 4 + i * 3, height: 4 + i * 3 }}
+            animate={{
+              opacity: [0.3, 1, 0.3],
+              scale: [0.9, 1.1, 0.9],
+            }}
+            transition={{
+              duration: 1.8,
+              delay: mouthDelay + i * 0.25,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Speech bubble */}
+      <div
+        className={`flex-1 relative bg-obsidian border border-gold/35 rounded-2xl p-5 md:p-6 ${
+          flip ? "text-right md:text-right" : ""
+        }`}
+      >
+        {/* Tail */}
+        <span
+          aria-hidden
+          className={`hidden md:block absolute top-8 w-3 h-3 bg-obsidian border border-gold/35 rotate-45 ${
+            flip
+              ? "right-0 translate-x-1/2 border-l-0 border-b-0"
+              : "left-0 -translate-x-1/2 border-r-0 border-t-0"
+          }`}
+        />
+        <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-gold/70 mb-2">
+          {flip ? "Nova asks" : "You ask"}
+        </p>
+        <p className="text-ivory/85 font-display text-lg md:text-xl leading-snug mb-4">
+          {question}
+        </p>
+        <div className="h-px bg-gold/15 my-3" />
+        <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-gold/70 mb-2">
+          {flip ? "Atlas answers" : "Atlas answers"}
+        </p>
+        <p className="text-ivory/65 text-sm leading-relaxed">{answer}</p>
+      </div>
+    </div>
+  );
+}
+
+/* SmallRobot — compact robot used by the ChatBot. Variants change
+   the head color tint slightly so the two bots feel distinct.
+   Mouth animation cycles through 5 shapes (closed/narrow/open/half/
+   wide) at varied widths to read clearly as 'lip sync.' Eyes blink
+   on a 4s cycle. Antenna pulse on a 1.6s cycle. */
+function SmallRobot({
+  variant,
+  mouthDelay,
+}: {
+  variant: "atlas" | "nova";
+  mouthDelay: number;
+}) {
+  const headStroke = "#D4B061";
+  const headTint = variant === "atlas" ? "#0B0A09" : "#15120e";
+  return (
+    <motion.div
+      animate={{ y: [0, -4, 0] }}
+      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+      className="relative"
+    >
+      <svg
+        viewBox="0 0 110 140"
+        className="w-20 md:w-24 h-auto drop-shadow-[0_0_18px_rgba(212,176,97,0.3)]"
+        aria-hidden
+      >
+        {/* Antenna */}
+        <line x1="55" y1="6" x2="55" y2="22" stroke={headStroke} strokeWidth="1.4" strokeLinecap="round" />
+        <motion.circle
+          cx="55"
+          cy="4"
+          r="3"
+          fill={headStroke}
+          animate={{ opacity: [0.4, 1, 0.4], r: [2.6, 3.2, 2.6] }}
+          transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+        />
+
+        {/* Head */}
+        <rect x="14" y="22" width="82" height="58" rx="11" fill={headTint} stroke={headStroke} strokeWidth="1.6" />
+        <rect x="22" y="30" width="66" height="38" rx="6" fill="#15120e" stroke="rgba(212,176,97,0.35)" strokeWidth="0.8" />
+
+        {/* Eyes — blink */}
+        <motion.g
+          animate={{ scaleY: [1, 1, 0.1, 1] }}
+          transition={{
+            duration: 4.5,
+            times: [0, 0.7, 0.74, 0.78],
+            repeat: Infinity,
+            delay: variant === "nova" ? 0.6 : 0,
+            ease: "easeOut",
+          }}
+          style={{ transformOrigin: "55px 47px" }}
+        >
+          <circle cx="42" cy="47" r="3.6" fill="#D4B061" />
+          <circle cx="68" cy="47" r="3.6" fill="#D4B061" />
+        </motion.g>
+
+        {/* Mouth — strong lip-sync cycle. rx + ry alternate so it
+            reads clearly as a mouth opening and closing. */}
+        <motion.ellipse
+          cx="55"
+          cy="62"
+          fill="#D4B061"
+          initial={{ rx: 5, ry: 1.2 }}
+          animate={{
+            rx: [5, 1.5, 6, 2.5, 5.5, 1.5, 4, 5],
+            ry: [1.2, 0.6, 3, 0.8, 2.4, 0.6, 1.5, 1.2],
+          }}
+          transition={{
+            duration: 1.8,
+            repeat: Infinity,
+            delay: mouthDelay,
+            ease: "easeInOut",
+          }}
+        />
+
+        {/* Neck */}
+        <rect x="44" y="80" width="22" height="9" fill={headTint} stroke={headStroke} strokeWidth="1.4" />
+
+        {/* Body */}
+        <rect x="10" y="89" width="90" height="42" rx="8" fill={headTint} stroke={headStroke} strokeWidth="1.6" />
+
+        {/* Pulsing core */}
+        <motion.g
+          animate={{ opacity: [0.55, 1, 0.55] }}
+          transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <circle cx="55" cy="110" r="6" fill="#D4B061" />
+          <circle cx="55" cy="110" r="9" fill="none" stroke="#D4B061" strokeWidth="0.9" opacity="0.45" />
+        </motion.g>
+
+        {/* Side LEDs */}
+        <line x1="20" y1="123" x2="32" y2="123" stroke="#D4B061" strokeWidth="1.6" strokeLinecap="round" opacity="0.55" />
+        <line x1="78" y1="123" x2="90" y2="123" stroke="#D4B061" strokeWidth="1.6" strokeLinecap="round" opacity="0.55" />
+      </svg>
+    </motion.div>
   );
 }
