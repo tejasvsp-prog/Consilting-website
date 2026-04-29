@@ -29,10 +29,6 @@ export default function Footer() {
               brands. SEO, websites, maintenance, and Meta Ads — built to
               perform.
             </p>
-            <Link to="/contact" className="btn-gold mt-8">
-              Book Demo
-              <span aria-hidden>→</span>
-            </Link>
           </div>
 
           <div className="md:col-span-2">

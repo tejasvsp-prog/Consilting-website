@@ -3,8 +3,8 @@ import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import PageTransition from "../components/PageTransition";
 import { Reveal } from "../components/Reveal";
+import ServiceOrbit from "../components/ServiceOrbit";
 import Hero from "../sections/Hero";
-import { services } from "../sections/Services";
 
 const stats = [
   { v: "4.2×", l: "Average blended ROAS" },
@@ -18,10 +18,10 @@ export default function Home() {
     <PageTransition>
       <Hero />
 
-      {/* What we do — services with strong wave + extra context */}
+      {/* What we do — orbit of services + digital-marketing-company copy */}
       <section className="section bg-obsidian border-t border-gold/15">
         <div className="mx-auto max-w-7xl px-6 md:px-10">
-          <div className="grid grid-cols-12 gap-10 mb-16">
+          <div className="grid grid-cols-12 gap-10 mb-20">
             <div className="col-span-12 md:col-span-6">
               <Reveal>
                 <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-gold mb-6">
@@ -38,14 +38,13 @@ export default function Home() {
             <div className="col-span-12 md:col-span-5 md:col-start-8">
               <Reveal delay={0.2}>
                 <p className="text-ivory/70 leading-relaxed">
-                  Each service is a complete engagement on its own — but the
-                  real lift comes when two or three run in concert. Same
-                  scoreboard for every program:{" "}
-                  <span className="gold">
-                    dollars in, dollars out, measured every Friday.
-                  </span>{" "}
-                  Pick one to start; we'll tell you in the first thirty
-                  minutes which combination your funnel actually needs.
+                  As a digital marketing studio, we help you{" "}
+                  <span className="gold">grow revenue</span> through four core
+                  services: search, sites, ongoing care, and paid social.
+                  Each is a complete engagement on its own — but the real
+                  lift comes when two or three run in concert. Same
+                  scoreboard either way: dollars in, dollars out, measured
+                  every Friday.
                 </p>
               </Reveal>
               <Reveal delay={0.35}>
@@ -57,62 +56,8 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Wave-animated card grid — stronger amplitude + sway */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {services.map((s, i) => (
-              <Link
-                key={s.n}
-                to={s.to}
-                className="group focus:outline-none focus:ring-2 focus:ring-gold/40 rounded-2xl"
-              >
-                <motion.article
-                  initial={{ opacity: 0, y: 100 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-80px" }}
-                  transition={{
-                    delay: i * 0.22,
-                    duration: 1.1,
-                    ease: [0.34, 1.45, 0.5, 1],
-                  }}
-                  className="card p-7 h-full flex flex-col"
-                >
-                  {/* Stronger wave: bigger y-amplitude + slight rotation sway */}
-                  <motion.div
-                    animate={{
-                      y: [0, -28, 0, 28, 0],
-                      rotate: [0, 1.4, 0, -1.4, 0],
-                    }}
-                    transition={{
-                      duration: 6,
-                      repeat: Infinity,
-                      delay: i * 0.9,
-                      ease: "easeInOut",
-                    }}
-                    className="flex flex-col h-full"
-                  >
-                    <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-gold mb-8">
-                      {s.n}
-                    </p>
-                    <h3 className="font-display font-light text-2xl md:text-3xl text-ivory leading-tight mb-3 transition-transform duration-500 group-hover:translate-x-1">
-                      {s.t}
-                    </h3>
-                    <p className="text-ivory/55 text-sm leading-relaxed">
-                      {s.short}
-                    </p>
-                    <span className="mt-auto pt-6 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.28em] font-medium text-gold">
-                      Read more
-                      <span
-                        aria-hidden
-                        className="inline-block transition-transform duration-300 group-hover:translate-x-1"
-                      >
-                        →
-                      </span>
-                    </span>
-                  </motion.div>
-                </motion.article>
-              </Link>
-            ))}
-          </div>
+          {/* Rotating orbit — click a card to zoom in */}
+          <ServiceOrbit />
         </div>
       </section>
 

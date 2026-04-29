@@ -1,5 +1,5 @@
 import { AnimatePresence } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   BrowserRouter,
   Navigate,
@@ -10,6 +10,7 @@ import {
 } from "react-router-dom";
 import Nav from "./components/Nav";
 import Footer from "./components/Footer";
+import Intro from "./components/Intro";
 import { RouteCurtain } from "./components/PageTransition";
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -36,7 +37,6 @@ function Layout() {
     <div className="grain min-h-screen flex flex-col bg-midnight text-ivory">
       <Nav />
       <main className="relative flex-1">
-        {/* Curtain sweeps top-to-bottom on every route change */}
         <RouteCurtain key={`curtain-${location.pathname}`} />
         <AnimatePresence mode="wait" initial={false}>
           <div key={location.pathname}>
@@ -50,31 +50,50 @@ function Layout() {
 }
 
 export default function App() {
+  // Intro plays on every full page load. Lock body scroll while it runs
+  // so the user can't peek behind the curtain.
+  const [introDone, setIntroDone] = useState(false);
+
+  useEffect(() => {
+    if (!introDone) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+  }, [introDone]);
+
   return (
-    <BrowserRouter>
-      <ScrollToTop />
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/services" element={<ServicesOverview />} />
-          <Route path="/services/seo" element={<Seo />} />
-          <Route
-            path="/services/website-development"
-            element={<WebsiteDevelopment />}
-          />
-          <Route
-            path="/services/website-maintenance"
-            element={<WebsiteMaintenance />}
-          />
-          <Route path="/services/meta-ads" element={<MetaAds />} />
-          <Route path="/clients" element={<Clients />} />
-          <Route path="/contact" element={<Contact />} />
-          {/* /book is now an alias for /contact — preserves any old links */}
-          <Route path="/book" element={<Navigate to="/contact" replace />} />
-          <Route path="*" element={<NotFound />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <>
+      <BrowserRouter>
+        <ScrollToTop />
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/services" element={<ServicesOverview />} />
+            <Route path="/services/seo" element={<Seo />} />
+            <Route
+              path="/services/website-development"
+              element={<WebsiteDevelopment />}
+            />
+            <Route
+              path="/services/website-maintenance"
+              element={<WebsiteMaintenance />}
+            />
+            <Route path="/services/meta-ads" element={<MetaAds />} />
+            <Route path="/clients" element={<Clients />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/book" element={<Navigate to="/contact" replace />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+
+      <AnimatePresence>
+        {!introDone && <Intro onDone={() => setIntroDone(true)} />}
+      </AnimatePresence>
+    </>
   );
 }
