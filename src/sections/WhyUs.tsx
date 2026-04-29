@@ -20,23 +20,14 @@ const pillars = [
   {
     n: "IV",
     t: "Built to compound",
-    d: "We don't sell volume. We build owned assets — content, automations, creative libraries, dashboards — that get cheaper to operate every month you stay with us.",
+    d: "We don't sell volume. We build owned assets — content, creative libraries, dashboards — that get cheaper to operate every month you stay with us.",
   },
 ];
 
 export default function WhyUs() {
   return (
-    <section
-      id="why"
-      className="section bg-obsidian relative overflow-hidden"
-    >
-      <div
-        aria-hidden
-        className="aurora bg-gold/10"
-        style={{ width: 700, height: 700, top: "20%", right: "-10%" }}
-      />
-
-      <div className="relative mx-auto max-w-7xl px-6 md:px-10">
+    <section id="why" className="section bg-obsidian">
+      <div className="mx-auto max-w-7xl px-6 md:px-10">
         <div className="grid grid-cols-12 gap-10">
           <div className="col-span-12 md:col-span-5">
             <Reveal>
@@ -49,7 +40,7 @@ export default function WhyUs() {
               <br />
               <SplitText text="motion." delay={0.15} />
               <br />
-              <span className="gold-text italic">
+              <span className="gold italic">
                 <SplitText text="We sell results." delay={0.3} />
               </span>
             </h2>
@@ -62,11 +53,11 @@ export default function WhyUs() {
             </Reveal>
           </div>
 
-          <div className="col-span-12 md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="col-span-12 md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-px bg-gold/15 border border-gold/15 rounded-2xl overflow-hidden">
             {pillars.map((p, i) => (
               <motion.div
                 key={p.t}
-                initial={{ opacity: 0, y: 50 }}
+                initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{
@@ -74,10 +65,8 @@ export default function WhyUs() {
                   delay: i * 0.08,
                   ease: [0.2, 0.8, 0.2, 1],
                 }}
-                whileHover={{ y: -6 }}
-                className="glass rounded-2xl p-7 md:p-8 relative overflow-hidden"
+                className="bg-midnight p-7 md:p-8"
               >
-                <div className="absolute -top-10 -right-10 size-40 rounded-full bg-gold/5 blur-2xl pointer-events-none" />
                 <div className="font-display text-gold text-3xl mb-5 italic">
                   {p.n}.
                 </div>

@@ -24,7 +24,7 @@ const testimonials: Testimonial[] = [
   },
   {
     quote:
-      "The new site paid for itself in nine weeks. Booking rate from organic doubled, and the AI qualifier they built means we only call leads that are actually ready to buy.",
+      "The new site paid for itself in nine weeks. Booking rate from organic doubled, and the maintenance retainer means I never have to think about it again.",
     name: "Priya Desai",
     role: "Owner",
     company: "Bayview Smiles",
@@ -42,48 +42,12 @@ const testimonials: Testimonial[] = [
     rating: 5,
     initials: "JR",
   },
-  {
-    quote:
-      "The level of seniority on the calls is unusual. We're a small business and we still get the founder's attention. That's worth more than the line item.",
-    name: "Sarah Lindqvist",
-    role: "Co-founder",
-    company: "Halo Studio",
-    industry: "Beauty & wellness",
-    rating: 5,
-    initials: "SL",
-  },
-  {
-    quote:
-      "AI automation that actually works. Our intake team handles 40% more leads with the same headcount. The thing has paid for itself ten times over.",
-    name: "Daniel Ortega",
-    role: "Managing Partner",
-    company: "Ortega Law",
-    industry: "Legal",
-    rating: 5,
-    initials: "DO",
-  },
-  {
-    quote:
-      "We came in for ads and stayed for everything else. They quietly became the operating system of our marketing. I'd recommend them to anyone who isn't a competitor.",
-    name: "Hannah Chen",
-    role: "CEO",
-    company: "Mira Apparel",
-    industry: "DTC apparel",
-    rating: 5,
-    initials: "HC",
-  },
 ];
 
 export default function Testimonials() {
   return (
-    <section id="voices" className="section bg-obsidian relative overflow-hidden">
-      <div
-        aria-hidden
-        className="aurora bg-gold/10"
-        style={{ width: 700, height: 700, top: "10%", left: "-10%" }}
-      />
-
-      <div className="relative mx-auto max-w-7xl px-6 md:px-10">
+    <section id="voices" className="section bg-obsidian">
+      <div className="mx-auto max-w-7xl px-6 md:px-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
           <div>
             <Reveal>
@@ -93,7 +57,7 @@ export default function Testimonials() {
             </Reveal>
             <h2 className="font-display font-light text-5xl md:text-7xl leading-[1.02] tracking-[-0.01em] max-w-3xl">
               <SplitText text="Operators who" />{" "}
-              <span className="gold-text italic">
+              <span className="gold italic">
                 <SplitText text="stayed." delay={0.15} />
               </span>
             </h2>
@@ -108,7 +72,7 @@ export default function Testimonials() {
           </Reveal>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {testimonials.map((t, i) => (
             <motion.article
               key={i}
@@ -120,8 +84,8 @@ export default function Testimonials() {
                 delay: (i % 3) * 0.08,
                 ease: [0.2, 0.8, 0.2, 1],
               }}
-              whileHover={{ y: -6 }}
-              className="glass rounded-2xl p-7 md:p-8 flex flex-col"
+              whileHover={{ y: -4 }}
+              className="card p-7 md:p-8 flex flex-col"
             >
               <div className="flex items-center justify-between mb-5">
                 <Stars n={t.rating} />
@@ -180,20 +144,8 @@ function Stars({ n }: { n: number }) {
 
 function Avatar({ initials }: { initials: string }) {
   return (
-    <div className="relative size-11 rounded-full overflow-hidden flex items-center justify-center font-display text-sm shrink-0 text-midnight bg-gradient-to-br from-gold-100 via-gold to-gold-700">
-      <svg
-        className="absolute inset-0 opacity-30 mix-blend-overlay"
-        viewBox="0 0 48 48"
-        aria-hidden
-      >
-        <defs>
-          <pattern id="dot" width="4" height="4" patternUnits="userSpaceOnUse">
-            <circle cx="1" cy="1" r="0.7" fill="white" />
-          </pattern>
-        </defs>
-        <rect width="48" height="48" fill="url(#dot)" />
-      </svg>
-      <span className="relative font-medium tracking-wider">{initials}</span>
+    <div className="size-11 rounded-full flex items-center justify-center font-display text-sm shrink-0 text-midnight bg-gold">
+      <span className="font-medium tracking-wider">{initials}</span>
     </div>
   );
 }

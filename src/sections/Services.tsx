@@ -1,5 +1,6 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
+import { Link } from "react-router-dom";
 import { Reveal, SplitText } from "../components/Reveal";
 
 type Service = {
@@ -8,37 +9,12 @@ type Service = {
   short: string;
   body: string;
   bullets: string[];
+  to: string;
 };
 
-const services: Service[] = [
+export const services: Service[] = [
   {
     n: "01",
-    t: "Meta Ads",
-    short: "Facebook & Instagram performance.",
-    body:
-      "Creative-led campaigns engineered for scale. We pair sharp angles, native-feeling video, and a budget structure that compounds — until the cost per acquisition stops surprising you.",
-    bullets: [
-      "Full-funnel campaign architecture",
-      "Creative testing pipelines",
-      "Pixel & CAPI server-side tracking",
-      "Weekly P&L-aware reporting",
-    ],
-  },
-  {
-    n: "02",
-    t: "Website Development",
-    short: "Sites that sell, not sit.",
-    body:
-      "Hand-built, conversion-obsessed websites in React and Next.js. Sub-2-second loads, design that earns the click, and an admin your team can actually run. Maintenance plans included.",
-    bullets: [
-      "Custom design & build",
-      "Headless CMS integration",
-      "Speed & Core Web Vitals tuning",
-      "Ongoing maintenance retainer",
-    ],
-  },
-  {
-    n: "03",
     t: "SEO",
     short: "Compounding traffic.",
     body:
@@ -49,19 +25,49 @@ const services: Service[] = [
       "Programmatic SEO at scale",
       "Backlink & digital PR",
     ],
+    to: "/services/seo",
+  },
+  {
+    n: "02",
+    t: "Website Development",
+    short: "Sites that sell, not sit.",
+    body:
+      "Hand-built, conversion-obsessed websites in React and Next.js. Sub-2-second loads, design that earns the click, and an admin your team can actually run.",
+    bullets: [
+      "Custom design & build",
+      "Headless CMS integration",
+      "Speed & Core Web Vitals tuning",
+      "Booking, payments, integrations",
+    ],
+    to: "/services/website-development",
+  },
+  {
+    n: "03",
+    t: "Website Maintenance",
+    short: "Always fast. Always live.",
+    body:
+      "A managed retainer for the site you already have. Updates, security patching, performance monitoring, content edits, and one human to call when something breaks at 9pm on a Friday.",
+    bullets: [
+      "Monthly updates & backups",
+      "Uptime & performance monitoring",
+      "Content edits within 24 hours",
+      "Security patching & SSL",
+    ],
+    to: "/services/website-maintenance",
   },
   {
     n: "04",
-    t: "AI Automation",
-    short: "Hire software, not headcount.",
+    t: "Meta Ads",
+    short: "Facebook & Instagram performance.",
     body:
-      "Custom AI workflows that handle the repetitive parts of your business — lead qualification, follow-ups, reporting, content ops. Built on your stack, owned by you, working while you sleep.",
+      "Creative-led campaigns engineered for scale. Sharp angles, native-feeling video, and a budget structure that compounds — until the cost per acquisition stops surprising you.",
     bullets: [
-      "Lead routing & qualification",
-      "AI inbox & follow-up agents",
-      "Internal ops automation",
-      "Custom GPT-based copilots",
+      "Full-funnel campaign architecture",
+      "Creative testing pipelines",
+      "Pixel & CAPI server-side tracking",
+      "Weekly P&L-aware reporting",
     ],
+    to: "/services/meta-ads",
   },
 ];
 
@@ -86,13 +92,12 @@ export default function Services() {
           <span className="text-ivory/40">
             <SplitText text="One outcome:" delay={0.15} />
           </span>{" "}
-          <span className="gold-text italic">
+          <span className="gold italic">
             <SplitText text="growth." delay={0.3} />
           </span>
         </h2>
 
         <div ref={ref} className="relative mt-24">
-          {/* spine */}
           <div className="absolute left-6 md:left-0 top-0 bottom-0 w-px bg-gold/15 hidden md:block" />
           <motion.div
             style={{ height: lineH }}
@@ -101,41 +106,55 @@ export default function Services() {
 
           <div className="space-y-24 md:space-y-32">
             {services.map((s) => (
-              <motion.article
+              <Link
                 key={s.n}
-                initial={{ opacity: 0, y: 80 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 1, ease: [0.2, 0.8, 0.2, 1] }}
-                className="grid grid-cols-12 gap-6 md:gap-10 md:pl-12 group"
+                to={s.to}
+                className="block group focus:outline-none focus:ring-2 focus:ring-gold/40 rounded-xl"
               >
-                <div className="col-span-12 md:col-span-2">
-                  <span className="font-mono text-xs uppercase tracking-[0.28em] text-gold">
-                    {s.n} · {s.short}
-                  </span>
-                </div>
-                <div className="col-span-12 md:col-span-5">
-                  <h3 className="font-display font-light text-4xl md:text-6xl leading-[0.95] tracking-[-0.01em] transition-transform duration-700 group-hover:translate-x-1">
-                    {s.t}
-                  </h3>
-                </div>
-                <div className="col-span-12 md:col-span-5">
-                  <p className="text-ivory/75 leading-relaxed text-base md:text-lg">
-                    {s.body}
-                  </p>
-                  <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
-                    {s.bullets.map((b) => (
-                      <li
-                        key={b}
-                        className="flex items-start gap-3 text-sm text-ivory/70"
+                <motion.article
+                  initial={{ opacity: 0, y: 60 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-80px" }}
+                  transition={{ duration: 0.9, ease: [0.2, 0.8, 0.2, 1] }}
+                  className="grid grid-cols-12 gap-6 md:gap-10 md:pl-12"
+                >
+                  <div className="col-span-12 md:col-span-2">
+                    <span className="font-mono text-xs uppercase tracking-[0.28em] text-gold">
+                      {s.n} · {s.short}
+                    </span>
+                  </div>
+                  <div className="col-span-12 md:col-span-5">
+                    <h3 className="font-display font-light text-4xl md:text-6xl leading-[0.95] tracking-[-0.01em] transition-transform duration-500 group-hover:translate-x-1">
+                      {s.t}
+                    </h3>
+                    <span className="mt-6 inline-flex items-center gap-3 text-[11px] uppercase tracking-[0.24em] font-medium text-gold">
+                      Explore service
+                      <span
+                        aria-hidden
+                        className="inline-block transition-transform duration-300 group-hover:translate-x-2"
                       >
-                        <span className="mt-2 size-1 rounded-full bg-gold shrink-0" />
-                        <span>{b}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </motion.article>
+                        →
+                      </span>
+                    </span>
+                  </div>
+                  <div className="col-span-12 md:col-span-5">
+                    <p className="text-ivory/75 leading-relaxed text-base md:text-lg">
+                      {s.body}
+                    </p>
+                    <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+                      {s.bullets.map((b) => (
+                        <li
+                          key={b}
+                          className="flex items-start gap-3 text-sm text-ivory/70"
+                        >
+                          <span className="mt-2 size-1 rounded-full bg-gold shrink-0" />
+                          <span>{b}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </motion.article>
+              </Link>
             ))}
           </div>
         </div>

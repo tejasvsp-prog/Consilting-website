@@ -33,26 +33,16 @@ body {
   color: #0b0a09;
 }
 
-/* Soft grain over the whole site */
+/* Fine paper grain — editorial, not generative */
 .grain::before {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 60;
-  opacity: 0.07;
+  opacity: 0.04;
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-}
-
-/* Aurora glow blobs that drift on the hero */
-.aurora {
-  position: absolute;
-  pointer-events: none;
-  filter: blur(80px);
-  opacity: 0.55;
-  border-radius: 9999px;
-  mix-blend-mode: screen;
 }
 
 /* Display tuning */
@@ -69,37 +59,9 @@ body {
   animation: marquee 42s linear infinite;
 }
 
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-.gold-text {
-  background: linear-gradient(
-    90deg,
-    #b8985a 0%,
-    #f0d488 35%,
-    #efe0a1 50%,
-    #f0d488 65%,
-    #b8985a 100%
-  );
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: shimmer 6s linear infinite;
-}
-
-/* Glass card */
-.glass {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.04) 0%,
-    rgba(255, 255, 255, 0.015) 100%
-  );
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(212, 176, 97, 0.18);
+/* Static gold — no shimmer, no animation */
+.gold {
+  color: #d4b061;
 }
 
 .gold-divider {
@@ -123,26 +85,30 @@ body {
   @apply block text-[11px] uppercase tracking-[0.24em] text-ivory/50 mb-2 font-medium;
 }
 
-/* Buttons */
+/* Buttons — solid gold, no animated gradient */
 .btn-gold {
-  @apply relative inline-flex items-center gap-3 px-7 py-4 rounded-full text-sm uppercase tracking-[0.2em] font-medium text-midnight transition-all duration-500;
-  background: linear-gradient(135deg, #f0d488 0%, #d4b061 50%, #b8985a 100%);
-  box-shadow: 0 10px 30px -10px rgba(212, 176, 97, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  @apply relative inline-flex items-center gap-3 px-7 py-4 rounded-full text-sm uppercase tracking-[0.2em] font-medium text-midnight bg-gold transition-all duration-300 hover:bg-gold-200;
 }
 .btn-gold:hover {
   transform: translateY(-2px);
-  box-shadow: 0 18px 40px -10px rgba(212, 176, 97, 0.7),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 .btn-ghost-gold {
-  @apply inline-flex items-center gap-3 px-7 py-4 rounded-full text-sm uppercase tracking-[0.2em] font-medium text-ivory border border-gold/40 transition-all duration-500 hover:border-gold hover:text-gold hover:gap-5;
+  @apply inline-flex items-center gap-3 px-7 py-4 rounded-full text-sm uppercase tracking-[0.2em] font-medium text-ivory border border-gold/40 transition-all duration-300 hover:border-gold hover:text-gold hover:gap-5;
+}
+
+.btn-link-gold {
+  @apply inline-flex items-center gap-3 text-sm uppercase tracking-[0.22em] font-medium text-gold border-b border-gold/40 pb-1 transition-all duration-300 hover:gap-4 hover:border-gold;
 }
 
 /* Section padding */
 .section {
-  @apply relative py-28 md:py-40;
+  @apply relative py-24 md:py-36;
+}
+
+/* Card — flat, no glass, no gradient — just a 1px gold rule and obsidian fill */
+.card {
+  @apply bg-obsidian border border-gold/15 rounded-2xl transition-colors duration-300 hover:border-gold/40;
 }
 
 /* shirorekha-style bar over the wordmark */
@@ -156,8 +122,30 @@ body {
     90deg,
     rgba(212, 176, 97, 0),
     #d4b061 30%,
-    #f0d488 50%,
     #d4b061 70%,
     rgba(212, 176, 97, 0)
   );
+}
+
+/* Page transition curtain — thin gold rule that wipes across on route change */
+.page-curtain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 70;
+  background: linear-gradient(180deg, rgba(11,10,9,0) 0%, rgba(11,10,9,0.92) 50%, rgba(11,10,9,0) 100%);
+}
+
+/* Underline-draw effect */
+.draw-underline {
+  background-image: linear-gradient(#d4b061, #d4b061);
+  background-size: 0% 1px;
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  transition: background-size 0.5s ease;
+  padding-bottom: 2px;
+}
+.draw-underline:hover,
+.draw-underline.active {
+  background-size: 100% 1px;
 }

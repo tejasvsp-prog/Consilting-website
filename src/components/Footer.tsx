@@ -1,5 +1,22 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import Wordmark from "./Wordmark";
+
+const siteLinks = [
+  { to: "/", label: "Home" },
+  { to: "/about", label: "About" },
+  { to: "/services", label: "Services" },
+  { to: "/clients", label: "Clients" },
+  { to: "/contact", label: "Contact" },
+  { to: "/book", label: "Book Demo" },
+];
+
+const serviceLinks = [
+  { to: "/services/seo", label: "SEO" },
+  { to: "/services/website-development", label: "Website Development" },
+  { to: "/services/website-maintenance", label: "Website Maintenance" },
+  { to: "/services/meta-ads", label: "Meta Ads" },
+];
 
 export default function Footer() {
   return (
@@ -10,9 +27,13 @@ export default function Footer() {
             <Wordmark size="md" animate={false} />
             <p className="mt-6 max-w-md text-ivory/60 leading-relaxed">
               A Michigan-based growth studio engineering revenue for ambitious
-              brands. Meta Ads, websites, SEO, and AI automation — built to
+              brands. SEO, websites, maintenance, and Meta Ads — built to
               perform.
             </p>
+            <Link to="/book" className="btn-gold mt-8">
+              Book Demo
+              <span aria-hidden>→</span>
+            </Link>
           </div>
 
           <div className="md:col-span-2">
@@ -20,22 +41,34 @@ export default function Footer() {
               Site
             </p>
             <ul className="space-y-2 text-ivory/80 text-sm">
-              <li><a className="hover:text-gold transition-colors" href="#services">Services</a></li>
-              <li><a className="hover:text-gold transition-colors" href="#why">Why Amara</a></li>
-              <li><a className="hover:text-gold transition-colors" href="#results">Results</a></li>
-              <li><a className="hover:text-gold transition-colors" href="#voices">Voices</a></li>
-              <li><a className="hover:text-gold transition-colors" href="#contact">Contact</a></li>
+              {siteLinks.map((l) => (
+                <li key={l.to}>
+                  <Link
+                    to={l.to}
+                    className="hover:text-gold transition-colors"
+                  >
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
           <div className="md:col-span-2">
             <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-gold mb-4">
-              Studio
+              Services
             </p>
             <ul className="space-y-2 text-ivory/80 text-sm">
-              <li>Michigan, USA</li>
-              <li>Mon – Fri</li>
-              <li>09:00 – 18:00 ET</li>
+              {serviceLinks.map((l) => (
+                <li key={l.to}>
+                  <Link
+                    to={l.to}
+                    className="hover:text-gold transition-colors"
+                  >
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -55,6 +88,8 @@ export default function Footer() {
             >
               +1 (517) 329-5868
             </a>
+            <p className="mt-4 text-ivory/50 text-sm">Michigan, USA</p>
+            <p className="text-ivory/50 text-sm">Mon–Fri · 9–6 ET</p>
           </div>
         </div>
 

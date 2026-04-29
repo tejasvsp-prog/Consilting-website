@@ -17,7 +17,7 @@ const tags = [
 
 export default function TrustedBy() {
   return (
-    <section className="relative py-14 border-y border-gold/10 bg-obsidian">
+    <section className="relative py-14 border-y border-gold/15 bg-obsidian">
       <p className="text-center font-mono text-[10px] uppercase tracking-[0.32em] text-ivory/40 mb-6">
         Trusted by operators across
       </p>

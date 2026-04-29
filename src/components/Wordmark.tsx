@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 
 type Props = {
   size?: "sm" | "md" | "lg" | "xl";
-  withTagline?: boolean;
+  showTagline?: boolean;
   animate?: boolean;
 };
 
@@ -14,13 +14,13 @@ const sizeMap = {
 };
 
 /**
- * AMARA · DIGITAL — refined Fraunces serif with a thin champagne-gold bar
+ * AMARA · DIGITAL — refined Fraunces serif with a thin gold bar
  * above the letters. The bar is a quiet nod to the Devanagari shirorekha,
  * fitting given the South Asian origin of "Amara" (timeless / eternal).
  */
 export default function Wordmark({
   size = "md",
-  withTagline = false,
+  showTagline = true,
   animate = true,
 }: Props) {
   const letters = "AMARA".split("");
@@ -56,14 +56,16 @@ export default function Wordmark({
           ))}
         </span>
       </div>
-      <motion.span
-        initial={animate ? { opacity: 0, y: 6 } : false}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7, duration: 0.6 }}
-        className="font-mono text-[0.42em] tracking-[0.42em] uppercase text-gold mt-2"
-      >
-        Digital{withTagline ? " · Michigan" : ""}
-      </motion.span>
+      {showTagline && (
+        <motion.span
+          initial={animate ? { opacity: 0, y: 6 } : false}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7, duration: 0.6 }}
+          className="font-mono text-[0.42em] tracking-[0.42em] uppercase text-gold mt-2"
+        >
+          Digital
+        </motion.span>
+      )}
     </div>
   );
 }

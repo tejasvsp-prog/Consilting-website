@@ -38,16 +38,6 @@ const cases: Case[] = [
       "New site shipped at 1.4s LCP, 28 location pages, programmatic SEO for service × city. Local pack rankings on every priority term.",
   },
   {
-    industry: "B2B services · Legal",
-    channel: "AI Automation",
-    headline: "63% of intake — automated.",
-    metric: "Intake automated",
-    value: 63,
-    suffix: "%",
-    detail:
-      "Custom AI qualifier on the website, routed via webhook into the CRM. Cut response time from 14h to 90 seconds and freed two FTEs for casework.",
-  },
-  {
     industry: "Healthcare · Multi-location",
     channel: "Meta Ads + Web",
     headline: "$1.8M attributable revenue, year one.",
@@ -59,11 +49,22 @@ const cases: Case[] = [
     detail:
       "Funnel rebuild + creative refresh + booking page redesign. 7,200 booked appointments tracked end-to-end through our reporting layer.",
   },
+  {
+    industry: "B2B services · Legal",
+    channel: "Maintenance",
+    headline: "99.98% uptime, 14-month run.",
+    metric: "Uptime",
+    value: 99.98,
+    suffix: "%",
+    decimals: 2,
+    detail:
+      "Took over a neglected WordPress build. Hardened security, migrated to managed hosting, set up monitoring. Two outages in 14 months — both resolved under fifteen minutes.",
+  },
 ];
 
 export default function Results() {
   return (
-    <section id="results" className="section bg-midnight relative">
+    <section id="results" className="section bg-midnight">
       <div className="mx-auto max-w-7xl px-6 md:px-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
           <div>
@@ -74,7 +75,7 @@ export default function Results() {
             </Reveal>
             <h2 className="font-display font-light text-5xl md:text-7xl leading-[1.02] tracking-[-0.01em] max-w-3xl">
               <SplitText text="The work," />{" "}
-              <span className="gold-text italic">
+              <span className="gold italic">
                 <SplitText text="in numbers." delay={0.2} />
               </span>
             </h2>
@@ -108,10 +109,9 @@ function ResultCard({ c, index }: { c: Case; index: number }) {
         delay: (index % 2) * 0.1,
         ease: [0.2, 0.8, 0.2, 1],
       }}
-      whileHover={{ y: -6 }}
-      className="glass rounded-2xl p-8 md:p-10 relative overflow-hidden"
+      whileHover={{ y: -4 }}
+      className="card p-8 md:p-10"
     >
-      <div className="absolute -top-20 -right-20 size-60 rounded-full bg-gold/5 blur-3xl pointer-events-none" />
       <div className="flex items-center justify-between mb-6 font-mono text-[10px] uppercase tracking-[0.28em]">
         <span className="text-ivory/40">{c.industry}</span>
         <span className="text-gold">{c.channel}</span>
@@ -163,7 +163,7 @@ function Counter({
   }, [inView, value, mv]);
 
   return (
-    <div className="font-display gold-text text-6xl md:text-7xl leading-none flex items-baseline gap-1">
+    <div className="font-display text-gold text-6xl md:text-7xl leading-none flex items-baseline gap-1">
       {prefix}
       <motion.span ref={ref}>{display}</motion.span>
       <span className="text-5xl md:text-6xl">{suffix}</span>
