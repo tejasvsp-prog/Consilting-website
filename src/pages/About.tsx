@@ -1,8 +1,8 @@
 import { motion, useInView } from "framer-motion";
 import { useMemo, useRef, useState, type ReactNode } from "react";
+import { Link } from "react-router-dom";
 import PageTransition from "../components/PageTransition";
 import { Reveal } from "../components/Reveal";
-import CtaStrip from "../sections/CtaStrip";
 
 /* ────────────────────────────────────────────────────────────────── */
 
@@ -55,7 +55,7 @@ export default function About() {
       <PremiseSection />
       <WhyUsSection />
       <ProcessMarquee />
-      <CtaStrip />
+      <NextMoveSection />
     </PageTransition>
   );
 }
@@ -919,30 +919,10 @@ function ProcessMarquee() {
           </p>
         </Reveal>
         <Reveal delay={0.1}>
-          <h2 className="font-display font-light text-5xl md:text-7xl leading-[0.98] tracking-[-0.015em] max-w-4xl mb-16 md:mb-20">
+          <h2 className="font-display font-light text-5xl md:text-7xl leading-[0.98] tracking-[-0.015em] max-w-4xl">
             Five moves.{" "}
             <span className="gold italic">Always in motion.</span>
           </h2>
-        </Reveal>
-
-        {/* Two chatbots conversing about the process */}
-        <Reveal delay={0.2}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-6 lg:gap-12 mb-4">
-            <ChatBot
-              variant="atlas"
-              side="left"
-              question="Where do we start?"
-              answer="By listening. Every engagement opens with a real conversation about your goals."
-              mouthDelay={0}
-            />
-            <ChatBot
-              variant="nova"
-              side="right"
-              question="And after launch?"
-              answer="We compound. Every month the system gets sharper, faster, cheaper to run."
-              mouthDelay={2.5}
-            />
-          </div>
         </Reveal>
       </div>
 
@@ -1005,6 +985,71 @@ function ProcessMarquee() {
             </article>
           ))}
         </motion.div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── Next Move — closer with two chatbots framing a Book-a-Demo ── */
+
+function NextMoveSection() {
+  return (
+    <section className="relative section bg-midnight border-t border-gold/15 overflow-hidden">
+      {/* Soft gold radial glow centered behind everything */}
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, rgba(212,176,97,0.08) 0%, transparent 60%)",
+        }}
+      />
+
+      <div className="relative mx-auto max-w-7xl px-6 md:px-10 text-center">
+        <Reveal>
+          <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-gold mb-10">
+            ◆ The next move
+          </p>
+        </Reveal>
+
+        <Reveal delay={0.1}>
+          <h2 className="font-display font-light text-5xl md:text-7xl lg:text-8xl leading-[0.95] tracking-[-0.02em] max-w-4xl mx-auto">
+            Make the move.{" "}
+            <span className="gold italic">We'll handle the rest.</span>
+          </h2>
+        </Reveal>
+
+        {/* Two chatbots framing the closer in a left/right exchange */}
+        <Reveal delay={0.25}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-6 lg:gap-12 mt-16 md:mt-20 max-w-5xl mx-auto text-left">
+            <ChatBot
+              variant="atlas"
+              side="left"
+              question="What happens on the call?"
+              answer="Thirty minutes. We open your funnel, your ad account, your site — and tell you, plainly, where the money is leaking."
+              mouthDelay={0}
+            />
+            <ChatBot
+              variant="nova"
+              side="right"
+              question="What should I bring?"
+              answer="Your numbers, your goals, and the question keeping you up at night. No deck. No homework."
+              mouthDelay={2.4}
+            />
+          </div>
+        </Reveal>
+
+        <Reveal delay={0.45}>
+          <div className="mt-16 md:mt-20 flex flex-wrap items-center justify-center gap-4">
+            <Link to="/contact" className="btn-gold">
+              Book Demo
+              <span aria-hidden>→</span>
+            </Link>
+            <a href="tel:+15173295868" className="btn-ghost-gold">
+              Call · 517-329-5868
+            </a>
+          </div>
+        </Reveal>
       </div>
     </section>
   );
