@@ -4,7 +4,6 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import Wordmark from "./Wordmark";
 
 const links = [
-  { to: "/", label: "Home" },
   { to: "/about", label: "About" },
   { to: "/services", label: "Services" },
   { to: "/clients", label: "Clients" },
@@ -56,7 +55,12 @@ export default function Nav() {
       </div>
 
       <div className="mx-auto max-w-7xl px-6 md:px-10 py-4 flex items-center justify-between">
-        <Link to="/" className="text-ivory">
+        <Link
+          to="/"
+          aria-label="Amara Digital — home"
+          title="Home"
+          className="group inline-flex items-center text-ivory transition-colors hover:[&_span]:text-gold"
+        >
           <Wordmark size="sm" animate={false} showTagline={false} />
         </Link>
         <nav className="hidden md:flex items-center gap-1">
