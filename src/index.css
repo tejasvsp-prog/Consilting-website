@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 html,
@@ -18,9 +18,9 @@ html {
 
 body {
   margin: 0;
-  background: #f4ecdd;
-  color: #141210;
-  font-family: "Manrope", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  background: #0b0a09;
+  color: #f2ead7;
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
   font-feature-settings: "ss01", "cv11";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -29,74 +29,135 @@ body {
 }
 
 ::selection {
-  background: #b23a1f;
-  color: #f4ecdd;
+  background: #d4b061;
+  color: #0b0a09;
 }
 
-/* Grain texture overlay */
+/* Soft grain over the whole site */
 .grain::before {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 60;
-  opacity: 0.06;
-  mix-blend-mode: multiply;
+  opacity: 0.07;
+  mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
 
-/* Fancy Fraunces tuning */
-.font-display {
-  font-optical-sizing: auto;
-  font-variation-settings: "SOFT" 50, "opsz" 144;
+/* Aurora glow blobs that drift on the hero */
+.aurora {
+  position: absolute;
+  pointer-events: none;
+  filter: blur(80px);
+  opacity: 0.55;
+  border-radius: 9999px;
+  mix-blend-mode: screen;
 }
 
-/* Marquee */
+/* Display tuning */
+.font-display {
+  font-optical-sizing: auto;
+  font-variation-settings: "SOFT" 60, "opsz" 144;
+}
+
 @keyframes marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
 .marquee-track {
-  animation: marquee 38s linear infinite;
+  animation: marquee 42s linear infinite;
 }
 
-/* Reveal letters */
-.letter {
-  display: inline-block;
-  will-change: transform, opacity;
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
-/* custom underline */
-.shirorekha {
-  position: relative;
-}
-.shirorekha::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: -0.18em;
-  height: 0.08em;
-  background: currentColor;
-  transform-origin: left center;
+.gold-text {
+  background: linear-gradient(
+    90deg,
+    #b8985a 0%,
+    #f0d488 35%,
+    #efe0a1 50%,
+    #f0d488 65%,
+    #b8985a 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 6s linear infinite;
 }
 
-/* hide scrollbar in marquee */
+/* Glass card */
+.glass {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.015) 100%
+  );
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(212, 176, 97, 0.18);
+}
+
+.gold-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(212, 176, 97, 0.55),
+    transparent
+  );
+}
+
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { scrollbar-width: none; }
 
-/* form inputs */
+/* Form field — dark luxury */
 .field {
-  @apply w-full bg-transparent border-b border-ink/30 py-3 text-ink placeholder-ink/40 focus:outline-none focus:border-rust transition-colors duration-300;
+  @apply w-full bg-transparent border-b border-ivory/20 py-3 text-ivory placeholder-ivory/30 focus:outline-none focus:border-gold transition-colors duration-300;
 }
 .field-label {
-  @apply block text-xs uppercase tracking-[0.2em] text-ink/60 mb-2 font-medium;
+  @apply block text-[11px] uppercase tracking-[0.24em] text-ivory/50 mb-2 font-medium;
 }
 
-/* button */
-.btn-primary {
-  @apply inline-flex items-center gap-3 bg-ink text-ivory px-7 py-4 rounded-full text-sm uppercase tracking-[0.18em] font-medium transition-all duration-500 hover:bg-rust hover:gap-5;
+/* Buttons */
+.btn-gold {
+  @apply relative inline-flex items-center gap-3 px-7 py-4 rounded-full text-sm uppercase tracking-[0.2em] font-medium text-midnight transition-all duration-500;
+  background: linear-gradient(135deg, #f0d488 0%, #d4b061 50%, #b8985a 100%);
+  box-shadow: 0 10px 30px -10px rgba(212, 176, 97, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
-.btn-ghost {
-  @apply inline-flex items-center gap-3 text-ink px-7 py-4 rounded-full text-sm uppercase tracking-[0.18em] font-medium border border-ink/30 transition-all duration-500 hover:border-ink hover:gap-5;
+.btn-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 40px -10px rgba(212, 176, 97, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.btn-ghost-gold {
+  @apply inline-flex items-center gap-3 px-7 py-4 rounded-full text-sm uppercase tracking-[0.2em] font-medium text-ivory border border-gold/40 transition-all duration-500 hover:border-gold hover:text-gold hover:gap-5;
+}
+
+/* Section padding */
+.section {
+  @apply relative py-28 md:py-40;
+}
+
+/* shirorekha-style bar over the wordmark */
+.bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -0.16em;
+  height: 0.06em;
+  background: linear-gradient(
+    90deg,
+    rgba(212, 176, 97, 0),
+    #d4b061 30%,
+    #f0d488 50%,
+    #d4b061 70%,
+    rgba(212, 176, 97, 0)
+  );
 }

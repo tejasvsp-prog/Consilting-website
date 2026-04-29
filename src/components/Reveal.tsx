@@ -44,21 +44,26 @@ export function SplitText({
   className,
   delay = 0,
   stagger = 0.04,
+  once = true,
 }: {
   text: string;
   className?: string;
   delay?: number;
   stagger?: number;
+  once?: boolean;
 }) {
   const words = text.split(" ");
   return (
     <span className={className}>
       {words.map((w, i) => (
-        <span key={i} className="inline-block overflow-hidden align-bottom mr-[0.25em]">
+        <span
+          key={i}
+          className="inline-block overflow-hidden align-bottom mr-[0.25em] pb-[0.05em]"
+        >
           <motion.span
             initial={{ y: "110%" }}
             whileInView={{ y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
+            viewport={{ once, margin: "-50px" }}
             transition={{
               duration: 0.9,
               delay: delay + i * stagger,
