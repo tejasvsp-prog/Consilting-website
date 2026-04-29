@@ -33,7 +33,7 @@ export default function Hero() {
       >
         <span className="size-1.5 rounded-full bg-gold" />
         <span className="font-mono text-[10px] md:text-[11px] uppercase tracking-[0.32em] text-ivory/55">
-          Michigan · Growth Studio · Est. 2024
+          Michigan · Growth Studio · Est. 2026
         </span>
       </motion.div>
 
@@ -44,9 +44,9 @@ export default function Hero() {
             initial={{ opacity: 0, x: -40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.8, duration: 1, ease: [0.2, 0.8, 0.2, 1] }}
-            className="font-display font-light text-[18vw] md:text-[13.5vw] leading-[0.86] tracking-[-0.025em] text-ivory pl-6 md:pl-10 whitespace-nowrap"
+            className="font-display font-light text-[22vw] md:text-[15vw] leading-[0.86] tracking-[-0.025em] text-ivory pl-6 md:pl-10 whitespace-nowrap"
           >
-            We engineer
+            Amara
           </motion.h1>
           <motion.span
             initial={{ scaleX: 0 }}
@@ -80,9 +80,9 @@ export default function Hero() {
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 1.4, duration: 1, ease: [0.2, 0.8, 0.2, 1] }}
-            className="font-display font-light italic text-[18vw] md:text-[13.5vw] leading-[0.86] tracking-[-0.025em] gold pr-6 md:pr-10 whitespace-nowrap"
+            className="font-display font-light italic text-[22vw] md:text-[15vw] leading-[0.86] tracking-[-0.025em] gold pr-6 md:pr-10 whitespace-nowrap"
           >
-            revenue.
+            Digital.
           </motion.h2>
         </div>
       </motion.div>
@@ -97,15 +97,15 @@ export default function Hero() {
         className="md:hidden absolute right-12 top-[42%] w-px h-12 bg-gold"
       />
 
-      {/* Bottom-right whisper line */}
+      {/* Bottom-left whisper line */}
       <motion.p
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.7, duration: 0.7 }}
-        className="absolute bottom-24 md:bottom-28 left-6 md:left-10 max-w-xs text-ivory/55 text-sm leading-relaxed"
+        className="absolute bottom-24 md:bottom-28 left-6 md:left-10 max-w-xs font-display text-2xl md:text-3xl text-ivory leading-tight"
       >
-        SEO, websites, maintenance, and Meta Ads — wired to one number:{" "}
-        <span className="gold">ROI</span>.
+        We engineer{" "}
+        <span className="gold italic">revenue.</span>
       </motion.p>
 
       {/* Scroll indicator */}
