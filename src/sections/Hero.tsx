@@ -33,7 +33,7 @@ export default function Hero() {
       >
         <span className="size-1.5 rounded-full bg-gold" />
         <span className="font-mono text-[10px] md:text-[11px] uppercase tracking-[0.32em] text-ivory/55">
-          Michigan · Growth Studio · Est. 2026
+          Michigan · Growth Studio
         </span>
       </motion.div>
 
@@ -54,8 +54,15 @@ export default function Hero() {
             transition={{ delay: 1.1, duration: 1.1, ease: [0.7, 0, 0.2, 1] }}
             style={{ originX: 0 }}
             aria-hidden
-            className="hidden md:block flex-1 h-px bg-gold ml-8 mr-0"
-          />
+            className="hidden md:block relative flex-1 h-px bg-gold ml-8 mr-0 overflow-visible"
+          >
+            {/* Traveling spark — left to right, looped */}
+            <motion.span
+              animate={{ left: ["0%", "100%"] }}
+              transition={{ duration: 4.5, repeat: Infinity, ease: "linear", delay: 2 }}
+              className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-gold shadow-[0_0_14px_rgba(212,176,97,0.95)]"
+            />
+          </motion.span>
         </div>
 
         {/* Bottom row: arrow rule + word, right-aligned */}
@@ -72,8 +79,15 @@ export default function Hero() {
               animate={{ scaleX: 1 }}
               transition={{ delay: 1.3, duration: 1.0, ease: [0.7, 0, 0.2, 1] }}
               style={{ originX: 0 }}
-              className="flex-1 h-px bg-gold"
-            />
+              className="relative flex-1 h-px bg-gold overflow-visible"
+            >
+              {/* Traveling spark — left to right toward the arrow */}
+              <motion.span
+                animate={{ left: ["0%", "100%"] }}
+                transition={{ duration: 4.5, repeat: Infinity, ease: "linear", delay: 2.4 }}
+                className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-gold shadow-[0_0_14px_rgba(212,176,97,0.95)]"
+              />
+            </motion.span>
             <ArrowTip />
           </motion.span>
           <motion.h2

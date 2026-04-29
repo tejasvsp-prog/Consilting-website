@@ -30,21 +30,20 @@ export default function Home() {
               </Reveal>
               <Reveal delay={0.1}>
                 <h2 className="font-display font-light text-4xl md:text-6xl leading-[1.02] tracking-[-0.01em]">
-                  Four levers.{" "}
-                  <span className="gold italic">Pick where to start.</span>
+                  Digital marketing,{" "}
+                  <span className="gold italic">end to end.</span>
                 </h2>
               </Reveal>
             </div>
             <div className="col-span-12 md:col-span-5 md:col-start-8">
               <Reveal delay={0.2}>
                 <p className="text-ivory/70 leading-relaxed">
-                  As a digital marketing studio, we help you{" "}
-                  <span className="gold">grow revenue</span> through four core
-                  services: search, sites, ongoing care, and paid social.
-                  Each is a complete engagement on its own — but the real
-                  lift comes when two or three run in concert. Same
-                  scoreboard either way: dollars in, dollars out, measured
-                  every Friday.
+                  Amara Digital is a Michigan-based digital marketing studio.
+                  We help businesses grow online through search engine
+                  optimization, custom websites, ongoing maintenance, and
+                  paid social campaigns on Meta. Each service runs as a
+                  standalone engagement, or together as a complete program —
+                  whichever fits your funnel.
                 </p>
               </Reveal>
               <Reveal delay={0.35}>
@@ -188,13 +187,14 @@ function Rocket() {
     >
       <motion.svg
         viewBox="0 0 240 460"
-        className="w-full h-auto drop-shadow-[0_0_40px_rgba(212,176,97,0.18)]"
+        className="w-full h-auto drop-shadow-[0_0_50px_rgba(212,176,97,0.28)]"
         animate={{
-          y: [0, -18, 0],
-          rotate: [-1.5, 1.5, -1.5],
+          y: [0, -34, -10, -28, 0],
+          rotate: [-3, 3.5, -2, 4, -3],
+          scale: [1, 1.04, 1.01, 1.05, 1],
         }}
         transition={{
-          duration: 5,
+          duration: 4.2,
           repeat: Infinity,
           ease: "easeInOut",
         }}

@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import Wordmark from "./Wordmark";
 
@@ -19,15 +18,14 @@ const serviceLinks = [
 
 export default function Footer() {
   return (
-    <footer className="relative bg-midnight text-ivory border-t border-gold/15">
+    <footer className="relative bg-midnight text-ivory border-t border-gold/15 overflow-hidden">
       <div className="mx-auto max-w-7xl px-6 md:px-10 pt-20 pb-10">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
           <div className="md:col-span-5">
             <Wordmark size="md" animate={false} />
             <p className="mt-6 max-w-md text-ivory/60 leading-relaxed">
-              A Michigan-based growth studio engineering revenue for ambitious
-              brands. SEO, websites, maintenance, and Meta Ads — built to
-              perform.
+              A Michigan-based digital marketing studio. SEO, websites,
+              maintenance, and Meta Ads — engineered for revenue.
             </p>
           </div>
 
@@ -84,28 +82,32 @@ export default function Footer() {
               +1 (517) 329-5868
             </a>
             <p className="mt-4 text-ivory/50 text-sm">Michigan, USA</p>
-            <p className="text-ivory/50 text-sm">Mon–Fri · 9–6 ET</p>
           </div>
         </div>
 
         <div className="gold-divider mt-16" />
 
         <div className="mt-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 font-mono text-[11px] uppercase tracking-[0.24em] text-ivory/40">
-          <span>© {new Date().getFullYear()} Amara Digital · All rights reserved</span>
+          <span>
+            © {new Date().getFullYear()} Amara Digital · All rights reserved
+          </span>
           <span>Engineered in Michigan</span>
         </div>
       </div>
 
-      <div className="overflow-hidden border-t border-gold/10">
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 0.08 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.5 }}
-          className="font-display text-[22vw] leading-none tracking-mark text-gold select-none whitespace-nowrap"
+      {/* Continuously-scrolling giant wordmark — quiet, but never still */}
+      <div className="border-t border-gold/10 overflow-hidden">
+        <div
+          className="marquee-track flex whitespace-nowrap font-display leading-none tracking-mark text-gold/[0.09] select-none"
+          style={{ fontSize: "22vw" }}
+          aria-hidden
         >
-          AMARA — DIGITAL —
-        </motion.div>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <span key={i} className="px-12">
+              AMARA — DIGITAL —
+            </span>
+          ))}
+        </div>
       </div>
     </footer>
   );

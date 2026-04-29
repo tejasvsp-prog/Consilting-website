@@ -41,7 +41,7 @@ export default function Nav() {
       {/* Top utility bar with phone */}
       <div className="border-b border-ivory/5">
         <div className="mx-auto max-w-7xl px-6 md:px-10 py-2 flex items-center justify-between text-[10px] uppercase tracking-[0.28em] font-mono text-ivory/50">
-          <span className="hidden sm:inline">Michigan, USA · Mon–Fri 9–6 ET</span>
+          <span className="hidden sm:inline">Michigan, USA</span>
           <a
             href={PHONE_HREF}
             className="inline-flex items-center gap-2 hover:text-gold transition-colors"

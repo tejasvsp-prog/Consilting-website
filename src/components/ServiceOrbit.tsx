@@ -67,6 +67,20 @@ export default function ServiceOrbit() {
 }
 
 function Orbit({ onSelect }: { onSelect: (i: number) => void }) {
+  // Position cards exactly at top / right / bottom / left with sin·cos.
+  // Using % of the parent (with translate -50/-50) keeps cards centered
+  // on the orbit ring regardless of their own size — the previous
+  // translateY(-%) approach was relative to the card's own height,
+  // which bunched everything near the center.
+  const radiusPct = 38;
+  const positions = [0, 1, 2, 3].map((i) => {
+    const rad = ((i * 90 - 90) * Math.PI) / 180; // 0 = top
+    return {
+      left: 50 + radiusPct * Math.cos(rad),
+      top: 50 + radiusPct * Math.sin(rad),
+    };
+  });
+
   return (
     <>
       {/* Rotating outer ring carrying the cards */}
@@ -81,17 +95,19 @@ function Orbit({ onSelect }: { onSelect: (i: number) => void }) {
       >
         {/* Decorative orbit rules */}
         <div className="absolute inset-[10%] rounded-full border border-gold/15" />
-        <div className="absolute inset-[22%] rounded-full border border-gold/8 border-dashed" />
+        <div className="absolute inset-[22%] rounded-full border border-gold/[0.08] border-dashed" />
 
         {services.map((s, i) => {
-          const angle = i * 90;
+          const p = positions[i];
           return (
             <button
               key={s.n}
               onClick={() => onSelect(i)}
-              className="absolute top-1/2 left-1/2 group focus:outline-none"
+              className="absolute group focus:outline-none"
               style={{
-                transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-37%) rotate(${-angle}deg)`,
+                left: `${p.left}%`,
+                top: `${p.top}%`,
+                transform: "translate(-50%, -50%)",
               }}
               aria-label={`Open ${s.t}`}
             >
@@ -103,7 +119,7 @@ function Orbit({ onSelect }: { onSelect: (i: number) => void }) {
                   repeat: Infinity,
                   ease: "linear",
                 }}
-                className="card w-36 h-36 lg:w-44 lg:h-44 p-5 flex flex-col justify-between cursor-pointer transition-all duration-300 group-hover:border-gold group-hover:scale-[1.05] group-focus:border-gold"
+                className="card w-36 h-36 lg:w-44 lg:h-44 p-5 flex flex-col justify-between cursor-pointer transition-all duration-300 group-hover:border-gold group-hover:scale-[1.05] group-focus:border-gold bg-midnight"
               >
                 <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-gold">
                   {s.n}
