@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: #f4ecdd;
+  color: #141210;
+  font-family: "Manrope", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: #b23a1f;
+  color: #f4ecdd;
+}
+
+/* Grain texture overlay */
+.grain::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  opacity: 0.06;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+/* Fancy Fraunces tuning */
+.font-display {
+  font-optical-sizing: auto;
+  font-variation-settings: "SOFT" 50, "opsz" 144;
+}
+
+/* Marquee */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee 38s linear infinite;
+}
+
+/* Reveal letters */
+.letter {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+/* custom underline */
+.shirorekha {
+  position: relative;
+}
+.shirorekha::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -0.18em;
+  height: 0.08em;
+  background: currentColor;
+  transform-origin: left center;
+}
+
+/* hide scrollbar in marquee */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
+
+/* form inputs */
+.field {
+  @apply w-full bg-transparent border-b border-ink/30 py-3 text-ink placeholder-ink/40 focus:outline-none focus:border-rust transition-colors duration-300;
+}
+.field-label {
+  @apply block text-xs uppercase tracking-[0.2em] text-ink/60 mb-2 font-medium;
+}
+
+/* button */
+.btn-primary {
+  @apply inline-flex items-center gap-3 bg-ink text-ivory px-7 py-4 rounded-full text-sm uppercase tracking-[0.18em] font-medium transition-all duration-500 hover:bg-rust hover:gap-5;
+}
+.btn-ghost {
+  @apply inline-flex items-center gap-3 text-ink px-7 py-4 rounded-full text-sm uppercase tracking-[0.18em] font-medium border border-ink/30 transition-all duration-500 hover:border-ink hover:gap-5;
+}
