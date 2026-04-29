@@ -1,8 +1,14 @@
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { useRef } from "react";
-import { Link } from "react-router-dom";
-import { SplitText } from "../components/Reveal";
 
+/**
+ * Hero — editorial split-line layout.
+ *
+ * Two rows of huge Fraunces display, staggered horizontally, joined by
+ * gold horizontal rules and an arrow tip. No subtitle paragraph, no
+ * stat ticker, no body CTAs — the nav's Book Demo is the conversion
+ * point. The hero earns the viewport with typography alone.
+ */
 export default function Hero() {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
@@ -10,114 +16,131 @@ export default function Hero() {
     target: ref,
     offset: ["start start", "end start"],
   });
-  const yHead = useTransform(scrollYProgress, [0, 1], ["0%", reduce ? "0%" : "-15%"]);
-  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.2]);
+  const yShift = useTransform(scrollYProgress, [0, 1], ["0%", reduce ? "0%" : "-12%"]);
+  const opacity = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
 
   return (
     <section
       ref={ref}
-      className="relative min-h-[100svh] pt-44 md:pt-52 pb-24 overflow-hidden"
+      className="relative min-h-[100svh] flex flex-col justify-center overflow-hidden pt-32 pb-24"
     >
+      {/* Tag */}
       <motion.div
-        style={{ opacity }}
-        className="relative mx-auto max-w-7xl px-6 md:px-10"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.7, duration: 0.7 }}
+        className="absolute top-32 md:top-40 left-6 md:left-10 flex items-center gap-3"
       >
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1 }}
-          className="flex items-center gap-4 mb-12"
-        >
-          <span className="size-2 rounded-full bg-gold" />
-          <span className="font-mono text-[11px] uppercase tracking-[0.3em] text-ivory/60">
-            Michigan · Growth Studio · Est. 2024
-          </span>
-        </motion.div>
+        <span className="size-1.5 rounded-full bg-gold" />
+        <span className="font-mono text-[10px] md:text-[11px] uppercase tracking-[0.32em] text-ivory/55">
+          Michigan · Growth Studio · Est. 2024
+        </span>
+      </motion.div>
 
-        <motion.h1
-          style={{ y: yHead }}
-          className="font-display font-light text-[12vw] md:text-[8.5vw] leading-[0.92] tracking-[-0.02em] text-ivory max-w-[18ch]"
-        >
-          <SplitText text="We don't run ads." />
-          <br />
-          <span className="gold italic">
-            <SplitText text="We engineer revenue." delay={0.2} />
-          </span>
-        </motion.h1>
-
-        <div className="mt-12 md:mt-16 grid grid-cols-12 gap-6 items-end">
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7, duration: 0.9 }}
-            className="col-span-12 md:col-span-6 text-lg md:text-xl text-ivory/70 leading-relaxed max-w-xl"
+      <motion.div style={{ y: yShift, opacity }} className="w-full">
+        {/* Top row: word + horizontal rule extending to the right edge */}
+        <div className="flex items-center w-full">
+          <motion.h1
+            initial={{ opacity: 0, x: -40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.8, duration: 1, ease: [0.2, 0.8, 0.2, 1] }}
+            className="font-display font-light text-[18vw] md:text-[13.5vw] leading-[0.86] tracking-[-0.025em] text-ivory pl-6 md:pl-10 whitespace-nowrap"
           >
-            Amara Digital is a Michigan-based growth studio for founders who
-            measure success in dollars, not impressions. SEO, websites, Meta
-            Ads, and ongoing maintenance — wired to one number:{" "}
-            <span className="gold">ROI</span>.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9, duration: 0.9 }}
-            className="col-span-12 md:col-span-5 md:col-start-8 flex flex-wrap items-center gap-4"
-          >
-            <Link to="/contact" className="btn-gold">
-              Book Demo
-              <span aria-hidden>→</span>
-            </Link>
-            <Link to="/services" className="btn-ghost-gold">
-              Our Services
-            </Link>
-          </motion.div>
+            We engineer
+          </motion.h1>
+          <motion.span
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ delay: 1.1, duration: 1.1, ease: [0.7, 0, 0.2, 1] }}
+            style={{ originX: 0 }}
+            aria-hidden
+            className="hidden md:block flex-1 h-px bg-gold ml-8 mr-0"
+          />
         </div>
 
-        {/* Stat ticker */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.1, duration: 1 }}
-          className="mt-24 md:mt-32 grid grid-cols-2 md:grid-cols-4 border-y border-gold/20"
-        >
-          {[
-            { k: "4.2x", v: "Avg. blended ROAS" },
-            { k: "312%", v: "Lead growth, 90 days" },
-            { k: "<1.8s", v: "Median LCP shipped" },
-            { k: "92%", v: "Client retention" },
-          ].map((s, i) => (
-            <div
-              key={s.v}
-              className={`px-6 py-7 md:py-8 ${
-                i < 3 ? "md:border-r border-gold/15" : ""
-              } ${i < 2 ? "border-b md:border-b-0 border-gold/15" : ""}`}
-            >
-              <div className="font-display text-3xl md:text-4xl text-gold">
-                {s.k}
-              </div>
-              <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.24em] text-ivory/50">
-                {s.v}
-              </div>
-            </div>
-          ))}
-        </motion.div>
+        {/* Bottom row: arrow rule + word, right-aligned */}
+        <div className="flex items-center w-full mt-4 md:mt-8 justify-end">
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.3, duration: 0.6 }}
+            aria-hidden
+            className="hidden md:flex flex-1 items-center mr-8 ml-0"
+          >
+            <motion.span
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ delay: 1.3, duration: 1.0, ease: [0.7, 0, 0.2, 1] }}
+              style={{ originX: 0 }}
+              className="flex-1 h-px bg-gold"
+            />
+            <ArrowTip />
+          </motion.span>
+          <motion.h2
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1.4, duration: 1, ease: [0.2, 0.8, 0.2, 1] }}
+            className="font-display font-light italic text-[18vw] md:text-[13.5vw] leading-[0.86] tracking-[-0.025em] gold pr-6 md:pr-10 whitespace-nowrap"
+          >
+            revenue.
+          </motion.h2>
+        </div>
       </motion.div>
+
+      {/* Mobile: vertical connector line shown only when md rules are hidden */}
+      <motion.span
+        initial={{ scaleY: 0 }}
+        animate={{ scaleY: 1 }}
+        transition={{ delay: 1.1, duration: 0.9, ease: [0.7, 0, 0.2, 1] }}
+        style={{ originY: 0 }}
+        aria-hidden
+        className="md:hidden absolute right-12 top-[42%] w-px h-12 bg-gold"
+      />
+
+      {/* Bottom-right whisper line */}
+      <motion.p
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.7, duration: 0.7 }}
+        className="absolute bottom-24 md:bottom-28 left-6 md:left-10 max-w-xs text-ivory/55 text-sm leading-relaxed"
+      >
+        SEO, websites, maintenance, and Meta Ads — wired to one number:{" "}
+        <span className="gold">ROI</span>.
+      </motion.p>
 
       {/* Scroll indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 1 }}
-        className="absolute left-1/2 -translate-x-1/2 bottom-8 flex flex-col items-center gap-3 text-ivory/40"
+        transition={{ delay: 1.8, duration: 1 }}
+        className="absolute left-1/2 -translate-x-1/2 bottom-8 flex flex-col items-center gap-3 text-ivory/35"
       >
-        <span className="font-mono text-[10px] uppercase tracking-[0.28em]">Scroll</span>
+        <span className="font-mono text-[10px] uppercase tracking-[0.32em]">
+          Scroll
+        </span>
         <motion.span
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
           className="block w-px h-10 bg-gradient-to-b from-gold to-transparent"
         />
       </motion.div>
     </section>
+  );
+}
+
+function ArrowTip() {
+  return (
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 22 22"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      className="text-gold shrink-0 -ml-px"
+      aria-hidden
+    >
+      <path d="M3 11h16M14 5l6 6-6 6" />
+    </svg>
   );
 }

@@ -7,7 +7,6 @@ const links = [
   { to: "/about", label: "About" },
   { to: "/services", label: "Services" },
   { to: "/clients", label: "Clients" },
-  { to: "/contact", label: "Contact" },
 ];
 
 const PHONE_DISPLAY = "(517) 329-5868";

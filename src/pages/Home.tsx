@@ -3,18 +3,59 @@ import { Link } from "react-router-dom";
 import PageTransition from "../components/PageTransition";
 import { Reveal } from "../components/Reveal";
 import Hero from "../sections/Hero";
-import CtaStrip from "../sections/CtaStrip";
 import { services } from "../sections/Services";
+
+const stats = [
+  { v: "4.2×", l: "Average blended ROAS" },
+  { v: "312%", l: "Lead growth, 90 days" },
+  { v: "<1.8s", l: "Median page load" },
+  { v: "92%", l: "Client retention" },
+];
 
 export default function Home() {
   return (
     <PageTransition>
       <Hero />
 
-      {/* Compact services teaser — 4 cards linking to detail pages */}
-      <section className="section bg-midnight border-t border-gold/15">
+      {/* Big-numbers stats — editorial, mega display, four columns */}
+      <section className="relative bg-midnight border-t border-gold/15 py-28 md:py-44">
+        <div className="mx-auto max-w-[110rem] px-6 md:px-10">
+          <Reveal>
+            <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-gold mb-16 md:mb-24">
+              ◆ The numbers
+            </p>
+          </Reveal>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-y-16 md:gap-x-12">
+            {stats.map((s, i) => (
+              <motion.div
+                key={s.l}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{
+                  duration: 0.95,
+                  delay: i * 0.1,
+                  ease: [0.2, 0.8, 0.2, 1],
+                }}
+                className="flex flex-col"
+              >
+                <span className="font-display font-light text-gold leading-[0.85] tracking-[-0.04em] text-[20vw] md:text-[10vw] lg:text-[8.5vw]">
+                  {s.v}
+                </span>
+                <span className="mt-6 md:mt-8 font-mono text-[10px] md:text-[11px] uppercase tracking-[0.28em] text-ivory/55 max-w-[18ch]">
+                  {s.l}
+                </span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Compact services teaser */}
+      <section className="section bg-obsidian border-t border-gold/15">
         <div className="mx-auto max-w-7xl px-6 md:px-10">
-          <div className="flex items-end justify-between gap-6 mb-12 flex-wrap">
+          <div className="flex items-end justify-between gap-6 mb-14 flex-wrap">
             <div>
               <Reveal>
                 <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-gold mb-6">
@@ -80,7 +121,39 @@ export default function Home() {
         </div>
       </section>
 
-      <CtaStrip />
+      {/* Single, dignified closer — one Book Demo on the page */}
+      <section className="bg-midnight border-t border-gold/15 py-28 md:py-40">
+        <div className="mx-auto max-w-7xl px-6 md:px-10">
+          <Reveal>
+            <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-gold mb-10">
+              ◆ Ready when you are
+            </p>
+          </Reveal>
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-10">
+            <Reveal delay={0.1}>
+              <h2 className="font-display font-light text-5xl md:text-7xl lg:text-[6vw] leading-[0.95] tracking-[-0.02em] max-w-3xl">
+                Thirty minutes.
+                <br />
+                <span className="gold italic">A real plan.</span>
+              </h2>
+            </Reveal>
+            <Reveal delay={0.3}>
+              <Link
+                to="/contact"
+                className="group inline-flex items-baseline gap-5 font-display text-3xl md:text-4xl text-ivory hover:text-gold transition-colors whitespace-nowrap"
+              >
+                <span>Book a demo</span>
+                <span
+                  aria-hidden
+                  className="text-gold text-2xl md:text-3xl transition-transform duration-500 group-hover:translate-x-2"
+                >
+                  →
+                </span>
+              </Link>
+            </Reveal>
+          </div>
+        </div>
+      </section>
     </PageTransition>
   );
 }
