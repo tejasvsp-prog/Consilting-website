@@ -7,8 +7,7 @@ const siteLinks = [
   { to: "/about", label: "About" },
   { to: "/services", label: "Services" },
   { to: "/clients", label: "Clients" },
-  { to: "/contact", label: "Contact" },
-  { to: "/book", label: "Book Demo" },
+  { to: "/contact", label: "Book a Demo" },
 ];
 
 const serviceLinks = [
@@ -30,7 +29,7 @@ export default function Footer() {
               brands. SEO, websites, maintenance, and Meta Ads — built to
               perform.
             </p>
-            <Link to="/book" className="btn-gold mt-8">
+            <Link to="/contact" className="btn-gold mt-8">
               Book Demo
               <span aria-hidden>→</span>
             </Link>

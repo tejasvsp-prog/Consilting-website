@@ -84,7 +84,7 @@ export default function Nav() {
             <PhoneIcon className="size-4" />
           </a>
           <Link
-            to="/book"
+            to="/contact"
             className="hidden sm:inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.24em] text-midnight bg-gold px-5 py-3 rounded-full font-semibold hover:bg-gold-200 transition-colors"
           >
             Book Demo
@@ -134,7 +134,7 @@ export default function Nav() {
               {l.label}
             </NavLink>
           ))}
-          <Link to="/book" className="mt-4 btn-gold justify-center">
+          <Link to="/contact" className="mt-4 btn-gold justify-center">
             Book Demo
           </Link>
         </div>

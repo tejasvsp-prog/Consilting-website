@@ -2,6 +2,7 @@ import { AnimatePresence } from "framer-motion";
 import { useEffect } from "react";
 import {
   BrowserRouter,
+  Navigate,
   Outlet,
   Route,
   Routes,
@@ -19,7 +20,6 @@ import WebsiteMaintenance from "./pages/services/WebsiteMaintenance";
 import MetaAds from "./pages/services/MetaAds";
 import Clients from "./pages/Clients";
 import Contact from "./pages/Contact";
-import Book from "./pages/Book";
 import NotFound from "./pages/NotFound";
 
 function ScrollToTop() {
@@ -36,9 +36,8 @@ function Layout() {
     <div className="grain min-h-screen flex flex-col bg-midnight text-ivory">
       <Nav />
       <main className="relative flex-1">
-        <AnimatePresence mode="wait" initial={false}>
-          <RouteCurtain key={`curtain-${location.pathname}`} />
-        </AnimatePresence>
+        {/* Curtain sweeps top-to-bottom on every route change */}
+        <RouteCurtain key={`curtain-${location.pathname}`} />
         <AnimatePresence mode="wait" initial={false}>
           <div key={location.pathname}>
             <Outlet />
@@ -71,7 +70,8 @@ export default function App() {
           <Route path="/services/meta-ads" element={<MetaAds />} />
           <Route path="/clients" element={<Clients />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/book" element={<Book />} />
+          {/* /book is now an alias for /contact — preserves any old links */}
+          <Route path="/book" element={<Navigate to="/contact" replace />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

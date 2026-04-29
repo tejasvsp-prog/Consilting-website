@@ -64,7 +64,7 @@ export default function Hero() {
             transition={{ delay: 0.9, duration: 0.9 }}
             className="col-span-12 md:col-span-5 md:col-start-8 flex flex-wrap items-center gap-4"
           >
-            <Link to="/book" className="btn-gold">
+            <Link to="/contact" className="btn-gold">
               Book Demo
               <span aria-hidden>→</span>
             </Link>

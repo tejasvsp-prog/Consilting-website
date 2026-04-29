@@ -174,7 +174,7 @@ export default function About() {
 
           <Reveal delay={0.4}>
             <div className="mt-16 flex flex-wrap gap-4">
-              <Link to="/book" className="btn-gold">
+              <Link to="/contact" className="btn-gold">
                 Start the diagnostic
                 <span aria-hidden>→</span>
               </Link>

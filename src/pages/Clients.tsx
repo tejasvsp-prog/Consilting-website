@@ -4,83 +4,60 @@ import PageTransition, { PageHeader } from "../components/PageTransition";
 import { Reveal } from "../components/Reveal";
 import CtaStrip from "../sections/CtaStrip";
 
-type CaseStudy = {
+type ClientCase = {
   client: string;
   industry: string;
+  location: string;
   scope: string[];
-  headline: string;
-  metric: string;
-  metricValue: string;
   story: string;
-  range: string;
+  url?: string;
 };
 
-const placeholderCases: CaseStudy[] = [
+/**
+ * Real client list. Scope tags reflect best-current understanding —
+ * confirm with the team and update before publishing.
+ */
+const clients: ClientCase[] = [
   {
-    client: "Client name pending",
-    industry: "DTC apparel",
-    scope: ["Meta Ads", "Website Development"],
-    headline: "From breakeven to 4.2× ROAS in 60 days.",
-    metric: "Blended ROAS",
-    metricValue: "4.2×",
+    client: "Lansing Area Veterans Coalition",
+    industry: "Nonprofit · Veterans services",
+    location: "Lansing, MI",
+    scope: ["Website Development", "Website Maintenance"],
     story:
-      "Inherited a stalled Meta account spending $40k/mo at break-even. Rebuilt CAPI tracking, restructured to consolidated ASC, shipped 22 new creative concepts in the first 60 days. Spend scaled to $140k/mo with CPA down 41%.",
-    range: "Q3–Q4 2024",
+      "A coalition serving Lansing-area veterans through outreach, advocacy, and direct support programs. We rebuilt the digital home so that the people who need help can find it in one click — and the volunteers and donors who power the mission have a clear, fast place to act.",
   },
   {
-    client: "Client name pending",
-    industry: "Home remodeling · Multi-state",
-    scope: ["SEO", "Website Development"],
-    headline: "+312% qualified leads from organic in 90 days.",
-    metric: "Lead growth",
-    metricValue: "+312%",
+    client: "Paws for a Cause MI",
+    industry: "Nonprofit · Animal welfare",
+    location: "Michigan",
+    scope: ["Website Development", "Meta Ads", "Website Maintenance"],
     story:
-      "Replaced a slow WordPress site with a custom Next.js build at 1.4s LCP. Launched 28 service × city programmatic pages and a content hub. Local pack rankings on every priority term within 90 days.",
-    range: "Q1 2025",
+      "A Michigan animal-welfare organization on a mission to find homes faster and raise the funds that keep the doors open. We pair a clean adoption-first site with paid social campaigns that put real dogs and cats in front of the right humans.",
+    url: "https://pawsforacausemi.org",
   },
   {
-    client: "Client name pending",
-    industry: "Multi-location healthcare",
-    scope: ["Meta Ads", "Website Development", "SEO"],
-    headline: "$1.8M attributable revenue, year one.",
-    metric: "Attributable revenue",
-    metricValue: "$1.8M",
+    client: "Moten Consulting Group",
+    industry: "Professional services · Consulting",
+    location: "Michigan",
+    scope: ["Website Development", "SEO"],
     story:
-      "Funnel rebuild plus a redesigned booking experience cut drop-off by 38%. Meta Ads brought in 7,200 booked appointments tracked end-to-end through our reporting layer.",
-    range: "Year 1, ongoing",
+      "A consulting practice that earns its work through reputation. We built a site that does justice to the brand — quietly confident, plainly written, and engineered to rank for the buyers actively looking for a senior partner.",
   },
   {
-    client: "Client name pending",
-    industry: "Boutique law firm",
-    scope: ["Website Maintenance", "SEO"],
-    headline: "99.98% uptime, 14-month run.",
-    metric: "Uptime",
-    metricValue: "99.98%",
+    client: "Mayuri Indian Restaurant",
+    industry: "Hospitality · Restaurant",
+    location: "Michigan",
+    scope: ["Website Development", "Meta Ads", "Website Maintenance"],
     story:
-      "Took over a neglected WordPress build with three open vulnerabilities and a failing SSL renewal. Hardened security, migrated to managed hosting, set up uptime + performance monitoring. Two outages in 14 months, both resolved under fifteen minutes.",
-    range: "Mar 2024 – present",
+      "A neighborhood Indian restaurant where the food deserves a website that earns the seat. We built a menu-forward site with smart local SEO and run Meta campaigns that fill tables on the nights that matter most.",
   },
   {
-    client: "Client name pending",
-    industry: "Beauty & wellness",
-    scope: ["Meta Ads", "Website Development"],
-    headline: "First $100k month, eight weeks in.",
-    metric: "Revenue / mo",
-    metricValue: "$118k",
+    client: "Holistic Manual Physical Therapy",
+    industry: "Healthcare · Physical therapy",
+    location: "Michigan",
+    scope: ["Website Development", "SEO", "Website Maintenance"],
     story:
-      "New brand site shipped at 1.6s LCP, paired with a tightly structured Meta launch. Hit $118k in attributable revenue in month two on $24k of ad spend.",
-    range: "Q4 2024",
-  },
-  {
-    client: "Client name pending",
-    industry: "B2B SaaS",
-    scope: ["SEO", "Website Maintenance"],
-    headline: "Doubled organic demos in two quarters.",
-    metric: "Organic demos / mo",
-    metricValue: "2.1×",
-    story:
-      "Rebuilt site IA, killed 60 thin pages, shipped 14 long-form articles tied to bottom-funnel intent. Demos from organic doubled with no paid spend increase.",
-    range: "H1 2025",
+      "A specialty PT clinic where the work is hands-on and patient-led. We built a calm, clinical web presence that signals expertise immediately, ranks for the conditions patients actually search, and routes them straight to a booking.",
   },
 ];
 
@@ -95,20 +72,28 @@ export default function Clients() {
             <span className="gold italic">moved the line for.</span>
           </>
         }
-        subtitle="A selection of recent engagements, each showing the lever pulled, the time horizon, and the metric that mattered. Names anonymized — full case studies available under NDA on request."
+        subtitle="A working list of the brands and organizations we partner with — across nonprofits, restaurants, healthcare, and consulting. Different industries, same standard."
       />
 
       <section className="section bg-midnight">
         <div className="mx-auto max-w-7xl px-6 md:px-10">
-          <Reveal>
-            <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-gold mb-12">
-              ◆ Case studies
-            </p>
-          </Reveal>
+          <div className="flex items-end justify-between mb-12 flex-wrap gap-4">
+            <Reveal>
+              <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-gold">
+                ◆ Selected partners
+              </p>
+            </Reveal>
+            <Reveal delay={0.15}>
+              <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-ivory/40">
+                {clients.length} active engagements
+              </p>
+            </Reveal>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {placeholderCases.map((c, i) => (
+            {clients.map((c, i) => (
               <motion.article
-                key={i}
+                key={c.client}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-80px" }}
@@ -120,39 +105,43 @@ export default function Clients() {
                 whileHover={{ y: -4 }}
                 className="card p-8 md:p-10 flex flex-col"
               >
-                <div className="flex items-start justify-between mb-6 font-mono text-[10px] uppercase tracking-[0.28em]">
-                  <div>
-                    <p className="text-ivory/40">{c.industry}</p>
-                    <p className="text-gold mt-1">{c.client}</p>
-                  </div>
-                  <span className="text-ivory/40">{c.range}</span>
-                </div>
-
-                <div className="flex items-baseline gap-4 mb-6">
-                  <span className="font-display text-gold text-5xl md:text-6xl leading-none">
-                    {c.metricValue}
-                  </span>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-ivory/50">
-                    {c.metric}
+                <div className="flex items-start justify-between mb-8 font-mono text-[10px] uppercase tracking-[0.28em] gap-4">
+                  <span className="text-ivory/40">{c.industry}</span>
+                  <span className="text-ivory/40 text-right shrink-0">
+                    {c.location}
                   </span>
                 </div>
 
-                <h3 className="font-display text-2xl md:text-3xl text-ivory leading-snug mb-5">
-                  {c.headline}
+                <h3 className="font-display font-light text-3xl md:text-4xl text-ivory leading-[1.05] tracking-[-0.01em] mb-6">
+                  {c.client}
                 </h3>
-                <p className="text-ivory/65 leading-relaxed text-sm mb-8">
+
+                <p className="text-ivory/70 leading-relaxed mb-8">
                   {c.story}
                 </p>
 
-                <div className="mt-auto flex flex-wrap gap-2 pt-6 border-t border-gold/15">
-                  {c.scope.map((s) => (
-                    <span
-                      key={s}
-                      className="text-[10px] uppercase tracking-[0.24em] font-medium text-gold border border-gold/30 rounded-full px-3 py-1"
+                <div className="mt-auto pt-6 border-t border-gold/15 flex items-center justify-between flex-wrap gap-4">
+                  <div className="flex flex-wrap gap-2">
+                    {c.scope.map((s) => (
+                      <span
+                        key={s}
+                        className="text-[10px] uppercase tracking-[0.24em] font-medium text-gold border border-gold/30 rounded-full px-3 py-1"
+                      >
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                  {c.url && (
+                    <a
+                      href={c.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.28em] font-medium text-gold border-b border-gold/40 pb-0.5 hover:gap-3 transition-all"
                     >
-                      {s}
-                    </span>
-                  ))}
+                      Visit site
+                      <span aria-hidden>↗</span>
+                    </a>
+                  )}
                 </div>
               </motion.article>
             ))}
@@ -161,23 +150,23 @@ export default function Clients() {
           <Reveal delay={0.4}>
             <div className="mt-16 card p-8 md:p-12 text-center">
               <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-gold mb-4">
-                ◆ Want the full version?
+                ◆ Want a deeper look?
               </p>
               <h3 className="font-display text-3xl md:text-5xl leading-tight mb-6">
-                Real names. Real numbers. Real screenshots.
+                Real numbers. Real screenshots. Real references.
               </h3>
               <p className="text-ivory/65 max-w-xl mx-auto mb-10">
-                We share full case studies — with named clients, dashboard
-                screenshots, and the actual creative that worked — under NDA
-                on a discovery call.
+                On a discovery call, we walk through the work we did, the
+                metrics that moved, and the people you can call to ask about
+                us directly.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4">
-                <Link to="/book" className="btn-gold">
+                <Link to="/contact" className="btn-gold">
                   Book a call
                   <span aria-hidden>→</span>
                 </Link>
-                <Link to="/contact" className="btn-ghost-gold">
-                  Send a message
+                <Link to="/services" className="btn-ghost-gold">
+                  See services
                 </Link>
               </div>
             </div>

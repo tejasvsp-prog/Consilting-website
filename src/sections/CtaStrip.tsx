@@ -29,7 +29,7 @@ export default function CtaStrip() {
 
         <Reveal delay={0.7}>
           <div className="mt-12 flex flex-wrap items-center justify-center gap-4">
-            <Link to="/book" className="btn-gold">
+            <Link to="/contact" className="btn-gold">
               Book Demo
               <span aria-hidden>→</span>
             </Link>

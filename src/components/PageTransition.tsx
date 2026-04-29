@@ -2,17 +2,21 @@ import { motion } from "framer-motion";
 import type { ReactNode } from "react";
 
 /**
- * Per-page wrapper. Wraps the entire route's content in an opacity + slight
- * upward translate enter animation, plus a downward exit. Combined with
- * AnimatePresence in the layout, this yields a clean fade-up between routes.
+ * Per-page wrapper. The new page mounts after the curtain has covered the
+ * screen, so the entrance animates from underneath the curtain — feels like
+ * the page itself is being unveiled rather than crossfading.
  */
 export default function PageTransition({ children }: { children: ReactNode }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 60 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -16 }}
-      transition={{ duration: 0.55, ease: [0.2, 0.8, 0.2, 1] }}
+      exit={{ opacity: 0, y: -24 }}
+      transition={{
+        delay: 0.55,
+        duration: 0.85,
+        ease: [0.2, 0.8, 0.2, 1],
+      }}
     >
       {children}
     </motion.div>
@@ -20,21 +24,76 @@ export default function PageTransition({ children }: { children: ReactNode }) {
 }
 
 /**
- * A thin gold rule that wipes top→bottom over the screen during a route
- * change. AnimatePresence fades it in at the start of the new route and out
- * once the page has settled. Pairs with PageTransition for a layered effect.
+ * Theatrical route transition.
+ *
+ * Five vertical panels — midnight, obsidian, gold, obsidian, midnight —
+ * slide up from below, each staggered ~50ms, until the screen is fully
+ * covered. At the apex of the cover, the AMARA wordmark + a thin gold
+ * underbar flash for a single beat. Then the panels keep rising and exit
+ * through the top, revealing the new page.
+ *
+ * Total duration: ~1.5s. Pairs with PageTransition's 0.55s entrance delay
+ * so the new content is unveiled exactly as the curtain lifts.
+ *
+ * Implementation: keyed by location.pathname so the component remounts on
+ * every route change and replays its enter animation. No AnimatePresence
+ * wrapping needed.
  */
 export function RouteCurtain() {
+  const panels = [
+    { color: "#0b0a09" }, // midnight
+    { color: "#15120e" }, // obsidian
+    { color: "#d4b061" }, // gold
+    { color: "#15120e" }, // obsidian
+    { color: "#0b0a09" }, // midnight
+  ];
+
   return (
-    <motion.div
-      key="curtain"
-      initial={{ scaleY: 0, opacity: 0.9 }}
-      animate={{ scaleY: 1, opacity: 0 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.7, ease: [0.7, 0, 0.2, 1] }}
-      style={{ originY: 0 }}
-      className="fixed inset-0 z-[55] pointer-events-none bg-gradient-to-b from-gold/0 via-gold/10 to-gold/0"
-    />
+    <div className="fixed inset-0 z-[80] pointer-events-none flex">
+      {panels.map((p, i) => (
+        <motion.div
+          key={i}
+          className="flex-1 will-change-transform"
+          style={{ background: p.color }}
+          initial={{ y: "101%" }}
+          animate={{ y: ["101%", "0%", "0%", "-101%"] }}
+          transition={{
+            duration: 1.5,
+            times: [0, 0.34, 0.5, 1],
+            delay: i * 0.045,
+            ease: [0.76, 0, 0.24, 1],
+          }}
+        />
+      ))}
+
+      {/* Mid-transition mark flash */}
+      <motion.div
+        className="absolute inset-0 flex flex-col items-center justify-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: [0, 0, 1, 1, 0] }}
+        transition={{
+          duration: 1.5,
+          times: [0, 0.36, 0.42, 0.55, 0.62],
+        }}
+      >
+        <motion.span
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: [0, 0, 1, 1, 0] }}
+          transition={{
+            duration: 1.5,
+            times: [0, 0.36, 0.46, 0.55, 0.62],
+            ease: [0.7, 0, 0.2, 1],
+          }}
+          className="block h-px w-32 md:w-48 bg-gold mb-5 origin-center"
+        />
+        <span className="font-display font-light text-3xl md:text-5xl tracking-mark text-ivory">
+          AMARA
+        </span>
+        <span className="mt-3 font-mono text-[10px] uppercase tracking-[0.42em] text-gold">
+          Digital
+        </span>
+      </motion.div>
+    </div>
   );
 }
 
@@ -60,25 +119,38 @@ export function PageHeader({
         <motion.p
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.6 }}
+          transition={{ delay: 0.7, duration: 0.6 }}
           className="font-mono text-[11px] uppercase tracking-[0.32em] text-gold mb-8"
         >
           ◆ {tag}
         </motion.p>
-        <h1 className="font-display font-light text-5xl md:text-7xl lg:text-[7vw] leading-[0.98] tracking-[-0.02em] max-w-5xl text-ivory">
+        <motion.h1
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.9, ease: [0.2, 0.8, 0.2, 1] }}
+          className="font-display font-light text-5xl md:text-7xl lg:text-[7vw] leading-[0.98] tracking-[-0.02em] max-w-5xl text-ivory"
+        >
           {title}
-        </h1>
+        </motion.h1>
         {subtitle && (
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.7 }}
+            transition={{ delay: 1.0, duration: 0.7 }}
             className="mt-8 max-w-2xl text-ivory/65 text-lg leading-relaxed"
           >
             {subtitle}
           </motion.p>
         )}
-        {children}
+        {children && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.15, duration: 0.7 }}
+          >
+            {children}
+          </motion.div>
+        )}
       </div>
     </header>
   );
