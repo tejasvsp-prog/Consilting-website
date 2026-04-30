@@ -990,42 +990,43 @@ function ProcessMarquee() {
   );
 }
 
-/* ─── Next Move — minimal closer + interactive 3D LED cube ──────── */
+/* ─── Next Move — flickering neon sign as the centerpiece ───────── */
 
 function NextMoveSection() {
   return (
-    <section className="relative section bg-midnight border-t border-gold/15 overflow-hidden">
+    <section className="relative section bg-midnight border-t border-gold/15 overflow-hidden min-h-[90vh] flex items-center">
+      {/* Soft ambient gold haze */}
       <div
         aria-hidden
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse at center, rgba(212,176,97,0.10) 0%, transparent 60%)",
+            "radial-gradient(ellipse at center, rgba(212,176,97,0.12) 0%, transparent 65%)",
         }}
       />
 
-      <div className="relative mx-auto max-w-7xl px-6 md:px-10 text-center">
+      {/* Faint brick-wall grid behind the neon */}
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none opacity-[0.06]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(212,176,97,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(212,176,97,0.6) 1px, transparent 1px)",
+          backgroundSize: "120px 60px",
+        }}
+      />
+
+      <div className="relative mx-auto max-w-7xl px-6 md:px-10 text-center w-full">
         <Reveal>
-          <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-gold mb-10">
+          <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-gold mb-12">
             ◆ The next move
           </p>
         </Reveal>
 
-        <Reveal delay={0.1}>
-          <h2 className="font-display font-light text-5xl md:text-7xl lg:text-8xl leading-[0.95] tracking-[-0.02em] max-w-4xl mx-auto">
-            Make the move.{" "}
-            <span className="gold italic">We'll handle the rest.</span>
-          </h2>
-        </Reveal>
+        <NeonSign />
 
-        <Reveal delay={0.25}>
-          <div className="my-16 md:my-24">
-            <LEDCube />
-          </div>
-        </Reveal>
-
-        <Reveal delay={0.35}>
-          <div className="flex flex-wrap items-center justify-center gap-4">
+        <Reveal delay={0.5}>
+          <div className="mt-20 md:mt-24 flex flex-wrap items-center justify-center gap-4">
             <Link to="/contact" className="btn-gold">
               Book Demo
               <span aria-hidden>→</span>
@@ -1040,135 +1041,94 @@ function NextMoveSection() {
   );
 }
 
-/* ─── LEDCube — 5×5×5 grid of 125 gold LED dots in 3D space.
-   Idle: continuously rotates around the Y axis on a 32s loop with
-   a slight X-axis bob.
-   Hover: rotation follows the cursor (rotateX / rotateY computed
-   from mouse position) and the dot lattice EXPANDS (gap grows by
-   1.55x) so it visibly inflates outward. Leaving the cube snaps
-   it back. Dots in the front-most layer glow brighter; back layers
-   recede. ───────────────────────────────────────────────────── */
-
-function LEDCube() {
-  const SIZE = 5;
-  const BASE_GAP = 18;
-  const HOVER_GAP = 28;
-
-  const [hover, setHover] = useState(false);
-  const [tilt, setTilt] = useState({ rx: -22, ry: 0 });
-
-  function onMove(e: React.MouseEvent<HTMLDivElement>) {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const px = (e.clientX - rect.left) / rect.width - 0.5;
-    const py = (e.clientY - rect.top) / rect.height - 0.5;
-    setTilt({ rx: -22 + py * -45, ry: px * 75 });
-  }
-
-  const gap = hover ? HOVER_GAP : BASE_GAP;
-  const center = (SIZE - 1) / 2;
-
-  // Pre-compute the dot lattice
-  const dots = useMemo(() => {
-    const arr: { x: number; y: number; z: number; bright: boolean }[] = [];
-    for (let z = 0; z < SIZE; z++) {
-      for (let y = 0; y < SIZE; y++) {
-        for (let x = 0; x < SIZE; x++) {
-          // Sprinkle ~1 in 6 'bright' dots to give the lattice
-          // some visual rhythm without going garish
-          const bright = (x * 37 + y * 53 + z * 71) % 6 === 0;
-          arr.push({ x, y, z, bright });
-        }
-      }
-    }
-    return arr;
-  }, []);
-
+/* NeonSign — the headline rendered as a glowing neon sign that
+   flickers irregularly. Multiple layered text-shadow halos give the
+   tube-glow effect; opacity keyframes simulate a worn neon segment
+   that briefly drops out and recovers. The italic 'We'll handle the
+   rest.' has its own slightly-different flicker cadence so the two
+   lines don't blink in lockstep. */
+function NeonSign() {
   return (
-    <div
-      className="mx-auto w-72 h-72 md:w-[420px] md:h-[420px] relative cursor-grab"
-      style={{ perspective: 1400 }}
-      onMouseMove={onMove}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => {
-        setHover(false);
-        setTilt({ rx: -22, ry: 0 });
-      }}
-    >
-      <motion.div
-        className="absolute inset-0 flex items-center justify-center"
-        style={{ transformStyle: "preserve-3d" }}
-        animate={
-          hover
-            ? { rotateX: tilt.rx, rotateY: tilt.ry }
-            : { rotateX: [-22, -10, -22], rotateY: [0, 360] }
-        }
-        transition={
-          hover
-            ? { duration: 0.35, ease: "easeOut" }
-            : {
-                rotateY: { duration: 32, repeat: Infinity, ease: "linear" },
-                rotateX: {
-                  duration: 8,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                },
-              }
-        }
-      >
-        {dots.map((d) => {
-          const dx = (d.x - center) * gap;
-          const dy = (d.y - center) * gap;
-          const dz = (d.z - center) * gap;
-          // Depth-based opacity (back layer dimmer, front brighter)
-          const depthRatio = d.z / (SIZE - 1);
-          const baseOpacity = 0.32 + depthRatio * 0.55;
-          // Bright dots use ivory; otherwise gold
-          const color = d.bright ? "#F2EAD7" : "#D4B061";
-          const size = d.bright ? 5 : 3.5;
-          return (
-            <span
-              key={`${d.x}${d.y}${d.z}`}
-              aria-hidden
-              className="absolute rounded-full"
-              style={{
-                width: size,
-                height: size,
-                marginLeft: -size / 2,
-                marginTop: -size / 2,
-                left: "50%",
-                top: "50%",
-                background: color,
-                opacity: baseOpacity,
-                boxShadow: d.bright
-                  ? "0 0 10px rgba(242,234,215,0.85), 0 0 16px rgba(212,176,97,0.5)"
-                  : "0 0 8px rgba(212,176,97,0.55)",
-                transform: `translate3d(${dx}px, ${dy}px, ${dz}px)`,
-                transition:
-                  "transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s ease",
-              }}
-            />
-          );
-        })}
-      </motion.div>
-
-      {/* Soft floor reflection */}
-      <div
+    <div className="relative inline-block">
+      {/* Anchor cables — small mounting points top + bottom */}
+      <span
         aria-hidden
-        className="absolute left-1/2 -translate-x-1/2 bottom-2 w-2/3 h-12 rounded-[50%] pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse at center, rgba(212,176,97,0.18), transparent 70%)",
-          filter: "blur(8px)",
-        }}
+        className="absolute -top-3 left-1/4 h-3 w-px bg-gold/40"
+      />
+      <span
+        aria-hidden
+        className="absolute -top-3 right-1/4 h-3 w-px bg-gold/40"
       />
 
-      {/* Cursor hint */}
-      <p
-        aria-hidden
-        className="absolute -bottom-6 left-1/2 -translate-x-1/2 font-mono text-[9px] uppercase tracking-[0.32em] text-ivory/35 whitespace-nowrap"
+      <motion.h2
+        initial={{ opacity: 0 }}
+        animate={{
+          opacity: [
+            1, 0.35, 1, 1, 1, 0.55, 1, 1, 0.85, 1, 1, 0.4, 1, 1, 1, 1,
+          ],
+        }}
+        transition={{
+          duration: 6.5,
+          times: [
+            0, 0.04, 0.06, 0.18, 0.34, 0.36, 0.39, 0.55, 0.57, 0.6, 0.78,
+            0.8, 0.83, 0.92, 0.97, 1,
+          ],
+          repeat: Infinity,
+          ease: "linear",
+        }}
+        className="font-couture font-normal text-6xl md:text-8xl lg:text-[10vw] leading-[0.92] tracking-[-0.005em] max-w-5xl mx-auto"
+        style={{
+          color: "#FFE9B3",
+          textShadow: [
+            "0 0 4px #FFE9B3",
+            "0 0 12px rgba(212,176,97,0.95)",
+            "0 0 28px rgba(212,176,97,0.85)",
+            "0 0 56px rgba(212,176,97,0.55)",
+            "0 0 100px rgba(212,176,97,0.35)",
+          ].join(", "),
+        }}
       >
-        ◆ hover to expand
-      </p>
+        Make the move.
+      </motion.h2>
+
+      <motion.h3
+        initial={{ opacity: 0 }}
+        animate={{
+          opacity: [1, 0.45, 1, 1, 0.7, 1, 1, 1, 0.5, 1, 1, 0.85, 1, 1, 1],
+        }}
+        transition={{
+          duration: 7.3,
+          times: [
+            0, 0.05, 0.07, 0.22, 0.24, 0.27, 0.45, 0.62, 0.64, 0.67, 0.85,
+            0.87, 0.9, 0.97, 1,
+          ],
+          repeat: Infinity,
+          ease: "linear",
+        }}
+        className="font-couture italic font-normal text-6xl md:text-8xl lg:text-[10vw] leading-[0.92] tracking-[-0.005em] max-w-5xl mx-auto mt-2 md:mt-3"
+        style={{
+          color: "#FFD37A",
+          textShadow: [
+            "0 0 4px #FFD37A",
+            "0 0 14px rgba(212,176,97,1)",
+            "0 0 32px rgba(212,176,97,0.9)",
+            "0 0 60px rgba(212,176,97,0.6)",
+            "0 0 110px rgba(212,176,97,0.4)",
+          ].join(", "),
+        }}
+      >
+        We'll handle the rest.
+      </motion.h3>
+
+      {/* Cable stubs hanging from the sign */}
+      <span
+        aria-hidden
+        className="absolute -bottom-3 left-1/3 h-3 w-px bg-gold/30"
+      />
+      <span
+        aria-hidden
+        className="absolute -bottom-3 right-1/3 h-3 w-px bg-gold/30"
+      />
     </div>
   );
 }

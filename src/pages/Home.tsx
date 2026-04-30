@@ -1,5 +1,5 @@
-import { motion } from "framer-motion";
-import { useMemo } from "react";
+import { motion, useAnimationControls } from "framer-motion";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import PageTransition from "../components/PageTransition";
 import { Reveal } from "../components/Reveal";
@@ -175,28 +175,95 @@ function RocketCloser() {
   );
 }
 
-/* Rocket SVG with continuous lift hover, flame flicker, and rising stars */
+/* Rocket — real-time cursor-driven movement with occasional bursts.
+   No more constant lift loop. Idle: nearly still with quiet breathing.
+   On mouse move within the section: rocket leans toward the cursor
+   (rotate/translate). Every 14-22 seconds: a brief 'burst' kicks the
+   rocket up + scaled, then it settles. */
 function Rocket() {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = useState({ rx: 0, ry: 0, x: 0, y: 0 });
+  const [thrust, setThrust] = useState(false);
+  const controls = useAnimationControls();
+
+  // Track cursor position relative to the rocket section
+  useEffect(() => {
+    const section = wrapRef.current?.closest("section");
+    if (!section) return;
+    function onMove(e: MouseEvent) {
+      const rect = section!.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width - 0.5;
+      const py = (e.clientY - rect.top) / rect.height - 0.5;
+      // Clamp influence so the rocket leans subtly, not violently
+      setTilt({
+        rx: py * -8,
+        ry: px * 14,
+        x: px * 18,
+        y: py * 12,
+      });
+    }
+    function onLeave() {
+      setTilt({ rx: 0, ry: 0, x: 0, y: 0 });
+    }
+    section.addEventListener("mousemove", onMove);
+    section.addEventListener("mouseleave", onLeave);
+    return () => {
+      section.removeEventListener("mousemove", onMove);
+      section.removeEventListener("mouseleave", onLeave);
+    };
+  }, []);
+
+  // Periodic burst — every 14–22s, the rocket lifts + flares briefly
+  useEffect(() => {
+    let alive = true;
+    let timeout: ReturnType<typeof setTimeout>;
+    async function loop() {
+      if (!alive) return;
+      const wait = 14000 + Math.random() * 8000;
+      timeout = setTimeout(async () => {
+        if (!alive) return;
+        setThrust(true);
+        await controls.start({
+          y: -36,
+          scale: 1.06,
+          rotate: (Math.random() - 0.5) * 5,
+          transition: { duration: 0.55, ease: [0.2, 0.8, 0.2, 1] },
+        });
+        await controls.start({
+          y: 0,
+          scale: 1,
+          rotate: 0,
+          transition: { duration: 1.2, ease: "easeOut" },
+        });
+        setThrust(false);
+        loop();
+      }, wait);
+    }
+    loop();
+    return () => {
+      alive = false;
+      clearTimeout(timeout);
+    };
+  }, [controls]);
+
   return (
     <motion.div
+      ref={wrapRef}
       initial={{ opacity: 0, y: 60 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 1.0, ease: [0.2, 0.8, 0.2, 1] }}
       className="relative w-48 sm:w-60 md:w-72 lg:w-80"
+      style={{ perspective: 1200 }}
     >
       <motion.svg
         viewBox="0 0 240 460"
         className="w-full h-auto drop-shadow-[0_0_50px_rgba(212,176,97,0.28)]"
-        animate={{
-          y: [0, -34, -10, -28, 0],
-          rotate: [-3, 3.5, -2, 4, -3],
-          scale: [1, 1.04, 1.01, 1.05, 1],
-        }}
-        transition={{
-          duration: 4.2,
-          repeat: Infinity,
-          ease: "easeInOut",
+        animate={controls}
+        style={{
+          transform: `rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) translate3d(${tilt.x}px, ${tilt.y}px, 0)`,
+          transformStyle: "preserve-3d",
+          transition: "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)",
         }}
         aria-hidden
       >
@@ -278,26 +345,29 @@ function Rocket() {
           strokeWidth="2"
         />
 
-        {/* Exhaust flames — animated flicker */}
+        {/* Exhaust — fully visible only during a burst, otherwise a
+            quiet pilot flame at low intensity. */}
         <motion.g
-          animate={{
-            scaleY: [0.85, 1.2, 0.9, 1.15, 0.85],
-            opacity: [0.85, 1, 0.9, 1, 0.85],
-          }}
-          transition={{
-            duration: 0.55,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
+          animate={
+            thrust
+              ? {
+                  scaleY: [0.85, 1.3, 1.0, 1.25, 1.0],
+                  opacity: [0.6, 1, 0.85, 1, 0.6],
+                }
+              : { scaleY: 0.45, opacity: 0.32 }
+          }
+          transition={
+            thrust
+              ? { duration: 0.5, repeat: Infinity, ease: "easeInOut" }
+              : { duration: 1.2, ease: "easeOut" }
+          }
           style={{ transformOrigin: "120px 334px" }}
         >
-          {/* Outer flame */}
           <path
             d="M96 334 Q108 380 120 410 Q132 380 144 334 Q140 360 130 380 Q120 392 110 380 Q100 360 96 334 Z"
             fill="#d4b061"
             opacity="0.95"
           />
-          {/* Inner flame */}
           <path
             d="M106 334 Q114 370 120 392 Q126 370 134 334 Q130 354 124 372 Q120 380 116 372 Q110 354 106 334 Z"
             fill="#f2ead7"
@@ -306,8 +376,8 @@ function Rocket() {
         </motion.g>
       </motion.svg>
 
-      {/* Rising sparks under the rocket */}
-      <Sparks />
+      {/* Rising sparks — only render during thrust */}
+      {thrust && <Sparks />}
     </motion.div>
   );
 }
