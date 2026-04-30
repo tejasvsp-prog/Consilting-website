@@ -1,8 +1,10 @@
 import ServiceDetail from "../../components/ServiceDetail";
+import { SunVisual } from "../../components/ServiceVisuals";
 
 export default function Seo() {
   return (
     <ServiceDetail
+      Visual={SunVisual}
       number="01"
       slug="seo"
       name="Search Engine Optimization"

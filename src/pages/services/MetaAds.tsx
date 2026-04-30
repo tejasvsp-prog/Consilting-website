@@ -1,8 +1,10 @@
 import ServiceDetail from "../../components/ServiceDetail";
+import { ConvoyVisual } from "../../components/ServiceVisuals";
 
 export default function MetaAds() {
   return (
     <ServiceDetail
+      Visual={ConvoyVisual}
       number="04"
       slug="meta-ads"
       name="Meta Ads"

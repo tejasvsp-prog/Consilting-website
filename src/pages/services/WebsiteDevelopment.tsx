@@ -1,8 +1,10 @@
 import ServiceDetail from "../../components/ServiceDetail";
+import { RobotVisual } from "../../components/ServiceVisuals";
 
 export default function WebsiteDevelopment() {
   return (
     <ServiceDetail
+      Visual={RobotVisual}
       number="02"
       slug="website-development"
       name="Website Development"

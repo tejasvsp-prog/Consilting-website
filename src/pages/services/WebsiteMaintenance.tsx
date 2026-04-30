@@ -1,8 +1,10 @@
 import ServiceDetail from "../../components/ServiceDetail";
+import { PulseVisual } from "../../components/ServiceVisuals";
 
 export default function WebsiteMaintenance() {
   return (
     <ServiceDetail
+      Visual={PulseVisual}
       number="03"
       slug="website-maintenance"
       name="Website Maintenance"

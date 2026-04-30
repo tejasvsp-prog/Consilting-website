@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import PageTransition, { PageHeader } from "./PageTransition";
 import { Reveal } from "./Reveal";
 import { services } from "../sections/Services";
-import CtaStrip from "../sections/CtaStrip";
 
 export type ServiceDetailProps = {
   number: string;
@@ -16,6 +15,7 @@ export type ServiceDetailProps = {
   process: { n: string; t: string; d: string }[];
   faqs: { q: string; a: string }[];
   resultStat: { value: string; label: string }[];
+  Visual?: () => JSX.Element;
 };
 
 export default function ServiceDetail(p: ServiceDetailProps) {
@@ -49,16 +49,28 @@ export default function ServiceDetail(p: ServiceDetailProps) {
         </div>
       </PageHeader>
 
-      <section className="section bg-midnight">
+      {/* Visual band */}
+      {p.Visual && (
+        <section className="bg-midnight pt-4 pb-20 md:pb-28">
+          <div className="mx-auto max-w-7xl px-6 md:px-10">
+            <Reveal>
+              <p.Visual />
+            </Reveal>
+          </div>
+        </section>
+      )}
+
+      {/* 1) What this is */}
+      <section className="section bg-midnight pt-0">
         <div className="mx-auto max-w-7xl px-6 md:px-10 grid grid-cols-12 gap-10">
           <div className="col-span-12 md:col-span-5">
             <Reveal>
               <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-gold mb-8">
-                ◆ The premise
+                ◆ What this is
               </p>
             </Reveal>
             <h2 className="font-display font-light text-4xl md:text-5xl leading-[1.05] tracking-[-0.01em]">
-              Why this exists.
+              The short version.
             </h2>
           </div>
           <div className="col-span-12 md:col-span-6 md:col-start-7">
@@ -82,6 +94,7 @@ export default function ServiceDetail(p: ServiceDetailProps) {
         </div>
       </section>
 
+      {/* 2) What you get */}
       <section className="section bg-obsidian border-y border-gold/15">
         <div className="mx-auto max-w-7xl px-6 md:px-10">
           <Reveal>
@@ -100,8 +113,14 @@ export default function ServiceDetail(p: ServiceDetailProps) {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ delay: (i % 4) * 0.06, duration: 0.7 }}
-                className="bg-midnight p-7 md:p-10"
+                className="bg-midnight p-7 md:p-10 relative group"
               >
+                <span
+                  aria-hidden
+                  className="absolute top-5 right-6 font-mono text-[10px] uppercase tracking-[0.28em] text-gold/40"
+                >
+                  {String(i + 1).padStart(2, "0")}
+                </span>
                 <h3 className="font-display text-2xl md:text-3xl text-ivory mb-3">
                   {d.t}
                 </h3>
@@ -112,40 +131,64 @@ export default function ServiceDetail(p: ServiceDetailProps) {
         </div>
       </section>
 
+      {/* 3) Process — no timeline, just three premium cards with a top-edge progress glow */}
       <section className="section bg-midnight">
         <div className="mx-auto max-w-7xl px-6 md:px-10">
           <Reveal>
             <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-gold mb-8">
-              ◆ The arc
+              ◆ Process
             </p>
           </Reveal>
           <h2 className="font-display font-light text-4xl md:text-6xl leading-[1.02] tracking-[-0.01em] max-w-3xl mb-16">
             How an engagement runs.
           </h2>
 
-          <ol className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {p.process.map((s, i) => (
-              <motion.li
-                key={s.n}
+              <motion.article
+                key={s.t}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ delay: i * 0.1, duration: 0.8 }}
-                className="card p-7 md:p-10 list-none"
+                className="card relative p-7 md:p-10 overflow-hidden"
               >
-                <p className="font-mono text-xs uppercase tracking-[0.28em] text-gold mb-6">
-                  {s.n}
-                </p>
+                {/* Top-edge glow rail */}
+                <span
+                  aria-hidden
+                  className="absolute top-0 left-0 h-px w-full bg-gradient-to-r from-transparent via-gold/70 to-transparent"
+                />
+                {/* Big numeral */}
+                <div className="flex items-baseline justify-between mb-6">
+                  <span className="font-display italic text-5xl md:text-6xl text-gold/85 leading-none">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-ivory/40">
+                    Step
+                  </span>
+                </div>
                 <h3 className="font-display text-2xl text-ivory mb-4">
                   {s.t}
                 </h3>
                 <p className="text-ivory/65 leading-relaxed text-sm">{s.d}</p>
-              </motion.li>
+                {/* Pulsing corner dot */}
+                <motion.span
+                  className="absolute bottom-5 right-5 size-1.5 rounded-full bg-gold"
+                  animate={{ opacity: [0.3, 1, 0.3] }}
+                  transition={{
+                    duration: 2.4,
+                    delay: i * 0.3,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                />
+              </motion.article>
             ))}
-          </ol>
+          </div>
         </div>
       </section>
 
+      {/* 4) FAQ */}
       <section className="section bg-obsidian border-y border-gold/15">
         <div className="mx-auto max-w-7xl px-6 md:px-10 grid grid-cols-12 gap-10">
           <div className="col-span-12 md:col-span-4">
@@ -178,6 +221,7 @@ export default function ServiceDetail(p: ServiceDetailProps) {
         </div>
       </section>
 
+      {/* 5) Other services */}
       <section className="section bg-midnight">
         <div className="mx-auto max-w-7xl px-6 md:px-10">
           <Reveal>
@@ -215,8 +259,6 @@ export default function ServiceDetail(p: ServiceDetailProps) {
           </div>
         </div>
       </section>
-
-      <CtaStrip />
     </PageTransition>
   );
 }
