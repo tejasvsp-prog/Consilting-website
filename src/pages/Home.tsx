@@ -271,37 +271,91 @@ function Rocket() {
   );
 }
 
-/* CSS-driven rising spark dots underneath the rocket. Each spark
-   uses the rocketSpark keyframe with custom CSS variables for
-   horizontal drift, duration, and delay. */
+/* Cinematic rocket sparks — a layered field of small bright sparks
+   plus larger glowing embers, all CSS-driven. Includes a soft
+   exhaust halo at the base of the rocket so the launch reads as
+   bright + warm without making the rocket itself jittery. */
 function Sparks() {
+  // 14 small bright sparks (rocketSpark keyframe — short, fast)
   const sparks = useMemo(
     () =>
-      Array.from({ length: 8 }, (_, i) => ({
-        left: 36 + (i * 7) % 28,
-        sx: ((i * 13) % 9) - 4 + "px",
-        delay: (i * 0.27).toFixed(2) + "s",
-        duration: (1.8 + ((i * 31) % 9) * 0.1).toFixed(2) + "s",
-        size: 2 + ((i * 11) % 3),
+      Array.from({ length: 14 }, (_, i) => ({
+        left: 30 + ((i * 11) % 40),
+        sx: ((i * 17) % 19) - 9 + "px",
+        delay: (i * 0.22).toFixed(2) + "s",
+        duration: (1.8 + ((i * 31) % 11) * 0.1).toFixed(2) + "s",
+        size: 1.5 + ((i * 7) % 3) * 0.7,
       })),
     []
   );
+
+  // 6 larger embers (rocketEmber keyframe — slower, longer rise)
+  const embers = useMemo(
+    () =>
+      Array.from({ length: 6 }, (_, i) => ({
+        left: 32 + ((i * 19) % 36),
+        sx: ((i * 23) % 31) - 15 + "px",
+        delay: (i * 0.55 + 0.2).toFixed(2) + "s",
+        duration: (3.2 + ((i * 13) % 7) * 0.15).toFixed(2) + "s",
+        size: 3.5 + ((i * 11) % 4) * 0.6,
+      })),
+    []
+  );
+
   return (
-    <div className="absolute left-0 right-0 -bottom-12 h-32 pointer-events-none">
+    <div className="absolute left-0 right-0 -bottom-16 h-56 pointer-events-none overflow-visible">
+      {/* Exhaust halo — soft warm glow under the rocket */}
+      <span
+        aria-hidden
+        className="absolute left-1/2 -translate-x-1/2 top-0 w-32 h-20 rounded-[50%] pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, rgba(255,250,236,0.35) 0%, rgba(212,176,97,0.25) 30%, transparent 70%)",
+          filter: "blur(8px)",
+        }}
+      />
+
+      {/* Small bright sparks */}
       {sparks.map((s, i) => (
         <span
-          key={i}
+          key={`s-${i}`}
           aria-hidden
-          className="rocket-spark absolute rounded-full bg-gold"
+          className="rocket-spark absolute rounded-full"
           style={
             {
               left: `${s.left}%`,
               bottom: 0,
               width: s.size,
               height: s.size,
+              background: "#FFFAEC",
+              boxShadow:
+                "0 0 6px rgba(255,250,236,0.95), 0 0 14px rgba(212,176,97,0.7)",
               "--sx": s.sx,
               "--dur": s.duration,
               "--delay": s.delay,
+            } as React.CSSProperties
+          }
+        />
+      ))}
+
+      {/* Larger glowing embers */}
+      {embers.map((e, i) => (
+        <span
+          key={`e-${i}`}
+          aria-hidden
+          className="rocket-ember absolute rounded-full"
+          style={
+            {
+              left: `${e.left}%`,
+              bottom: 0,
+              width: e.size,
+              height: e.size,
+              background: "#FFE9B3",
+              boxShadow:
+                "0 0 10px rgba(255,233,179,1), 0 0 24px rgba(255,233,179,0.7), 0 0 50px rgba(212,176,97,0.55)",
+              "--sx": e.sx,
+              "--dur": e.duration,
+              "--delay": e.delay,
             } as React.CSSProperties
           }
         />

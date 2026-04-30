@@ -55,65 +55,33 @@ export default function Hero() {
         <div className="flex items-center w-full">
           <DrawWord
             text="Amara"
-            startDelay={0.55}
-            className="font-display font-light text-[22vw] md:text-[15vw] leading-[0.86] tracking-[-0.025em] text-ivory pl-6 md:pl-10 whitespace-nowrap"
+            startDelay={0.45}
+            drawDuration={1.6}
+            className="font-display font-light text-[24vw] md:text-[16vw] leading-[0.86] tracking-[-0.012em] text-ivory pl-6 md:pl-10 whitespace-nowrap"
           />
-          <motion.span
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ delay: 1.2, duration: 1.0, ease: [0.7, 0, 0.2, 1] }}
-            style={{ originX: 0 }}
+          <span
             aria-hidden
-            className="hidden md:block relative flex-1 h-px bg-gold ml-8 mr-0 overflow-visible"
-          >
-            <motion.span
-              animate={{ left: ["0%", "100%"] }}
-              transition={{
-                duration: 4.5,
-                repeat: Infinity,
-                ease: "linear",
-                delay: 2.0,
-              }}
-              className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-gold shadow-[0_0_14px_rgba(212,176,97,0.95)]"
-            />
-          </motion.span>
+            className="hidden md:block relative flex-1 h-px bg-gold ml-8 mr-0 overflow-visible opacity-0 animate-[fadeInUp_0.9s_ease-out_2.2s_forwards] origin-left"
+            style={{ transformOrigin: "left center" }}
+          />
         </div>
 
         {/* Bottom row: arrow rule + Digital, right-aligned */}
-        <div className="flex items-center w-full mt-4 md:mt-8 justify-end">
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.4, duration: 0.6 }}
+        <div className="flex items-center w-full mt-3 md:mt-6 justify-end">
+          <span
             aria-hidden
-            className="hidden md:flex flex-1 items-center mr-8 ml-0"
+            className="hidden md:flex flex-1 items-center mr-8 ml-0 opacity-0 animate-[fadeInUp_0.9s_ease-out_2.4s_forwards]"
           >
-            <motion.span
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ delay: 1.4, duration: 1.0, ease: [0.7, 0, 0.2, 1] }}
-              style={{ originX: 0 }}
-              className="relative flex-1 h-px bg-gold overflow-visible"
-            >
-              <motion.span
-                animate={{ left: ["0%", "100%"] }}
-                transition={{
-                  duration: 4.5,
-                  repeat: Infinity,
-                  ease: "linear",
-                  delay: 2.4,
-                }}
-                className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-gold shadow-[0_0_14px_rgba(212,176,97,0.95)]"
-              />
-            </motion.span>
+            <span className="relative flex-1 h-px bg-gold overflow-visible" />
             <ArrowTip />
-          </motion.span>
+          </span>
           <DrawWord
             text="Digital."
             italic
             gold
-            startDelay={1.45}
-            className="font-display font-light italic text-[22vw] md:text-[15vw] leading-[0.86] tracking-[-0.025em] gold pr-6 md:pr-10 whitespace-nowrap"
+            startDelay={2.0}
+            drawDuration={1.6}
+            className="font-display font-light italic text-[24vw] md:text-[16vw] leading-[0.86] tracking-[-0.012em] gold pr-6 md:pr-10 whitespace-nowrap"
           />
         </div>
       </motion.div>
@@ -159,88 +127,49 @@ export default function Hero() {
   );
 }
 
-/* ─── DrawWord — letter-by-letter draw-in + recurring shine sweep ─ */
 
+/* ─── DrawWord — CSS-driven light-beam draw + glow ─────────────
+   Text reveals left -> right via a clip-path animation. A bright
+   vertical beam travels in sync with the clip edge — reads as a
+   beam of light tracing the letters. After the draw completes,
+   the text softly pulses with a gold halo. All animations run via
+   pure CSS so they fire on first paint regardless of tab focus,
+   viewport entry, or framer-motion mount timing. */
 function DrawWord({
   text,
   italic,
   gold,
   startDelay = 0,
+  drawDuration = 1.6,
   className,
 }: {
   text: string;
   italic?: boolean;
   gold?: boolean;
   startDelay?: number;
+  drawDuration?: number;
   className?: string;
 }) {
-  const letters = text.split("");
-  const drawDuration = 0.55;
-  const stagger = 0.06;
-  // After all letters land, the shine sweep starts
-  const shineDelay = startDelay + letters.length * stagger + 0.4;
-
   return (
-    <span className={`relative inline-block isolate ${className ?? ""}`}>
-      {/* Base letters drawing in left -> right with stagger */}
-      <span aria-label={text}>
-        {letters.map((c, i) => (
-          <motion.span
-            key={i}
-            aria-hidden
-            initial={{ opacity: 0, y: 28, filter: "blur(8px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            transition={{
-              delay: startDelay + i * stagger,
-              duration: drawDuration,
-              ease: [0.2, 0.8, 0.2, 1],
-            }}
-            className="inline-block"
-          >
-            {c === " " ? " " : c}
-          </motion.span>
-        ))}
-      </span>
-
-      {/* Glowing shine layer — masked sweep that lights the word
-          left -> right after the letters have arrived. Repeats. */}
-      <motion.span
+    <span
+      className={`relative inline-block isolate ${className ?? ""}`}
+      style={
+        {
+          "--draw-delay": `${startDelay}s`,
+          "--draw-dur": `${drawDuration}s`,
+        } as React.CSSProperties
+      }
+      aria-label={text}
+    >
+      <span
         aria-hidden
-        className={`absolute inset-0 pointer-events-none ${italic ? "italic" : ""}`}
-        style={{
-          color: gold ? "#FFE9B3" : "#FFFAEC",
-          textShadow:
-            "0 0 24px rgba(212,176,97,0.8), 0 0 56px rgba(212,176,97,0.5), 0 0 100px rgba(212,176,97,0.25)",
-          WebkitMaskImage:
-            "linear-gradient(110deg, transparent 35%, black 47%, black 53%, transparent 65%)",
-          maskImage:
-            "linear-gradient(110deg, transparent 35%, black 47%, black 53%, transparent 65%)",
-          WebkitMaskSize: "300% 100%",
-          maskSize: "300% 100%",
-          WebkitMaskRepeat: "no-repeat",
-          maskRepeat: "no-repeat",
-        }}
-        initial={{
-          opacity: 0,
-          WebkitMaskPosition: "150% 0",
-          maskPosition: "150% 0",
-        }}
-        animate={{
-          opacity: [0, 1, 1, 0],
-          WebkitMaskPosition: ["150% 0", "150% 0", "-50% 0", "-50% 0"],
-          maskPosition: ["150% 0", "150% 0", "-50% 0", "-50% 0"],
-        }}
-        transition={{
-          duration: 5,
-          times: [0, 0.05, 0.55, 0.6],
-          delay: shineDelay,
-          repeat: Infinity,
-          repeatDelay: 4,
-          ease: [0.5, 0, 0.5, 1],
-        }}
+        className={`word-draw ${italic ? "italic" : ""} ${
+          gold ? "gold" : "text-ivory"
+        }`}
       >
         {text}
-      </motion.span>
+      </span>
+      <span aria-hidden className="word-beam" />
     </span>
   );
 }

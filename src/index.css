@@ -67,18 +67,17 @@ body {
   85% { opacity: 1; transform: scale(1); }
 }
 
-/* Rocket continuous wobble — CSS-driven so it always plays from
-   first paint, independent of tab focus or React re-renders. */
+/* Rocket continuous wobble — slow + smooth, CSS-driven so it always
+   plays from first paint, independent of tab focus. */
 @keyframes rocketWobble {
-  0%   { transform: translateY(0) rotate(-2deg); }
-  20%  { transform: translateY(-12px) rotate(2deg); }
-  40%  { transform: translateY(-4px) rotate(-1.2deg); }
-  60%  { transform: translateY(-10px) rotate(1.6deg); }
-  80%  { transform: translateY(-6px) rotate(-1.8deg); }
-  100% { transform: translateY(0) rotate(-2deg); }
+  0%   { transform: translateY(0) rotate(-1.4deg); }
+  25%  { transform: translateY(-9px) rotate(1.4deg); }
+  50%  { transform: translateY(-3px) rotate(-0.9deg); }
+  75%  { transform: translateY(-7px) rotate(1.0deg); }
+  100% { transform: translateY(0) rotate(-1.4deg); }
 }
 .rocket-wobble {
-  animation: rocketWobble 5.5s ease-in-out infinite;
+  animation: rocketWobble 9s ease-in-out infinite;
   transform-origin: center center;
 }
 
@@ -94,18 +93,123 @@ body {
   transform-box: fill-box;
 }
 
+/* Rocket sparks — cinematic. Larger, brighter, longer rise.
+   Each spark has --sx (horizontal drift), --dur, --delay. */
 @keyframes rocketSpark {
-  0%   { transform: translate3d(0, 0, 0); opacity: 0; }
-  10%  { opacity: 1; }
-  100% { transform: translate3d(var(--sx, 0), -120px, 0); opacity: 0; }
+  0%   { transform: translate3d(0, 20px, 0) scale(0.4); opacity: 0; }
+  8%   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  60%  { opacity: 1; }
+  100% {
+    transform: translate3d(var(--sx, 0), -200px, 0) scale(0.4);
+    opacity: 0;
+  }
 }
 .rocket-spark {
-  animation: rocketSpark var(--dur, 2s) ease-out var(--delay, 0s) infinite;
+  animation: rocketSpark var(--dur, 2.6s) ease-out var(--delay, 0s) infinite;
+}
+
+/* Bright "ember" — bigger sparks with longer halos */
+@keyframes rocketEmber {
+  0%   { transform: translate3d(0, 30px, 0) scale(0.3); opacity: 0; }
+  10%  { opacity: 1; transform: translate3d(0, 0, 0) scale(1.2); }
+  40%  { transform: translate3d(calc(var(--sx, 0) * 0.5), -90px, 0) scale(1); }
+  100% {
+    transform: translate3d(var(--sx, 0), -280px, 0) scale(0.3);
+    opacity: 0;
+  }
+}
+.rocket-ember {
+  animation: rocketEmber var(--dur, 3.5s) ease-out var(--delay, 0s) infinite;
 }
 
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(30px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Wordmark light-beam draw ─────────────────────────────────────
+   The .word-draw layer is clipped from the right (invisible), then
+   reveals left -> right. A separate .word-beam element travels in
+   sync with the clip edge, so it reads as a beam of light tracing
+   the letters. After the draw completes, .word-glow keeps the text
+   softly pulsing. */
+@keyframes wordReveal {
+  from { clip-path: inset(0 100% -10% 0); }
+  to   { clip-path: inset(0 -2% -10% 0); }
+}
+.word-draw {
+  display: inline-block;
+  clip-path: inset(0 100% -10% 0);
+  animation:
+    wordReveal var(--draw-dur, 1.6s)
+      cubic-bezier(0.7, 0, 0.3, 1)
+      var(--draw-delay, 0s) forwards,
+    wordGlowPulse 5s ease-in-out
+      calc(var(--draw-delay, 0s) + var(--draw-dur, 1.6s)) infinite;
+}
+
+@keyframes wordGlowPulse {
+  0%, 100% {
+    text-shadow:
+      0 0 18px rgba(212, 176, 97, 0.45),
+      0 0 42px rgba(212, 176, 97, 0.28),
+      0 0 90px rgba(212, 176, 97, 0.16);
+  }
+  50% {
+    text-shadow:
+      0 0 28px rgba(212, 176, 97, 0.65),
+      0 0 60px rgba(212, 176, 97, 0.42),
+      0 0 120px rgba(212, 176, 97, 0.24);
+  }
+}
+
+@keyframes beamSweep {
+  0%   { left: 0%;   opacity: 0; }
+  6%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
+}
+.word-beam {
+  position: absolute;
+  top: -4%;
+  bottom: -4%;
+  width: 4px;
+  margin-left: -2px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(255, 250, 236, 0.9) 30%,
+    #fffaec 50%,
+    rgba(255, 250, 236, 0.9) 70%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 14px rgba(255, 250, 236, 0.95),
+    0 0 36px rgba(255, 250, 236, 0.7),
+    0 0 70px rgba(212, 176, 97, 0.55);
+  opacity: 0;
+  animation: beamSweep var(--draw-dur, 1.6s)
+    cubic-bezier(0.7, 0, 0.3, 1)
+    var(--draw-delay, 0s) forwards;
+  pointer-events: none;
+}
+
+/* ─── LED-edge glass face for the services cube ───────────────── */
+.cube-led-face {
+  border: 1.5px solid rgba(255, 250, 236, 0.78);
+  box-shadow:
+    inset 0 0 38px rgba(255, 250, 236, 0.18),
+    inset 0 0 100px rgba(212, 176, 97, 0.08),
+    0 0 28px rgba(255, 250, 236, 0.45),
+    0 0 70px rgba(212, 176, 97, 0.32);
+}
+.cube-led-face-dim {
+  border: 1.5px solid rgba(255, 250, 236, 0.45);
+  box-shadow:
+    inset 0 0 26px rgba(255, 250, 236, 0.12),
+    inset 0 0 80px rgba(212, 176, 97, 0.05),
+    0 0 16px rgba(255, 250, 236, 0.28),
+    0 0 44px rgba(212, 176, 97, 0.22);
 }
 
 /* Static gold — no shimmer, no animation */

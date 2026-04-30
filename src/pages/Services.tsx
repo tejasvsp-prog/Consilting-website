@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import PageTransition, { PageHeader } from "../components/PageTransition";
 import { services } from "../sections/Services";
@@ -11,11 +11,11 @@ export default function ServicesOverview() {
         tag="Services"
         title={
           <>
-            Four levers.{" "}
+            4 options.{" "}
             <span className="gold italic">One outcome: growth.</span>
           </>
         }
-        subtitle="Each service is a self-contained engagement, but the real lift comes from running two or more in concert. Pick where you want to start."
+        subtitle="Four services — engineered to bring you more attention, better leads, stronger branding, and more revenue. Run one as a standalone engagement, or stack them together as a complete program."
       />
 
       <section className="section bg-midnight pb-32 md:pb-48">
@@ -39,7 +39,7 @@ export default function ServicesOverview() {
      the matching face when clicked
    ───────────────────────────────────────────────────────────── */
 
-const CUBE_SIZE = 520; // px — bigger, fills more of the space
+const CUBE_SIZE = 600; // px — large, premium, dominant
 const HALF = CUBE_SIZE / 2;
 
 function ServiceCube() {
@@ -112,20 +112,20 @@ function ServiceCube() {
   return (
     <div className="grid grid-cols-12 gap-10 lg:gap-20 items-center">
       {/* Cube column */}
-      <div className="col-span-12 lg:col-span-7 relative flex items-center justify-center min-h-[560px] lg:min-h-[680px]">
+      <div className="col-span-12 lg:col-span-7 relative flex items-center justify-center min-h-[520px] sm:min-h-[600px] lg:min-h-[760px]">
         <div
           aria-hidden
-          className="absolute left-1/2 -translate-x-1/2 bottom-4 lg:bottom-10 w-3/4 h-14 rounded-[50%] pointer-events-none"
+          className="absolute left-1/2 -translate-x-1/2 bottom-4 lg:bottom-10 w-3/4 h-16 rounded-[50%] pointer-events-none"
           style={{
             background:
-              "radial-gradient(ellipse at center, rgba(212,176,97,0.22), transparent 70%)",
-            filter: "blur(12px)",
+              "radial-gradient(ellipse at center, rgba(255,250,236,0.18) 0%, rgba(212,176,97,0.22) 30%, transparent 75%)",
+            filter: "blur(14px)",
           }}
         />
 
         <div
           ref={containerRef}
-          className="relative cursor-grab active:cursor-grabbing select-none scale-[0.65] sm:scale-[0.78] md:scale-90 lg:scale-100"
+          className="relative cursor-grab active:cursor-grabbing select-none scale-[0.5] sm:scale-[0.65] md:scale-75 lg:scale-95 xl:scale-100"
           style={{
             width: CUBE_SIZE,
             height: CUBE_SIZE,
@@ -199,78 +199,76 @@ function CubeFace({
 }) {
   return (
     <div
-      className={`absolute inset-0 rounded-2xl border-2 ${
-        ornamental ? "border-gold/30" : "border-gold/55"
-      } bg-[#0b0a09] overflow-hidden`}
+      className={`absolute inset-0 rounded-2xl overflow-hidden ${
+        ornamental ? "cube-led-face-dim" : "cube-led-face"
+      }`}
       style={{
         transform,
         backfaceVisibility: "hidden",
-        boxShadow:
-          "inset 0 0 80px rgba(212,176,97,0.12), 0 0 40px rgba(0,0,0,0.5)",
+        background:
+          "linear-gradient(135deg, rgba(15,13,11,0.96) 0%, rgba(11,10,9,0.94) 50%, rgba(21,18,14,0.96) 100%)",
       }}
     >
-      {/* LED matrix — flickering gold dots in a tight grid */}
-      <LEDMatrix />
+      {/* Mirror-glass sheen — diagonal highlight that reads as
+          reflective surface */}
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(135deg, rgba(255,250,236,0.06) 0%, transparent 35%, transparent 65%, rgba(212,176,97,0.05) 100%)",
+        }}
+      />
+
+      {/* Inner LED frame — tight white edge inside the bezel for the
+          'lighted mirror' depth */}
+      <div
+        aria-hidden
+        className="absolute inset-3 rounded-xl pointer-events-none"
+        style={{
+          border: "1px solid rgba(255, 250, 236, 0.32)",
+          boxShadow:
+            "inset 0 0 24px rgba(255,250,236,0.08), 0 0 12px rgba(255,250,236,0.18)",
+        }}
+      />
+
+      {/* Sparse LED corner pixels — quiet rhythm so the panel feels
+          alive without a busy dot matrix */}
+      <CornerPixels />
+
       {children}
     </div>
   );
 }
 
-/* LEDMatrix — fills the face with a grid of dots. A handful flicker
-   on randomized cycles. Lit dots use a warm white center with a soft
-   gold halo for a clean, premium LED-display feel. */
-function LEDMatrix() {
-  const COLS = 16;
-  const ROWS = 16;
-  const lit = useMemo(() => {
-    const set = new Set<number>();
-    for (let i = 0; i < COLS * ROWS; i++) {
-      if ((i * 37 + 11) % 11 === 0) set.add(i);
-    }
-    return set;
-  }, []);
-
-  const cells = [];
-  for (let r = 0; r < ROWS; r++) {
-    for (let c = 0; c < COLS; c++) {
-      const i = r * COLS + c;
-      const isLit = lit.has(i);
-      cells.push(
+/* Minimal corner pixel grid — four small lit dots in each corner. */
+function CornerPixels() {
+  const corners = [
+    { top: "10px", left: "10px" },
+    { top: "10px", right: "10px" },
+    { bottom: "10px", left: "10px" },
+    { bottom: "10px", right: "10px" },
+  ];
+  return (
+    <>
+      {corners.map((c, i) => (
         <span
           key={i}
           aria-hidden
-          className="block rounded-full"
+          className="absolute size-1 rounded-full"
           style={{
-            width: isLit ? 4 : 3,
-            height: isLit ? 4 : 3,
-            background: isLit ? "#FFFAEC" : "rgba(212,176,97,0.20)",
-            boxShadow: isLit
-              ? "0 0 4px rgba(255,250,236,0.9), 0 0 10px rgba(255,250,236,0.6), 0 0 18px rgba(212,176,97,0.45)"
-              : "none",
-            animation: isLit
-              ? `ledFlicker ${2.5 + (i % 7) * 0.4}s ease-in-out ${(i % 11) * 0.18}s infinite`
-              : undefined,
+            ...c,
+            background: "#FFFAEC",
+            boxShadow:
+              "0 0 6px rgba(255,250,236,0.95), 0 0 12px rgba(212,176,97,0.55)",
+            animation: `ledFlicker ${3 + (i % 3) * 0.5}s ease-in-out ${i * 0.3}s infinite`,
           }}
         />
-      );
-    }
-  }
-
-  return (
-    <div
-      aria-hidden
-      className="absolute inset-0 grid pointer-events-none p-4"
-      style={{
-        gridTemplateColumns: `repeat(${COLS}, 1fr)`,
-        gridTemplateRows: `repeat(${ROWS}, 1fr)`,
-        gap: "2px",
-        placeItems: "center",
-      }}
-    >
-      {cells}
-    </div>
+      ))}
+    </>
   );
 }
+
 
 /* Service face content — shown on the four side faces. */
 function ServiceFaceContent({
@@ -283,27 +281,42 @@ function ServiceFaceContent({
   return (
     <button
       onClick={onOpen}
-      className="absolute inset-5 md:inset-7 flex flex-col p-5 md:p-7 text-left group focus:outline-none rounded-xl backdrop-blur-md bg-midnight/82 border border-gold/30 overflow-hidden"
+      className="absolute inset-8 md:inset-10 flex flex-col text-left group focus:outline-none overflow-hidden"
     >
-      <div className="flex items-center justify-between mb-5 font-mono text-[10px] uppercase tracking-[0.26em]">
-        <span className="text-gold">{service.n}</span>
-        <span className="text-ivory/40 truncate ml-2">{service.short}</span>
+      {/* Top — number badge only, no rotating subtitle */}
+      <div className="flex items-center justify-between mb-8">
+        <span className="font-mono text-[11px] uppercase tracking-[0.32em] text-gold">
+          {service.n}
+        </span>
+        <span
+          aria-hidden
+          className="size-1.5 rounded-full bg-[#FFFAEC]"
+          style={{
+            boxShadow:
+              "0 0 6px rgba(255,250,236,0.95), 0 0 14px rgba(212,176,97,0.6)",
+            animation: "ledFlicker 3.4s ease-in-out infinite",
+          }}
+        />
       </div>
-      <h3 className="font-display font-light text-2xl md:text-[2.4rem] leading-[1.0] tracking-[-0.01em] text-ivory mb-4 transition-transform duration-500 group-hover:translate-x-1">
+
+      <h3 className="font-couture font-normal text-4xl md:text-[3.2rem] leading-[1.0] tracking-[-0.005em] text-ivory mb-6 transition-transform duration-500 group-hover:translate-x-1">
         {service.t}
       </h3>
-      <p className="text-ivory/60 text-[12.5px] md:text-[13px] leading-relaxed mb-4 line-clamp-3">
+
+      <p className="text-ivory/65 text-[13.5px] md:text-[14.5px] leading-relaxed mb-6 line-clamp-4">
         {service.body}
       </p>
-      <ul className="space-y-1.5 text-[11.5px] text-ivory/55 mb-auto">
+
+      <ul className="space-y-2 text-[12.5px] text-ivory/55 mb-auto">
         {service.bullets.slice(0, 3).map((b) => (
-          <li key={b} className="flex items-start gap-2">
+          <li key={b} className="flex items-start gap-2.5">
             <span className="mt-1.5 size-1 rounded-full bg-gold shrink-0" />
             <span className="truncate">{b}</span>
           </li>
         ))}
       </ul>
-      <span className="mt-4 pt-4 border-t border-gold/15 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.26em] font-medium text-gold">
+
+      <span className="mt-6 pt-5 border-t border-gold/20 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.32em] font-medium text-gold">
         Open service
         <span
           aria-hidden
@@ -329,7 +342,12 @@ function BrandFaceContent({
       <span
         className={`font-couture ${
           italic ? "italic gold" : "text-ivory"
-        } text-5xl md:text-7xl tracking-[-0.005em]`}
+        } text-6xl md:text-8xl tracking-[-0.005em]`}
+        style={{
+          textShadow: italic
+            ? "0 0 22px rgba(212,176,97,0.6), 0 0 56px rgba(212,176,97,0.35)"
+            : "0 0 22px rgba(255,250,236,0.45), 0 0 56px rgba(212,176,97,0.25)",
+        }}
       >
         {line}
       </span>
@@ -348,30 +366,33 @@ function FaceButton({
   index: number;
   onClick: () => void;
 }) {
+  const PROMISE = [
+    "More attention",
+    "Better leads",
+    "Stronger branding",
+    "More revenue",
+  ][index];
   return (
     <div className="flex items-stretch gap-3 md:gap-4">
       <button
         onClick={onClick}
-        className="group flex-1 card flex items-center gap-5 md:gap-6 p-6 md:p-7 hover:border-gold transition-colors text-left"
+        className="group flex-1 card flex items-center gap-6 md:gap-8 p-7 md:p-8 hover:border-gold transition-colors text-left"
       >
-        <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-gold w-10 shrink-0">
+        <span className="font-mono text-[12px] uppercase tracking-[0.32em] text-gold w-10 shrink-0">
           0{index + 1}
         </span>
         <div className="flex-1">
-          <h4 className="font-display text-2xl md:text-3xl text-ivory leading-tight">
+          <h4 className="font-couture font-normal text-3xl md:text-4xl text-ivory leading-[1.05] tracking-[-0.005em]">
             {service.t}
           </h4>
-          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-ivory/45 mt-1.5">
-            {service.short}
+          <p className="text-ivory/50 text-[13px] mt-2 leading-relaxed">
+            {PROMISE}.
           </p>
         </div>
-        <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-gold/70 group-hover:text-gold transition-colors whitespace-nowrap">
-          rotate →
-        </span>
       </button>
       <Link
         to={service.to}
-        className="card px-5 md:px-6 flex items-center justify-center text-gold hover:border-gold transition-colors"
+        className="card px-6 md:px-7 flex items-center justify-center text-gold hover:border-gold transition-colors"
         aria-label={`Open ${service.t}`}
       >
         <span className="text-xl">↗</span>
