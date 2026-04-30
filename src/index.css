@@ -67,6 +67,47 @@ body {
   85% { opacity: 1; transform: scale(1); }
 }
 
+/* Rocket continuous wobble — CSS-driven so it always plays from
+   first paint, independent of tab focus or React re-renders. */
+@keyframes rocketWobble {
+  0%   { transform: translateY(0) rotate(-2deg); }
+  20%  { transform: translateY(-12px) rotate(2deg); }
+  40%  { transform: translateY(-4px) rotate(-1.2deg); }
+  60%  { transform: translateY(-10px) rotate(1.6deg); }
+  80%  { transform: translateY(-6px) rotate(-1.8deg); }
+  100% { transform: translateY(0) rotate(-2deg); }
+}
+.rocket-wobble {
+  animation: rocketWobble 5.5s ease-in-out infinite;
+  transform-origin: center center;
+}
+
+@keyframes rocketFlame {
+  0%, 100% { transform: scaleY(0.85); opacity: 0.85; }
+  25%      { transform: scaleY(1.20); opacity: 1.00; }
+  50%      { transform: scaleY(0.92); opacity: 0.92; }
+  75%      { transform: scaleY(1.15); opacity: 1.00; }
+}
+.rocket-flame {
+  animation: rocketFlame 0.55s ease-in-out infinite;
+  transform-origin: 120px 334px;
+  transform-box: fill-box;
+}
+
+@keyframes rocketSpark {
+  0%   { transform: translate3d(0, 0, 0); opacity: 0; }
+  10%  { opacity: 1; }
+  100% { transform: translate3d(var(--sx, 0), -120px, 0); opacity: 0; }
+}
+.rocket-spark {
+  animation: rocketSpark var(--dur, 2s) ease-out var(--delay, 0s) infinite;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* Static gold — no shimmer, no animation */
 .gold {
   color: #d4b061;

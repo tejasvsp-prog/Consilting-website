@@ -169,9 +169,6 @@ function ServiceCube() {
           </motion.div>
         </div>
 
-        <p className="absolute bottom-0 left-1/2 -translate-x-1/2 font-mono text-[10px] uppercase tracking-[0.32em] text-ivory/35 whitespace-nowrap">
-          ◆ drag · click a face · or tap below
-        </p>
       </div>
 
       {/* Service face navigator — fills the space CtaStrip used to occupy */}
@@ -219,17 +216,16 @@ function CubeFace({
   );
 }
 
-/* LEDMatrix — fills the face with a grid of gold dots. A handful
-   flicker on randomized cycles so the cube reads as a working LED
-   panel rather than a static print. */
+/* LEDMatrix — fills the face with a grid of dots. A handful flicker
+   on randomized cycles. Lit dots use a warm white center with a soft
+   gold halo for a clean, premium LED-display feel. */
 function LEDMatrix() {
-  const COLS = 18;
-  const ROWS = 18;
+  const COLS = 16;
+  const ROWS = 16;
   const lit = useMemo(() => {
-    // Mark ~1 in 9 dots as 'live' (will flicker)
     const set = new Set<number>();
     for (let i = 0; i < COLS * ROWS; i++) {
-      if ((i * 37 + 11) % 9 === 0) set.add(i);
+      if ((i * 37 + 11) % 11 === 0) set.add(i);
     }
     return set;
   }, []);
@@ -243,13 +239,14 @@ function LEDMatrix() {
         <span
           key={i}
           aria-hidden
-          className={`block rounded-full ${
-            isLit ? "bg-gold" : "bg-gold/25"
-          }`}
+          className="block rounded-full"
           style={{
-            width: 4,
-            height: 4,
-            boxShadow: isLit ? "0 0 6px rgba(212,176,97,0.85)" : "none",
+            width: isLit ? 4 : 3,
+            height: isLit ? 4 : 3,
+            background: isLit ? "#FFFAEC" : "rgba(212,176,97,0.20)",
+            boxShadow: isLit
+              ? "0 0 4px rgba(255,250,236,0.9), 0 0 10px rgba(255,250,236,0.6), 0 0 18px rgba(212,176,97,0.45)"
+              : "none",
             animation: isLit
               ? `ledFlicker ${2.5 + (i % 7) * 0.4}s ease-in-out ${(i % 11) * 0.18}s infinite`
               : undefined,
@@ -262,7 +259,7 @@ function LEDMatrix() {
   return (
     <div
       aria-hidden
-      className="absolute inset-0 grid pointer-events-none p-3"
+      className="absolute inset-0 grid pointer-events-none p-4"
       style={{
         gridTemplateColumns: `repeat(${COLS}, 1fr)`,
         gridTemplateRows: `repeat(${ROWS}, 1fr)`,
@@ -286,27 +283,27 @@ function ServiceFaceContent({
   return (
     <button
       onClick={onOpen}
-      className="absolute inset-6 md:inset-8 flex flex-col p-6 md:p-8 text-left group focus:outline-none rounded-xl backdrop-blur-sm bg-midnight/72 border border-gold/25"
+      className="absolute inset-5 md:inset-7 flex flex-col p-5 md:p-7 text-left group focus:outline-none rounded-xl backdrop-blur-md bg-midnight/82 border border-gold/30 overflow-hidden"
     >
-      <div className="flex items-center justify-between mb-7 font-mono text-[10px] uppercase tracking-[0.28em]">
+      <div className="flex items-center justify-between mb-5 font-mono text-[10px] uppercase tracking-[0.26em]">
         <span className="text-gold">{service.n}</span>
-        <span className="text-ivory/40">{service.short}</span>
+        <span className="text-ivory/40 truncate ml-2">{service.short}</span>
       </div>
-      <h3 className="font-display font-light text-3xl md:text-5xl leading-[0.96] tracking-[-0.01em] text-ivory mb-6 transition-transform duration-500 group-hover:translate-x-1">
+      <h3 className="font-display font-light text-2xl md:text-[2.4rem] leading-[1.0] tracking-[-0.01em] text-ivory mb-4 transition-transform duration-500 group-hover:translate-x-1">
         {service.t}
       </h3>
-      <p className="text-ivory/65 text-sm leading-relaxed mb-6">
+      <p className="text-ivory/60 text-[12.5px] md:text-[13px] leading-relaxed mb-4 line-clamp-3">
         {service.body}
       </p>
-      <ul className="space-y-2 text-[12px] text-ivory/55 mb-auto">
+      <ul className="space-y-1.5 text-[11.5px] text-ivory/55 mb-auto">
         {service.bullets.slice(0, 3).map((b) => (
           <li key={b} className="flex items-start gap-2">
             <span className="mt-1.5 size-1 rounded-full bg-gold shrink-0" />
-            <span>{b}</span>
+            <span className="truncate">{b}</span>
           </li>
         ))}
       </ul>
-      <span className="mt-6 pt-5 border-t border-gold/15 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.28em] font-medium text-gold">
+      <span className="mt-4 pt-4 border-t border-gold/15 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.26em] font-medium text-gold">
         Open service
         <span
           aria-hidden

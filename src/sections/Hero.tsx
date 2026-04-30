@@ -4,13 +4,13 @@ import {
   useScroll,
   useTransform,
 } from "framer-motion";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 
 /**
- * Hero — 3D TV/monitor displaying "Amara Digital" with mouse-driven
- * tilt, flanked by columns of flickering LED bars and surrounded by
- * subtle drifting gold particles. Replaces the previous split-line
- * typography hero. Premium midnight + gold styling, no neon.
+ * Hero — Amara / Digital split-line typography. Two staggered rows
+ * of huge serif display, joined by gold horizontal rules with a
+ * traveling spark dot. The wordmark draws in letter-by-letter and
+ * then a luminous shine sweeps across each line.
  */
 export default function Hero() {
   const ref = useRef<HTMLDivElement>(null);
@@ -19,21 +19,25 @@ export default function Hero() {
     target: ref,
     offset: ["start start", "end start"],
   });
-  const yShift = useTransform(scrollYProgress, [0, 1], ["0%", reduce ? "0%" : "-10%"]);
+  const yShift = useTransform(
+    scrollYProgress,
+    [0, 1],
+    ["0%", reduce ? "0%" : "-12%"]
+  );
   const opacity = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
 
   return (
     <section
       ref={ref}
-      className="relative min-h-[100svh] flex items-center justify-center overflow-hidden pt-32 pb-24"
+      className="relative min-h-[100svh] flex flex-col justify-center overflow-hidden pt-32 pb-24"
     >
       <DriftingParticles />
 
-      {/* Tag */}
+      {/* Tag top-left */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.55, duration: 0.6 }}
+        transition={{ delay: 0.4, duration: 0.6 }}
         className="absolute top-32 md:top-40 left-6 md:left-10 flex items-center gap-3 z-20"
       >
         <motion.span
@@ -46,32 +50,89 @@ export default function Hero() {
         </span>
       </motion.div>
 
-      {/* LED arrays float on either side, anchored to viewport edges */}
-      <div className="hidden md:flex absolute left-6 lg:left-12 top-1/2 -translate-y-1/2 flex-col gap-3 z-10">
-        <LEDArray seed={0} />
-      </div>
-      <div className="hidden md:flex absolute right-6 lg:right-12 top-1/2 -translate-y-1/2 flex-col gap-3 z-10">
-        <LEDArray seed={11} />
-      </div>
+      <motion.div style={{ y: yShift, opacity }} className="w-full">
+        {/* Top row: Amara + horizontal rule with traveling spark */}
+        <div className="flex items-center w-full">
+          <DrawWord
+            text="Amara"
+            startDelay={0.55}
+            className="font-display font-light text-[22vw] md:text-[15vw] leading-[0.86] tracking-[-0.025em] text-ivory pl-6 md:pl-10 whitespace-nowrap"
+          />
+          <motion.span
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ delay: 1.2, duration: 1.0, ease: [0.7, 0, 0.2, 1] }}
+            style={{ originX: 0 }}
+            aria-hidden
+            className="hidden md:block relative flex-1 h-px bg-gold ml-8 mr-0 overflow-visible"
+          >
+            <motion.span
+              animate={{ left: ["0%", "100%"] }}
+              transition={{
+                duration: 4.5,
+                repeat: Infinity,
+                ease: "linear",
+                delay: 2.0,
+              }}
+              className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-gold shadow-[0_0_14px_rgba(212,176,97,0.95)]"
+            />
+          </motion.span>
+        </div>
 
-      {/* TV — centered, wider, dominates the viewport */}
-      <motion.div
-        style={{ y: yShift, opacity }}
-        className="relative w-full mx-auto px-6 md:px-24 lg:px-32 flex items-center justify-center"
-      >
-        <TV3D />
+        {/* Bottom row: arrow rule + Digital, right-aligned */}
+        <div className="flex items-center w-full mt-4 md:mt-8 justify-end">
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.4, duration: 0.6 }}
+            aria-hidden
+            className="hidden md:flex flex-1 items-center mr-8 ml-0"
+          >
+            <motion.span
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ delay: 1.4, duration: 1.0, ease: [0.7, 0, 0.2, 1] }}
+              style={{ originX: 0 }}
+              className="relative flex-1 h-px bg-gold overflow-visible"
+            >
+              <motion.span
+                animate={{ left: ["0%", "100%"] }}
+                transition={{
+                  duration: 4.5,
+                  repeat: Infinity,
+                  ease: "linear",
+                  delay: 2.4,
+                }}
+                className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-gold shadow-[0_0_14px_rgba(212,176,97,0.95)]"
+              />
+            </motion.span>
+            <ArrowTip />
+          </motion.span>
+          <DrawWord
+            text="Digital."
+            italic
+            gold
+            startDelay={1.45}
+            className="font-display font-light italic text-[22vw] md:text-[15vw] leading-[0.86] tracking-[-0.025em] gold pr-6 md:pr-10 whitespace-nowrap"
+          />
+        </div>
       </motion.div>
 
-      {/* Mobile: simple horizontal LED bar under the TV */}
-      <div className="md:hidden absolute bottom-44 inset-x-0 flex items-center justify-center gap-2 z-10">
-        <LEDArray seed={5} />
-      </div>
+      {/* Mobile vertical connector */}
+      <motion.span
+        initial={{ scaleY: 0 }}
+        animate={{ scaleY: 1 }}
+        transition={{ delay: 1.2, duration: 0.9, ease: [0.7, 0, 0.2, 1] }}
+        style={{ originY: 0 }}
+        aria-hidden
+        className="md:hidden absolute right-12 top-[42%] w-px h-12 bg-gold"
+      />
 
-      {/* Bottom-left whisper */}
+      {/* Whisper bottom-left */}
       <motion.p
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.7, duration: 0.7 }}
+        transition={{ delay: 1.9, duration: 0.7 }}
         className="absolute bottom-24 md:bottom-28 left-6 md:left-10 max-w-xs font-display text-2xl md:text-3xl text-ivory leading-tight z-20"
       >
         We engineer{" "}
@@ -82,7 +143,7 @@ export default function Hero() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.8, duration: 1 }}
+        transition={{ delay: 2.0, duration: 1 }}
         className="absolute left-1/2 -translate-x-1/2 bottom-8 flex flex-col items-center gap-3 text-ivory/35 z-20"
       >
         <span className="font-mono text-[10px] uppercase tracking-[0.32em]">
@@ -98,305 +159,106 @@ export default function Hero() {
   );
 }
 
-/* ─── 3D TV — proper 6-sided 3D box, services-cube style ───────── */
+/* ─── DrawWord — letter-by-letter draw-in + recurring shine sweep ─ */
 
-function TV3D() {
-  // Default rotation makes the 3D thickness obvious from the start.
-  const BASE_RX = -7;
-  const BASE_RY = 14;
-  const DEPTH = 56; // px — half-thickness from the cube center
-  const [tilt, setTilt] = useState({ rx: 0, ry: 0 });
-
-  function onMove(e: React.MouseEvent<HTMLDivElement>) {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    setTilt({ rx: y * -10, ry: x * 22 });
-  }
+function DrawWord({
+  text,
+  italic,
+  gold,
+  startDelay = 0,
+  className,
+}: {
+  text: string;
+  italic?: boolean;
+  gold?: boolean;
+  startDelay?: number;
+  className?: string;
+}) {
+  const letters = text.split("");
+  const drawDuration = 0.55;
+  const stagger = 0.06;
+  // After all letters land, the shine sweep starts
+  const shineDelay = startDelay + letters.length * stagger + 0.4;
 
   return (
-    <div
-      style={{ perspective: 2200 }}
-      onMouseMove={onMove}
-      onMouseLeave={() => setTilt({ rx: 0, ry: 0 })}
-      className="relative w-full max-w-[1100px] mx-auto"
-    >
-      {/* Soft floor reflection under the TV */}
-      <div
-        aria-hidden
-        className="absolute left-1/2 -translate-x-1/2 -bottom-8 w-3/4 h-12 rounded-[50%] pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse at center, rgba(212,176,97,0.18), transparent 70%)",
-          filter: "blur(10px)",
-        }}
-      />
-
-      <motion.div
-        initial={{ opacity: 0, scale: 0.94 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.0, delay: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
-        style={{ transformStyle: "preserve-3d" }}
-        className="relative w-full aspect-[16/10]"
-      >
-        <motion.div
-          animate={{
-            rotateX: BASE_RX + tilt.rx,
-            rotateY: BASE_RY + tilt.ry,
-          }}
-          transition={{ duration: 0.45, ease: "easeOut" }}
-          style={{ transformStyle: "preserve-3d" }}
-          className="relative w-full h-full"
-        >
-          {/* Back face — visible from behind. Same shape as front. */}
-          <div
+    <span className={`relative inline-block isolate ${className ?? ""}`}>
+      {/* Base letters drawing in left -> right with stagger */}
+      <span aria-label={text}>
+        {letters.map((c, i) => (
+          <motion.span
+            key={i}
             aria-hidden
-            className="absolute inset-0 rounded-[28px] bg-gradient-to-b from-[#15120e] to-[#0b0a09] border border-gold/20"
-            style={{
-              transform: `translateZ(-${DEPTH}px) rotateY(180deg)`,
-              backfaceVisibility: "hidden",
+            initial={{ opacity: 0, y: 28, filter: "blur(8px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{
+              delay: startDelay + i * stagger,
+              duration: drawDuration,
+              ease: [0.2, 0.8, 0.2, 1],
             }}
-          />
-
-          {/* Top thickness face */}
-          <div
-            aria-hidden
-            className="absolute left-0 right-0 top-0 bg-gradient-to-b from-coal to-obsidian border-x border-y border-gold/40"
-            style={{
-              height: `${DEPTH * 2}px`,
-              transformOrigin: "top",
-              transform: `rotateX(-90deg)`,
-            }}
-          />
-          {/* Bottom thickness face */}
-          <div
-            aria-hidden
-            className="absolute left-0 right-0 bottom-0 bg-gradient-to-b from-obsidian to-midnight border-x border-y border-gold/40"
-            style={{
-              height: `${DEPTH * 2}px`,
-              transformOrigin: "bottom",
-              transform: `rotateX(90deg)`,
-            }}
-          />
-          {/* Right thickness face */}
-          <div
-            aria-hidden
-            className="absolute right-0 top-0 bottom-0 bg-gradient-to-r from-coal to-obsidian border-x border-y border-gold/30"
-            style={{
-              width: `${DEPTH * 2}px`,
-              transformOrigin: "right",
-              transform: `rotateY(90deg)`,
-            }}
-          />
-          {/* Left thickness face */}
-          <div
-            aria-hidden
-            className="absolute left-0 top-0 bottom-0 bg-gradient-to-l from-coal to-obsidian border-x border-y border-gold/30"
-            style={{
-              width: `${DEPTH * 2}px`,
-              transformOrigin: "left",
-              transform: `rotateY(-90deg)`,
-            }}
-          />
-
-          {/* FRONT FACE — the screen + bezel */}
-          <div
-            className="absolute inset-0 bg-gradient-to-b from-coal to-obsidian rounded-[28px] border-2 border-gold/55 p-4 md:p-7 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.85),inset_0_1px_0_rgba(255,255,255,0.04)]"
-            style={{
-              transform: `translateZ(${DEPTH}px)`,
-              backfaceVisibility: "hidden",
-            }}
+            className="inline-block"
           >
-            <BezelStars />
-            {/* Inner bezel ring */}
-            <div className="absolute inset-2 rounded-2xl border border-gold/15 pointer-events-none" />
+            {c === " " ? " " : c}
+          </motion.span>
+        ))}
+      </span>
 
-            {/* Screen */}
-            <div className="relative w-full h-full bg-midnight rounded-2xl overflow-hidden flex flex-col items-center justify-center px-4 py-6">
-              {/* CRT scanlines */}
-              <div
-                aria-hidden
-                className="absolute inset-0 pointer-events-none opacity-25 mix-blend-overlay"
-                style={{
-                  backgroundImage:
-                    "repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(212,176,97,0.18) 3px, rgba(212,176,97,0.18) 4px)",
-                }}
-              />
-
-              {/* CRT vignette */}
-              <div
-                aria-hidden
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background:
-                    "radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.55) 100%)",
-                }}
-              />
-
-              {/* Inner glow tint */}
-              <div
-                aria-hidden
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background:
-                    "radial-gradient(ellipse at center, rgba(212,176,97,0.10), transparent 65%)",
-                }}
-              />
-
-              {/* AMARA — line one */}
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.85, duration: 0.9, ease: [0.2, 0.8, 0.2, 1] }}
-                className="relative font-display font-light text-ivory text-[14vw] md:text-[8.5vw] leading-[0.9] tracking-[-0.01em] z-10"
-              >
-                Amara
-              </motion.h1>
-
-              {/* Digital — italic gold */}
-              <motion.h2
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.05, duration: 0.9, ease: [0.2, 0.8, 0.2, 1] }}
-                className="relative font-couture italic gold text-[14vw] md:text-[8.5vw] leading-[0.9] z-10"
-                style={{
-                  textShadow:
-                    "0 0 20px rgba(212,176,97,0.45), 0 0 40px rgba(212,176,97,0.25)",
-                }}
-              >
-                Digital
-              </motion.h2>
-
-              {/* Slow scan beam */}
-              <motion.span
-                aria-hidden
-                animate={{ y: ["-50%", "120%"] }}
-                transition={{
-                  duration: 9,
-                  repeat: Infinity,
-                  ease: "linear",
-                  delay: 2,
-                }}
-                className="absolute inset-x-0 h-32 pointer-events-none"
-                style={{
-                  background:
-                    "linear-gradient(to bottom, transparent 0%, rgba(212,176,97,0.18) 35%, rgba(212,176,97,0.55) 50%, rgba(212,176,97,0.18) 65%, transparent 100%)",
-                  mixBlendMode: "screen",
-                }}
-              />
-
-              {/* Power LED — bottom right */}
-              <motion.span
-                aria-hidden
-                animate={{ opacity: [0.35, 1, 0.35] }}
-                transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute bottom-3 right-3 size-1.5 rounded-full bg-gold"
-                style={{ boxShadow: "0 0 8px rgba(212,176,97,0.95)" }}
-              />
-            </div>
-          </div>
-
-          {/* Stand */}
-          <div className="mx-auto mt-3 w-32 h-3 bg-gradient-to-b from-gold/45 to-gold/10 rounded-b-md" />
-          <div className="mx-auto mt-1 w-48 h-1.5 bg-gold/25 rounded-md" />
-        </motion.div>
-      </motion.div>
-    </div>
+      {/* Glowing shine layer — masked sweep that lights the word
+          left -> right after the letters have arrived. Repeats. */}
+      <motion.span
+        aria-hidden
+        className={`absolute inset-0 pointer-events-none ${italic ? "italic" : ""}`}
+        style={{
+          color: gold ? "#FFE9B3" : "#FFFAEC",
+          textShadow:
+            "0 0 24px rgba(212,176,97,0.8), 0 0 56px rgba(212,176,97,0.5), 0 0 100px rgba(212,176,97,0.25)",
+          WebkitMaskImage:
+            "linear-gradient(110deg, transparent 35%, black 47%, black 53%, transparent 65%)",
+          maskImage:
+            "linear-gradient(110deg, transparent 35%, black 47%, black 53%, transparent 65%)",
+          WebkitMaskSize: "300% 100%",
+          maskSize: "300% 100%",
+          WebkitMaskRepeat: "no-repeat",
+          maskRepeat: "no-repeat",
+        }}
+        initial={{
+          opacity: 0,
+          WebkitMaskPosition: "150% 0",
+          maskPosition: "150% 0",
+        }}
+        animate={{
+          opacity: [0, 1, 1, 0],
+          WebkitMaskPosition: ["150% 0", "150% 0", "-50% 0", "-50% 0"],
+          maskPosition: ["150% 0", "150% 0", "-50% 0", "-50% 0"],
+        }}
+        transition={{
+          duration: 5,
+          times: [0, 0.05, 0.55, 0.6],
+          delay: shineDelay,
+          repeat: Infinity,
+          repeatDelay: 4,
+          ease: [0.5, 0, 0.5, 1],
+        }}
+      >
+        {text}
+      </motion.span>
+    </span>
   );
 }
 
-/* ─── BezelStars — twinkling gold stars around the TV bezel ────── */
-
-function BezelStars() {
-  const stars = useMemo(
-    () => [
-      { left: "-3%", top: "-3%" },
-      { left: "102%", top: "-2%" },
-      { left: "-4%", top: "104%" },
-      { left: "104%", top: "102%" },
-      { left: "50%", top: "-7%" },
-      { left: "-6%", top: "50%" },
-      { left: "106%", top: "50%" },
-      { left: "50%", top: "108%" },
-    ],
-    []
-  );
+function ArrowTip() {
   return (
-    <>
-      {stars.map((s, i) => (
-        <motion.svg
-          key={i}
-          aria-hidden
-          className="absolute w-3 h-3 md:w-4 md:h-4 text-gold pointer-events-none"
-          style={{
-            left: s.left,
-            top: s.top,
-            transform: "translate(-50%, -50%)",
-          }}
-          viewBox="0 0 24 24"
-          animate={{
-            opacity: [0.25, 1, 0.25],
-            scale: [0.8, 1.15, 0.8],
-            rotate: [0, 180],
-          }}
-          transition={{
-            duration: 4 + (i % 3),
-            delay: i * 0.4,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        >
-          <path
-            d="M12 2 L13.5 10 L22 12 L13.5 14 L12 22 L10.5 14 L2 12 L10.5 10 Z"
-            fill="currentColor"
-          />
-        </motion.svg>
-      ))}
-    </>
-  );
-}
-
-/* ─── LEDArray — vertical column of flickering LED bars ─────────── */
-
-function LEDArray({ seed }: { seed: number }) {
-  const count = 9;
-  // Pre-randomized timings so they flicker independently but
-  // deterministically per render.
-  const timings = useMemo(
-    () =>
-      Array.from({ length: count }, (_, i) => {
-        const r = (Math.sin((i + seed) * 53.7) + 1) / 2;
-        return {
-          duration: 1.6 + r * 2.2,
-          delay: r * 1.4 + (i % 3) * 0.2,
-        };
-      }),
-    [seed]
-  );
-
-  return (
-    <>
-      {timings.map((t, i) => (
-        <motion.span
-          key={i}
-          aria-hidden
-          className="block w-2.5 h-2.5 md:w-3 md:h-7 rounded-sm bg-gold"
-          animate={{
-            opacity: [0.2, 1, 0.35, 0.95, 0.25, 1, 0.5, 1, 0.2],
-          }}
-          transition={{
-            duration: t.duration,
-            repeat: Infinity,
-            delay: t.delay,
-            ease: "easeInOut",
-          }}
-          style={{
-            boxShadow:
-              "0 0 6px rgba(212,176,97,0.85), 0 0 14px rgba(212,176,97,0.45)",
-          }}
-        />
-      ))}
-    </>
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 22 22"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      className="text-gold shrink-0 -ml-px"
+      aria-hidden
+    >
+      <path d="M3 11h16M14 5l6 6-6 6" />
+    </svg>
   );
 }
 

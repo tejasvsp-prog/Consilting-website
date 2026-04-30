@@ -175,15 +175,13 @@ function RocketCloser() {
   );
 }
 
-/* Rocket — continuous gentle wobble + cursor-follow tilt.
-   The base motion.div applies a continuous wobble loop (always on).
-   The inner motion.svg adds a cursor-driven tilt on top, so the
-   rocket is always moving while also leaning toward the cursor. */
+/* Rocket — CSS-driven wobble + flame so they run from first paint
+   regardless of tab focus or React re-renders. Cursor follow stays
+   as the only motion-driven layer. */
 function Rocket() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [tilt, setTilt] = useState({ rx: 0, ry: 0, x: 0, y: 0 });
 
-  // Track cursor position relative to the section
   useEffect(() => {
     const section = wrapRef.current?.closest("section");
     if (!section) return;
@@ -210,182 +208,102 @@ function Rocket() {
   }, []);
 
   return (
-    <motion.div
+    <div
       ref={wrapRef}
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 1.0, delay: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
-      className="relative w-48 sm:w-60 md:w-72 lg:w-80"
+      className="relative w-48 sm:w-60 md:w-72 lg:w-80 opacity-0 animate-[fadeInUp_1s_ease-out_0.2s_forwards]"
       style={{ perspective: 1200 }}
     >
-      {/* Continuous wobble — runs from mount, never stops */}
-      <motion.div
-        animate={{
-          y: [0, -12, -4, -10, 0],
-          rotate: [-2, 2, -1.2, 1.6, -2],
-        }}
-        transition={{
-          duration: 5.5,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      >
-        {/* Inner layer adds cursor-follow tilt on top of the wobble */}
-        <motion.svg
-          viewBox="0 0 240 460"
-          className="w-full h-auto drop-shadow-[0_0_50px_rgba(212,176,97,0.28)]"
+      {/* CSS wobble layer — always animating */}
+      <div className="rocket-wobble">
+        {/* Cursor-follow inner layer */}
+        <div
           style={{
             transform: `rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) translate3d(${tilt.x}px, ${tilt.y}px, 0)`,
             transformStyle: "preserve-3d",
             transition: "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)",
           }}
-          aria-hidden
         >
-        <defs>
-          <linearGradient id="rocketBody" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#f2ead7" />
-            <stop offset="100%" stopColor="#d4b061" />
-          </linearGradient>
-          <radialGradient id="window" cx="0.4" cy="0.35" r="0.6">
-            <stop offset="0%" stopColor="#d4b061" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="#0b0a09" />
-          </radialGradient>
-        </defs>
+          <svg
+            viewBox="0 0 240 460"
+            className="w-full h-auto drop-shadow-[0_0_50px_rgba(212,176,97,0.28)]"
+            aria-hidden
+          >
+            <defs>
+              <linearGradient id="rocketBody" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#f2ead7" />
+                <stop offset="100%" stopColor="#d4b061" />
+              </linearGradient>
+              <radialGradient id="window" cx="0.4" cy="0.35" r="0.6">
+                <stop offset="0%" stopColor="#d4b061" stopOpacity="0.6" />
+                <stop offset="100%" stopColor="#0b0a09" />
+              </radialGradient>
+            </defs>
+            <path d="M120 30 L86 132 L154 132 Z" fill="#d4b061" stroke="#d4b061" strokeWidth="2" />
+            <rect x="86" y="132" width="68" height="180" rx="3" fill="url(#rocketBody)" stroke="#d4b061" strokeWidth="2" />
+            <line x1="86" y1="170" x2="154" y2="170" stroke="#d4b061" strokeWidth="1.5" opacity="0.45" />
+            <line x1="86" y1="282" x2="154" y2="282" stroke="#d4b061" strokeWidth="1.5" opacity="0.45" />
+            <circle cx="120" cy="210" r="22" fill="url(#window)" stroke="#d4b061" strokeWidth="3" />
+            <circle cx="113" cy="203" r="6" fill="#f2ead7" opacity="0.55" />
+            <path d="M86 290 L52 350 L86 332 Z" fill="#d4b061" />
+            <path d="M154 290 L188 350 L154 332 Z" fill="#d4b061" />
+            <rect x="98" y="312" width="44" height="22" rx="3" fill="#15120e" stroke="#d4b061" strokeWidth="2" />
 
-        {/* Nose cone */}
-        <path
-          d="M120 30 L86 132 L154 132 Z"
-          fill="#d4b061"
-          stroke="#d4b061"
-          strokeWidth="2"
-        />
+            {/* Exhaust flames — CSS-driven flicker (always on) */}
+            <g className="rocket-flame">
+              <path
+                d="M96 334 Q108 380 120 410 Q132 380 144 334 Q140 360 130 380 Q120 392 110 380 Q100 360 96 334 Z"
+                fill="#d4b061"
+                opacity="0.95"
+              />
+              <path
+                d="M106 334 Q114 370 120 392 Q126 370 134 334 Q130 354 124 372 Q120 380 116 372 Q110 354 106 334 Z"
+                fill="#f2ead7"
+                opacity="0.7"
+              />
+            </g>
+          </svg>
+        </div>
+      </div>
 
-        {/* Body */}
-        <rect
-          x="86"
-          y="132"
-          width="68"
-          height="180"
-          rx="3"
-          fill="url(#rocketBody)"
-          stroke="#d4b061"
-          strokeWidth="2"
-        />
-
-        {/* Bands */}
-        <line
-          x1="86"
-          y1="170"
-          x2="154"
-          y2="170"
-          stroke="#d4b061"
-          strokeWidth="1.5"
-          opacity="0.45"
-        />
-        <line
-          x1="86"
-          y1="282"
-          x2="154"
-          y2="282"
-          stroke="#d4b061"
-          strokeWidth="1.5"
-          opacity="0.45"
-        />
-
-        {/* Window */}
-        <circle
-          cx="120"
-          cy="210"
-          r="22"
-          fill="url(#window)"
-          stroke="#d4b061"
-          strokeWidth="3"
-        />
-        <circle cx="113" cy="203" r="6" fill="#f2ead7" opacity="0.55" />
-
-        {/* Fins */}
-        <path d="M86 290 L52 350 L86 332 Z" fill="#d4b061" />
-        <path d="M154 290 L188 350 L154 332 Z" fill="#d4b061" />
-
-        {/* Engine bell */}
-        <rect
-          x="98"
-          y="312"
-          width="44"
-          height="22"
-          rx="3"
-          fill="#15120e"
-          stroke="#d4b061"
-          strokeWidth="2"
-        />
-
-        {/* Exhaust flames — always flickering */}
-        <motion.g
-          animate={{
-            scaleY: [0.85, 1.2, 0.9, 1.15, 0.85],
-            opacity: [0.85, 1, 0.9, 1, 0.85],
-          }}
-          transition={{
-            duration: 0.55,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          style={{ transformOrigin: "120px 334px" }}
-        >
-          <path
-            d="M96 334 Q108 380 120 410 Q132 380 144 334 Q140 360 130 380 Q120 392 110 380 Q100 360 96 334 Z"
-            fill="#d4b061"
-            opacity="0.95"
-          />
-          <path
-            d="M106 334 Q114 370 120 392 Q126 370 134 334 Q130 354 124 372 Q120 380 116 372 Q110 354 106 334 Z"
-            fill="#f2ead7"
-            opacity="0.7"
-          />
-        </motion.g>
-      </motion.svg>
-      </motion.div>
-
-      {/* Rising sparks — always rendered, drifting around the rocket */}
+      {/* CSS-driven sparks rising around the rocket — always on */}
       <Sparks />
-    </motion.div>
+    </div>
   );
 }
 
-/* Small rising spark dots underneath the rocket */
+/* CSS-driven rising spark dots underneath the rocket. Each spark
+   uses the rocketSpark keyframe with custom CSS variables for
+   horizontal drift, duration, and delay. */
 function Sparks() {
   const sparks = useMemo(
     () =>
       Array.from({ length: 8 }, (_, i) => ({
-        left: 38 + Math.random() * 24, // % within container
-        delay: i * 0.25,
-        duration: 1.8 + Math.random() * 0.9,
-        size: 2 + Math.random() * 2.5,
+        left: 36 + (i * 7) % 28,
+        sx: ((i * 13) % 9) - 4 + "px",
+        delay: (i * 0.27).toFixed(2) + "s",
+        duration: (1.8 + ((i * 31) % 9) * 0.1).toFixed(2) + "s",
+        size: 2 + ((i * 11) % 3),
       })),
     []
   );
   return (
     <div className="absolute left-0 right-0 -bottom-12 h-32 pointer-events-none">
       {sparks.map((s, i) => (
-        <motion.span
+        <span
           key={i}
-          className="absolute rounded-full bg-gold"
-          style={{
-            left: `${s.left}%`,
-            bottom: 0,
-            width: `${s.size}px`,
-            height: `${s.size}px`,
-          }}
-          animate={{
-            y: [0, -120],
-            opacity: [0, 1, 0],
-          }}
-          transition={{
-            duration: s.duration,
-            delay: s.delay,
-            repeat: Infinity,
-            ease: "easeOut",
-          }}
+          aria-hidden
+          className="rocket-spark absolute rounded-full bg-gold"
+          style={
+            {
+              left: `${s.left}%`,
+              bottom: 0,
+              width: s.size,
+              height: s.size,
+              "--sx": s.sx,
+              "--dur": s.duration,
+              "--delay": s.delay,
+            } as React.CSSProperties
+          }
         />
       ))}
     </div>
