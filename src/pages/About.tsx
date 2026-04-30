@@ -990,18 +990,17 @@ function ProcessMarquee() {
   );
 }
 
-/* ─── Next Move — closer with two chatbots framing a Book-a-Demo ── */
+/* ─── Next Move — minimal closer + interactive 3D LED cube ──────── */
 
 function NextMoveSection() {
   return (
     <section className="relative section bg-midnight border-t border-gold/15 overflow-hidden">
-      {/* Soft gold radial glow centered behind everything */}
       <div
         aria-hidden
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse at center, rgba(212,176,97,0.08) 0%, transparent 60%)",
+            "radial-gradient(ellipse at center, rgba(212,176,97,0.10) 0%, transparent 60%)",
         }}
       />
 
@@ -1019,28 +1018,14 @@ function NextMoveSection() {
           </h2>
         </Reveal>
 
-        {/* Two chatbots framing the closer in a left/right exchange */}
         <Reveal delay={0.25}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-6 lg:gap-12 mt-16 md:mt-20 max-w-5xl mx-auto text-left">
-            <ChatBot
-              variant="atlas"
-              side="left"
-              question="What happens on the call?"
-              answer="Thirty minutes. We open your funnel, your ad account, your site — and tell you, plainly, where the money is leaking."
-              mouthDelay={0}
-            />
-            <ChatBot
-              variant="nova"
-              side="right"
-              question="What should I bring?"
-              answer="Your numbers, your goals, and the question keeping you up at night. No deck. No homework."
-              mouthDelay={2.4}
-            />
+          <div className="my-16 md:my-24">
+            <LEDCube />
           </div>
         </Reveal>
 
-        <Reveal delay={0.45}>
-          <div className="mt-16 md:mt-20 flex flex-wrap items-center justify-center gap-4">
+        <Reveal delay={0.35}>
+          <div className="flex flex-wrap items-center justify-center gap-4">
             <Link to="/contact" className="btn-gold">
               Book Demo
               <span aria-hidden>→</span>
@@ -1055,182 +1040,135 @@ function NextMoveSection() {
   );
 }
 
-/* ─── ChatBot — small robot with a lip-sync mouth + speech bubble ─ */
+/* ─── LEDCube — 5×5×5 grid of 125 gold LED dots in 3D space.
+   Idle: continuously rotates around the Y axis on a 32s loop with
+   a slight X-axis bob.
+   Hover: rotation follows the cursor (rotateX / rotateY computed
+   from mouse position) and the dot lattice EXPANDS (gap grows by
+   1.55x) so it visibly inflates outward. Leaving the cube snaps
+   it back. Dots in the front-most layer glow brighter; back layers
+   recede. ───────────────────────────────────────────────────── */
 
-function ChatBot({
-  variant,
-  side,
-  question,
-  answer,
-  mouthDelay,
-}: {
-  variant: "atlas" | "nova";
-  side: "left" | "right";
-  question: string;
-  answer: string;
-  mouthDelay: number;
-}) {
-  const flip = side === "right";
+function LEDCube() {
+  const SIZE = 5;
+  const BASE_GAP = 18;
+  const HOVER_GAP = 28;
+
+  const [hover, setHover] = useState(false);
+  const [tilt, setTilt] = useState({ rx: -22, ry: 0 });
+
+  function onMove(e: React.MouseEvent<HTMLDivElement>) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width - 0.5;
+    const py = (e.clientY - rect.top) / rect.height - 0.5;
+    setTilt({ rx: -22 + py * -45, ry: px * 75 });
+  }
+
+  const gap = hover ? HOVER_GAP : BASE_GAP;
+  const center = (SIZE - 1) / 2;
+
+  // Pre-compute the dot lattice
+  const dots = useMemo(() => {
+    const arr: { x: number; y: number; z: number; bright: boolean }[] = [];
+    for (let z = 0; z < SIZE; z++) {
+      for (let y = 0; y < SIZE; y++) {
+        for (let x = 0; x < SIZE; x++) {
+          // Sprinkle ~1 in 6 'bright' dots to give the lattice
+          // some visual rhythm without going garish
+          const bright = (x * 37 + y * 53 + z * 71) % 6 === 0;
+          arr.push({ x, y, z, bright });
+        }
+      }
+    }
+    return arr;
+  }, []);
 
   return (
     <div
-      className={`flex items-stretch gap-4 md:gap-5 ${
-        flip ? "md:flex-row-reverse" : ""
-      }`}
+      className="mx-auto w-72 h-72 md:w-[420px] md:h-[420px] relative cursor-grab"
+      style={{ perspective: 1400 }}
+      onMouseMove={onMove}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => {
+        setHover(false);
+        setTilt({ rx: -22, ry: 0 });
+      }}
     >
-      <div className="shrink-0 flex flex-col items-center gap-2">
-        <SmallRobot variant={variant} mouthDelay={mouthDelay} />
-        <span className="font-mono text-[8.5px] uppercase tracking-[0.32em] text-gold/70">
-          ◆ {variant === "atlas" ? "Atlas" : "Nova"}
-        </span>
-      </div>
+      <motion.div
+        className="absolute inset-0 flex items-center justify-center"
+        style={{ transformStyle: "preserve-3d" }}
+        animate={
+          hover
+            ? { rotateX: tilt.rx, rotateY: tilt.ry }
+            : { rotateX: [-22, -10, -22], rotateY: [0, 360] }
+        }
+        transition={
+          hover
+            ? { duration: 0.35, ease: "easeOut" }
+            : {
+                rotateY: { duration: 32, repeat: Infinity, ease: "linear" },
+                rotateX: {
+                  duration: 8,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                },
+              }
+        }
+      >
+        {dots.map((d) => {
+          const dx = (d.x - center) * gap;
+          const dy = (d.y - center) * gap;
+          const dz = (d.z - center) * gap;
+          // Depth-based opacity (back layer dimmer, front brighter)
+          const depthRatio = d.z / (SIZE - 1);
+          const baseOpacity = 0.32 + depthRatio * 0.55;
+          // Bright dots use ivory; otherwise gold
+          const color = d.bright ? "#F2EAD7" : "#D4B061";
+          const size = d.bright ? 5 : 3.5;
+          return (
+            <span
+              key={`${d.x}${d.y}${d.z}`}
+              aria-hidden
+              className="absolute rounded-full"
+              style={{
+                width: size,
+                height: size,
+                marginLeft: -size / 2,
+                marginTop: -size / 2,
+                left: "50%",
+                top: "50%",
+                background: color,
+                opacity: baseOpacity,
+                boxShadow: d.bright
+                  ? "0 0 10px rgba(242,234,215,0.85), 0 0 16px rgba(212,176,97,0.5)"
+                  : "0 0 8px rgba(212,176,97,0.55)",
+                transform: `translate3d(${dx}px, ${dy}px, ${dz}px)`,
+                transition:
+                  "transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s ease",
+              }}
+            />
+          );
+        })}
+      </motion.div>
 
-      {/* Comic-style connector circles */}
-      <div className="hidden md:flex flex-col justify-center items-center gap-1.5 shrink-0">
-        {[0, 1, 2].map((i) => (
-          <motion.span
-            key={i}
-            className="rounded-full bg-midnight border border-gold"
-            style={{ width: 4 + i * 3, height: 4 + i * 3 }}
-            animate={{
-              opacity: [0.3, 1, 0.3],
-              scale: [0.9, 1.1, 0.9],
-            }}
-            transition={{
-              duration: 1.8,
-              delay: mouthDelay + i * 0.25,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Speech bubble */}
+      {/* Soft floor reflection */}
       <div
-        className={`flex-1 relative bg-obsidian border border-gold/35 rounded-2xl p-5 md:p-6 ${
-          flip ? "text-right md:text-right" : ""
-        }`}
-      >
-        {/* Tail */}
-        <span
-          aria-hidden
-          className={`hidden md:block absolute top-8 w-3 h-3 bg-obsidian border border-gold/35 rotate-45 ${
-            flip
-              ? "right-0 translate-x-1/2 border-l-0 border-b-0"
-              : "left-0 -translate-x-1/2 border-r-0 border-t-0"
-          }`}
-        />
-        <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-gold/70 mb-2">
-          {flip ? "Nova asks" : "You ask"}
-        </p>
-        <p className="text-ivory/85 font-display text-lg md:text-xl leading-snug mb-4">
-          {question}
-        </p>
-        <div className="h-px bg-gold/15 my-3" />
-        <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-gold/70 mb-2">
-          {flip ? "Atlas answers" : "Atlas answers"}
-        </p>
-        <p className="text-ivory/65 text-sm leading-relaxed">{answer}</p>
-      </div>
-    </div>
-  );
-}
-
-/* SmallRobot — compact robot used by the ChatBot. Variants change
-   the head color tint slightly so the two bots feel distinct.
-   Mouth animation cycles through 5 shapes (closed/narrow/open/half/
-   wide) at varied widths to read clearly as 'lip sync.' Eyes blink
-   on a 4s cycle. Antenna pulse on a 1.6s cycle. */
-function SmallRobot({
-  variant,
-  mouthDelay,
-}: {
-  variant: "atlas" | "nova";
-  mouthDelay: number;
-}) {
-  const headStroke = "#D4B061";
-  const headTint = variant === "atlas" ? "#0B0A09" : "#15120e";
-  return (
-    <motion.div
-      animate={{ y: [0, -4, 0] }}
-      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-      className="relative"
-    >
-      <svg
-        viewBox="0 0 110 140"
-        className="w-20 md:w-24 h-auto drop-shadow-[0_0_18px_rgba(212,176,97,0.3)]"
         aria-hidden
+        className="absolute left-1/2 -translate-x-1/2 bottom-2 w-2/3 h-12 rounded-[50%] pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, rgba(212,176,97,0.18), transparent 70%)",
+          filter: "blur(8px)",
+        }}
+      />
+
+      {/* Cursor hint */}
+      <p
+        aria-hidden
+        className="absolute -bottom-6 left-1/2 -translate-x-1/2 font-mono text-[9px] uppercase tracking-[0.32em] text-ivory/35 whitespace-nowrap"
       >
-        {/* Antenna */}
-        <line x1="55" y1="6" x2="55" y2="22" stroke={headStroke} strokeWidth="1.4" strokeLinecap="round" />
-        <motion.circle
-          cx="55"
-          cy="4"
-          r="3"
-          fill={headStroke}
-          animate={{ opacity: [0.4, 1, 0.4], r: [2.6, 3.2, 2.6] }}
-          transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-        />
-
-        {/* Head */}
-        <rect x="14" y="22" width="82" height="58" rx="11" fill={headTint} stroke={headStroke} strokeWidth="1.6" />
-        <rect x="22" y="30" width="66" height="38" rx="6" fill="#15120e" stroke="rgba(212,176,97,0.35)" strokeWidth="0.8" />
-
-        {/* Eyes — blink */}
-        <motion.g
-          animate={{ scaleY: [1, 1, 0.1, 1] }}
-          transition={{
-            duration: 4.5,
-            times: [0, 0.7, 0.74, 0.78],
-            repeat: Infinity,
-            delay: variant === "nova" ? 0.6 : 0,
-            ease: "easeOut",
-          }}
-          style={{ transformOrigin: "55px 47px" }}
-        >
-          <circle cx="42" cy="47" r="3.6" fill="#D4B061" />
-          <circle cx="68" cy="47" r="3.6" fill="#D4B061" />
-        </motion.g>
-
-        {/* Mouth — strong lip-sync cycle. rx + ry alternate so it
-            reads clearly as a mouth opening and closing. */}
-        <motion.ellipse
-          cx="55"
-          cy="62"
-          fill="#D4B061"
-          initial={{ rx: 5, ry: 1.2 }}
-          animate={{
-            rx: [5, 1.5, 6, 2.5, 5.5, 1.5, 4, 5],
-            ry: [1.2, 0.6, 3, 0.8, 2.4, 0.6, 1.5, 1.2],
-          }}
-          transition={{
-            duration: 1.8,
-            repeat: Infinity,
-            delay: mouthDelay,
-            ease: "easeInOut",
-          }}
-        />
-
-        {/* Neck */}
-        <rect x="44" y="80" width="22" height="9" fill={headTint} stroke={headStroke} strokeWidth="1.4" />
-
-        {/* Body */}
-        <rect x="10" y="89" width="90" height="42" rx="8" fill={headTint} stroke={headStroke} strokeWidth="1.6" />
-
-        {/* Pulsing core */}
-        <motion.g
-          animate={{ opacity: [0.55, 1, 0.55] }}
-          transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <circle cx="55" cy="110" r="6" fill="#D4B061" />
-          <circle cx="55" cy="110" r="9" fill="none" stroke="#D4B061" strokeWidth="0.9" opacity="0.45" />
-        </motion.g>
-
-        {/* Side LEDs */}
-        <line x1="20" y1="123" x2="32" y2="123" stroke="#D4B061" strokeWidth="1.6" strokeLinecap="round" opacity="0.55" />
-        <line x1="78" y1="123" x2="90" y2="123" stroke="#D4B061" strokeWidth="1.6" strokeLinecap="round" opacity="0.55" />
-      </svg>
-    </motion.div>
+        ◆ hover to expand
+      </p>
+    </div>
   );
 }
