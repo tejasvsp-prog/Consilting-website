@@ -1,8 +1,7 @@
 import { motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import PageTransition, { PageHeader } from "../components/PageTransition";
-import CtaStrip from "../sections/CtaStrip";
 import { services } from "../sections/Services";
 
 export default function ServicesOverview() {
@@ -19,13 +18,11 @@ export default function ServicesOverview() {
         subtitle="Each service is a self-contained engagement, but the real lift comes from running two or more in concert. Pick where you want to start."
       />
 
-      <section className="section bg-midnight">
-        <div className="mx-auto max-w-7xl px-6 md:px-10">
+      <section className="section bg-midnight pb-32 md:pb-48">
+        <div className="mx-auto max-w-[1500px] px-6 md:px-10">
           <ServiceCube />
         </div>
       </section>
-
-      <CtaStrip />
     </PageTransition>
   );
 }
@@ -42,7 +39,7 @@ export default function ServicesOverview() {
      the matching face when clicked
    ───────────────────────────────────────────────────────────── */
 
-const CUBE_SIZE = 360; // px — also the per-face width/height
+const CUBE_SIZE = 520; // px — bigger, fills more of the space
 const HALF = CUBE_SIZE / 2;
 
 function ServiceCube() {
@@ -113,27 +110,26 @@ function ServiceCube() {
   }
 
   return (
-    <div className="grid grid-cols-12 gap-10 md:gap-16 items-center">
+    <div className="grid grid-cols-12 gap-10 lg:gap-20 items-center">
       {/* Cube column */}
-      <div className="col-span-12 lg:col-span-7 relative flex items-center justify-center min-h-[440px] md:min-h-[520px]">
-        {/* Soft floor reflection */}
+      <div className="col-span-12 lg:col-span-7 relative flex items-center justify-center min-h-[560px] lg:min-h-[680px]">
         <div
           aria-hidden
-          className="absolute left-1/2 -translate-x-1/2 bottom-2 md:bottom-8 w-3/4 h-12 rounded-[50%] pointer-events-none"
+          className="absolute left-1/2 -translate-x-1/2 bottom-4 lg:bottom-10 w-3/4 h-14 rounded-[50%] pointer-events-none"
           style={{
             background:
-              "radial-gradient(ellipse at center, rgba(212,176,97,0.18), transparent 70%)",
-            filter: "blur(10px)",
+              "radial-gradient(ellipse at center, rgba(212,176,97,0.22), transparent 70%)",
+            filter: "blur(12px)",
           }}
         />
 
         <div
           ref={containerRef}
-          className="relative cursor-grab active:cursor-grabbing select-none"
+          className="relative cursor-grab active:cursor-grabbing select-none scale-[0.65] sm:scale-[0.78] md:scale-90 lg:scale-100"
           style={{
             width: CUBE_SIZE,
             height: CUBE_SIZE,
-            perspective: 1600,
+            perspective: 2000,
           }}
           onMouseEnter={() => setInteracting(true)}
           onMouseLeave={() => setInteracting(false)}
@@ -148,7 +144,6 @@ function ServiceCube() {
             transition={{ duration: dragging ? 0 : 0.4, ease: "easeOut" }}
             style={{ transformStyle: "preserve-3d" }}
           >
-            {/* Four service faces around the Y axis */}
             {services.map((s, i) => (
               <CubeFace
                 key={s.n}
@@ -158,7 +153,6 @@ function ServiceCube() {
               </CubeFace>
             ))}
 
-            {/* Top brand face */}
             <CubeFace
               transform={`rotateX(90deg) translateZ(${HALF}px)`}
               ornamental
@@ -166,7 +160,6 @@ function ServiceCube() {
               <BrandFaceContent line="Amara" />
             </CubeFace>
 
-            {/* Bottom brand face */}
             <CubeFace
               transform={`rotateX(-90deg) translateZ(${HALF}px)`}
               ornamental
@@ -176,33 +169,21 @@ function ServiceCube() {
           </motion.div>
         </div>
 
-        {/* Drag hint */}
         <p className="absolute bottom-0 left-1/2 -translate-x-1/2 font-mono text-[10px] uppercase tracking-[0.32em] text-ivory/35 whitespace-nowrap">
           ◆ drag · click a face · or tap below
         </p>
       </div>
 
-      {/* Service face navigator + active info */}
-      <div className="col-span-12 lg:col-span-5">
-        <div className="space-y-3">
-          {services.map((s, i) => (
-            <FaceButton
-              key={s.n}
-              service={s}
-              onClick={() => snapTo(i)}
-            />
-          ))}
-        </div>
-        <div className="mt-10 pt-10 border-t border-gold/15">
-          <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-gold mb-3">
-            ◆ tip
-          </p>
-          <p className="text-ivory/55 text-sm leading-relaxed max-w-md">
-            Click and drag the cube to inspect any side. Each face is a
-            full service brief — click into the cube face or use the
-            list above to dive in.
-          </p>
-        </div>
+      {/* Service face navigator — fills the space CtaStrip used to occupy */}
+      <div className="col-span-12 lg:col-span-5 space-y-4 md:space-y-5">
+        {services.map((s, i) => (
+          <FaceButton
+            key={s.n}
+            service={s}
+            index={i}
+            onClick={() => snapTo(i)}
+          />
+        ))}
       </div>
     </div>
   );
@@ -221,27 +202,75 @@ function CubeFace({
 }) {
   return (
     <div
-      className={`absolute inset-0 rounded-2xl border ${
-        ornamental ? "border-gold/25" : "border-gold/45"
-      } bg-midnight overflow-hidden`}
+      className={`absolute inset-0 rounded-2xl border-2 ${
+        ornamental ? "border-gold/30" : "border-gold/55"
+      } bg-[#0b0a09] overflow-hidden`}
       style={{
         transform,
         backfaceVisibility: "hidden",
         boxShadow:
-          "inset 0 0 60px rgba(212,176,97,0.08), 0 0 30px rgba(0,0,0,0.4)",
+          "inset 0 0 80px rgba(212,176,97,0.12), 0 0 40px rgba(0,0,0,0.5)",
       }}
     >
-      {/* Subtle dot grid */}
-      <div
-        aria-hidden
-        className="absolute inset-0 opacity-25 pointer-events-none"
-        style={{
-          backgroundImage:
-            "radial-gradient(rgba(212,176,97,0.45) 1px, transparent 1px)",
-          backgroundSize: "24px 24px",
-        }}
-      />
+      {/* LED matrix — flickering gold dots in a tight grid */}
+      <LEDMatrix />
       {children}
+    </div>
+  );
+}
+
+/* LEDMatrix — fills the face with a grid of gold dots. A handful
+   flicker on randomized cycles so the cube reads as a working LED
+   panel rather than a static print. */
+function LEDMatrix() {
+  const COLS = 18;
+  const ROWS = 18;
+  const lit = useMemo(() => {
+    // Mark ~1 in 9 dots as 'live' (will flicker)
+    const set = new Set<number>();
+    for (let i = 0; i < COLS * ROWS; i++) {
+      if ((i * 37 + 11) % 9 === 0) set.add(i);
+    }
+    return set;
+  }, []);
+
+  const cells = [];
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const i = r * COLS + c;
+      const isLit = lit.has(i);
+      cells.push(
+        <span
+          key={i}
+          aria-hidden
+          className={`block rounded-full ${
+            isLit ? "bg-gold" : "bg-gold/25"
+          }`}
+          style={{
+            width: 4,
+            height: 4,
+            boxShadow: isLit ? "0 0 6px rgba(212,176,97,0.85)" : "none",
+            animation: isLit
+              ? `ledFlicker ${2.5 + (i % 7) * 0.4}s ease-in-out ${(i % 11) * 0.18}s infinite`
+              : undefined,
+          }}
+        />
+      );
+    }
+  }
+
+  return (
+    <div
+      aria-hidden
+      className="absolute inset-0 grid pointer-events-none p-3"
+      style={{
+        gridTemplateColumns: `repeat(${COLS}, 1fr)`,
+        gridTemplateRows: `repeat(${ROWS}, 1fr)`,
+        gap: "2px",
+        placeItems: "center",
+      }}
+    >
+      {cells}
     </div>
   );
 }
@@ -257,13 +286,13 @@ function ServiceFaceContent({
   return (
     <button
       onClick={onOpen}
-      className="absolute inset-0 flex flex-col p-7 md:p-9 text-left group focus:outline-none"
+      className="absolute inset-6 md:inset-8 flex flex-col p-6 md:p-8 text-left group focus:outline-none rounded-xl backdrop-blur-sm bg-midnight/72 border border-gold/25"
     >
-      <div className="flex items-center justify-between mb-6 font-mono text-[10px] uppercase tracking-[0.28em]">
+      <div className="flex items-center justify-between mb-7 font-mono text-[10px] uppercase tracking-[0.28em]">
         <span className="text-gold">{service.n}</span>
         <span className="text-ivory/40">{service.short}</span>
       </div>
-      <h3 className="font-display font-light text-3xl md:text-5xl leading-[0.96] tracking-[-0.01em] text-ivory mb-5 transition-transform duration-500 group-hover:translate-x-1">
+      <h3 className="font-display font-light text-3xl md:text-5xl leading-[0.96] tracking-[-0.01em] text-ivory mb-6 transition-transform duration-500 group-hover:translate-x-1">
         {service.t}
       </h3>
       <p className="text-ivory/65 text-sm leading-relaxed mb-6">
@@ -315,38 +344,40 @@ function BrandFaceContent({
 
 function FaceButton({
   service,
+  index,
   onClick,
 }: {
   service: (typeof services)[number];
+  index: number;
   onClick: () => void;
 }) {
   return (
-    <div className="flex items-stretch gap-3">
+    <div className="flex items-stretch gap-3 md:gap-4">
       <button
         onClick={onClick}
-        className="group flex-1 card flex items-center gap-5 p-5 hover:border-gold transition-colors"
+        className="group flex-1 card flex items-center gap-5 md:gap-6 p-6 md:p-7 hover:border-gold transition-colors text-left"
       >
-        <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-gold w-8 shrink-0">
-          {service.n}
+        <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-gold w-10 shrink-0">
+          0{index + 1}
         </span>
-        <div className="flex-1 text-left">
-          <h4 className="font-display text-xl text-ivory leading-tight">
+        <div className="flex-1">
+          <h4 className="font-display text-2xl md:text-3xl text-ivory leading-tight">
             {service.t}
           </h4>
-          <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-ivory/40 mt-1">
+          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-ivory/45 mt-1.5">
             {service.short}
           </p>
         </div>
-        <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-gold/70 group-hover:text-gold transition-colors">
+        <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-gold/70 group-hover:text-gold transition-colors whitespace-nowrap">
           rotate →
         </span>
       </button>
       <Link
         to={service.to}
-        className="card px-5 flex items-center justify-center text-gold hover:border-gold transition-colors"
+        className="card px-5 md:px-6 flex items-center justify-center text-gold hover:border-gold transition-colors"
         aria-label={`Open ${service.t}`}
       >
-        <span className="text-lg">↗</span>
+        <span className="text-xl">↗</span>
       </Link>
     </div>
   );

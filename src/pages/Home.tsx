@@ -212,14 +212,13 @@ function Rocket() {
   return (
     <motion.div
       ref={wrapRef}
-      initial={{ opacity: 0, y: 60 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 1.0, ease: [0.2, 0.8, 0.2, 1] }}
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1.0, delay: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
       className="relative w-48 sm:w-60 md:w-72 lg:w-80"
       style={{ perspective: 1200 }}
     >
-      {/* Continuous wobble — always on */}
+      {/* Continuous wobble — runs from mount, never stops */}
       <motion.div
         animate={{
           y: [0, -12, -4, -10, 0],

@@ -46,27 +46,26 @@ export default function Hero() {
         </span>
       </motion.div>
 
+      {/* LED arrays float on either side, anchored to viewport edges */}
+      <div className="hidden md:flex absolute left-6 lg:left-12 top-1/2 -translate-y-1/2 flex-col gap-3 z-10">
+        <LEDArray seed={0} />
+      </div>
+      <div className="hidden md:flex absolute right-6 lg:right-12 top-1/2 -translate-y-1/2 flex-col gap-3 z-10">
+        <LEDArray seed={11} />
+      </div>
+
+      {/* TV — centered, wider, dominates the viewport */}
       <motion.div
         style={{ y: yShift, opacity }}
-        className="relative w-full mx-auto max-w-7xl px-6 md:px-10"
+        className="relative w-full mx-auto px-6 md:px-24 lg:px-32 flex items-center justify-center"
       >
-        <div className="grid grid-cols-12 gap-3 md:gap-6 items-center">
-          {/* Left LED array */}
-          <div className="col-span-12 md:col-span-2 flex md:flex-col items-center justify-center gap-2 md:gap-3 order-2 md:order-1">
-            <LEDArray seed={0} />
-          </div>
-
-          {/* TV center */}
-          <div className="col-span-12 md:col-span-8 order-1 md:order-2">
-            <TV3D />
-          </div>
-
-          {/* Right LED array */}
-          <div className="col-span-12 md:col-span-2 flex md:flex-col items-center justify-center gap-2 md:gap-3 order-3">
-            <LEDArray seed={11} />
-          </div>
-        </div>
+        <TV3D />
       </motion.div>
+
+      {/* Mobile: simple horizontal LED bar under the TV */}
+      <div className="md:hidden absolute bottom-44 inset-x-0 flex items-center justify-center gap-2 z-10">
+        <LEDArray seed={5} />
+      </div>
 
       {/* Bottom-left whisper */}
       <motion.p
@@ -99,13 +98,13 @@ export default function Hero() {
   );
 }
 
-/* ─── 3D TV — central monitor with mouse tilt + scanlines ──────── */
+/* ─── 3D TV — proper 6-sided 3D box, services-cube style ───────── */
 
 function TV3D() {
   // Default rotation makes the 3D thickness obvious from the start.
-  const BASE_RX = -8;
-  const BASE_RY = 18;
-  const DEPTH = 32; // px — TV thickness
+  const BASE_RX = -7;
+  const BASE_RY = 14;
+  const DEPTH = 56; // px — half-thickness from the cube center
   const [tilt, setTilt] = useState({ rx: 0, ry: 0 });
 
   function onMove(e: React.MouseEvent<HTMLDivElement>) {
@@ -117,17 +116,28 @@ function TV3D() {
 
   return (
     <div
-      style={{ perspective: 1500 }}
+      style={{ perspective: 2200 }}
       onMouseMove={onMove}
       onMouseLeave={() => setTilt({ rx: 0, ry: 0 })}
-      className="relative max-w-[820px] mx-auto"
+      className="relative w-full max-w-[1100px] mx-auto"
     >
+      {/* Soft floor reflection under the TV */}
+      <div
+        aria-hidden
+        className="absolute left-1/2 -translate-x-1/2 -bottom-8 w-3/4 h-12 rounded-[50%] pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, rgba(212,176,97,0.18), transparent 70%)",
+          filter: "blur(10px)",
+        }}
+      />
+
       <motion.div
         initial={{ opacity: 0, scale: 0.94 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.0, delay: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+        transition={{ duration: 1.0, delay: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
         style={{ transformStyle: "preserve-3d" }}
-        className="relative"
+        className="relative w-full aspect-[16/10]"
       >
         <motion.div
           animate={{
@@ -136,64 +146,68 @@ function TV3D() {
           }}
           transition={{ duration: 0.45, ease: "easeOut" }}
           style={{ transformStyle: "preserve-3d" }}
-          className="relative"
+          className="relative w-full h-full"
         >
-          {/* Decorative gold stars surrounding the bezel */}
-          <BezelStars />
-
-          {/* Back panel — visible behind the TV at depth -DEPTH */}
+          {/* Back face — visible from behind. Same shape as front. */}
           <div
             aria-hidden
-            className="absolute inset-0 aspect-[16/10] rounded-3xl bg-gradient-to-b from-[#15120e] to-[#0b0a09] border border-gold/15"
-            style={{ transform: `translateZ(-${DEPTH}px)` }}
+            className="absolute inset-0 rounded-[28px] bg-gradient-to-b from-[#15120e] to-[#0b0a09] border border-gold/20"
+            style={{
+              transform: `translateZ(-${DEPTH}px) rotateY(180deg)`,
+              backfaceVisibility: "hidden",
+            }}
           />
 
-          {/* Top thickness slab */}
+          {/* Top thickness face */}
           <div
             aria-hidden
-            className="absolute left-0 right-0 top-0 rounded-t-3xl bg-gradient-to-b from-coal to-obsidian border-x border-t border-gold/40"
+            className="absolute left-0 right-0 top-0 bg-gradient-to-b from-coal to-obsidian border-x border-y border-gold/40"
             style={{
               height: `${DEPTH * 2}px`,
               transformOrigin: "top",
-              transform: `rotateX(-90deg) translateZ(0px)`,
+              transform: `rotateX(-90deg)`,
             }}
           />
-          {/* Bottom thickness slab */}
+          {/* Bottom thickness face */}
           <div
             aria-hidden
-            className="absolute left-0 right-0 bottom-0 rounded-b-3xl bg-gradient-to-b from-obsidian to-midnight border-x border-b border-gold/40"
+            className="absolute left-0 right-0 bottom-0 bg-gradient-to-b from-obsidian to-midnight border-x border-y border-gold/40"
             style={{
               height: `${DEPTH * 2}px`,
               transformOrigin: "bottom",
-              transform: `rotateX(90deg) translateZ(0px)`,
+              transform: `rotateX(90deg)`,
             }}
           />
-          {/* Right thickness slab */}
+          {/* Right thickness face */}
           <div
             aria-hidden
-            className="absolute right-0 top-0 bottom-0 rounded-r-3xl bg-gradient-to-r from-coal to-obsidian border-y border-r border-gold/30"
+            className="absolute right-0 top-0 bottom-0 bg-gradient-to-r from-coal to-obsidian border-x border-y border-gold/30"
             style={{
               width: `${DEPTH * 2}px`,
               transformOrigin: "right",
-              transform: `rotateY(90deg) translateZ(0px)`,
+              transform: `rotateY(90deg)`,
             }}
           />
-          {/* Left thickness slab */}
+          {/* Left thickness face */}
           <div
             aria-hidden
-            className="absolute left-0 top-0 bottom-0 rounded-l-3xl bg-gradient-to-l from-coal to-obsidian border-y border-l border-gold/30"
+            className="absolute left-0 top-0 bottom-0 bg-gradient-to-l from-coal to-obsidian border-x border-y border-gold/30"
             style={{
               width: `${DEPTH * 2}px`,
               transformOrigin: "left",
-              transform: `rotateY(-90deg) translateZ(0px)`,
+              transform: `rotateY(-90deg)`,
             }}
           />
 
-          {/* TV bezel — front face (translated forward by DEPTH) */}
+          {/* FRONT FACE — the screen + bezel */}
           <div
-            className="relative aspect-[16/10] bg-gradient-to-b from-coal to-obsidian rounded-3xl border-2 border-gold/55 p-4 md:p-7 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.75),inset_0_1px_0_rgba(255,255,255,0.04)]"
-            style={{ transform: `translateZ(${DEPTH}px)` }}
+            className="absolute inset-0 bg-gradient-to-b from-coal to-obsidian rounded-[28px] border-2 border-gold/55 p-4 md:p-7 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.85),inset_0_1px_0_rgba(255,255,255,0.04)]"
+            style={{
+              transform: `translateZ(${DEPTH}px)`,
+              backfaceVisibility: "hidden",
+            }}
           >
+            <BezelStars />
             {/* Inner bezel ring */}
             <div className="absolute inset-2 rounded-2xl border border-gold/15 pointer-events-none" />
 

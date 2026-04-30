@@ -59,6 +59,14 @@ body {
   animation: marquee 42s linear infinite;
 }
 
+@keyframes ledFlicker {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  35% { opacity: 0.35; transform: scale(0.85); }
+  55% { opacity: 1; transform: scale(1); }
+  70% { opacity: 0.55; transform: scale(0.9); }
+  85% { opacity: 1; transform: scale(1); }
+}
+
 /* Static gold — no shimmer, no animation */
 .gold {
   color: #d4b061;
