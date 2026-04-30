@@ -102,18 +102,22 @@ export default function Hero() {
 /* ─── 3D TV — central monitor with mouse tilt + scanlines ──────── */
 
 function TV3D() {
+  // Default rotation makes the 3D thickness obvious from the start.
+  const BASE_RX = -8;
+  const BASE_RY = 18;
+  const DEPTH = 32; // px — TV thickness
   const [tilt, setTilt] = useState({ rx: 0, ry: 0 });
 
   function onMove(e: React.MouseEvent<HTMLDivElement>) {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width - 0.5;
     const y = (e.clientY - rect.top) / rect.height - 0.5;
-    setTilt({ rx: y * -7, ry: x * 14 });
+    setTilt({ rx: y * -10, ry: x * 22 });
   }
 
   return (
     <div
-      style={{ perspective: 1600 }}
+      style={{ perspective: 1500 }}
       onMouseMove={onMove}
       onMouseLeave={() => setTilt({ rx: 0, ry: 0 })}
       className="relative max-w-[820px] mx-auto"
@@ -126,7 +130,10 @@ function TV3D() {
         className="relative"
       >
         <motion.div
-          animate={{ rotateX: tilt.rx, rotateY: tilt.ry }}
+          animate={{
+            rotateX: BASE_RX + tilt.rx,
+            rotateY: BASE_RY + tilt.ry,
+          }}
           transition={{ duration: 0.45, ease: "easeOut" }}
           style={{ transformStyle: "preserve-3d" }}
           className="relative"
@@ -134,8 +141,59 @@ function TV3D() {
           {/* Decorative gold stars surrounding the bezel */}
           <BezelStars />
 
-          {/* TV bezel */}
-          <div className="relative aspect-[16/10] bg-gradient-to-b from-coal to-obsidian rounded-3xl border-2 border-gold/55 p-4 md:p-7 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.75),inset_0_1px_0_rgba(255,255,255,0.04)]">
+          {/* Back panel — visible behind the TV at depth -DEPTH */}
+          <div
+            aria-hidden
+            className="absolute inset-0 aspect-[16/10] rounded-3xl bg-gradient-to-b from-[#15120e] to-[#0b0a09] border border-gold/15"
+            style={{ transform: `translateZ(-${DEPTH}px)` }}
+          />
+
+          {/* Top thickness slab */}
+          <div
+            aria-hidden
+            className="absolute left-0 right-0 top-0 rounded-t-3xl bg-gradient-to-b from-coal to-obsidian border-x border-t border-gold/40"
+            style={{
+              height: `${DEPTH * 2}px`,
+              transformOrigin: "top",
+              transform: `rotateX(-90deg) translateZ(0px)`,
+            }}
+          />
+          {/* Bottom thickness slab */}
+          <div
+            aria-hidden
+            className="absolute left-0 right-0 bottom-0 rounded-b-3xl bg-gradient-to-b from-obsidian to-midnight border-x border-b border-gold/40"
+            style={{
+              height: `${DEPTH * 2}px`,
+              transformOrigin: "bottom",
+              transform: `rotateX(90deg) translateZ(0px)`,
+            }}
+          />
+          {/* Right thickness slab */}
+          <div
+            aria-hidden
+            className="absolute right-0 top-0 bottom-0 rounded-r-3xl bg-gradient-to-r from-coal to-obsidian border-y border-r border-gold/30"
+            style={{
+              width: `${DEPTH * 2}px`,
+              transformOrigin: "right",
+              transform: `rotateY(90deg) translateZ(0px)`,
+            }}
+          />
+          {/* Left thickness slab */}
+          <div
+            aria-hidden
+            className="absolute left-0 top-0 bottom-0 rounded-l-3xl bg-gradient-to-l from-coal to-obsidian border-y border-l border-gold/30"
+            style={{
+              width: `${DEPTH * 2}px`,
+              transformOrigin: "left",
+              transform: `rotateY(-90deg) translateZ(0px)`,
+            }}
+          />
+
+          {/* TV bezel — front face (translated forward by DEPTH) */}
+          <div
+            className="relative aspect-[16/10] bg-gradient-to-b from-coal to-obsidian rounded-3xl border-2 border-gold/55 p-4 md:p-7 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.75),inset_0_1px_0_rgba(255,255,255,0.04)]"
+            style={{ transform: `translateZ(${DEPTH}px)` }}
+          >
             {/* Inner bezel ring */}
             <div className="absolute inset-2 rounded-2xl border border-gold/15 pointer-events-none" />
 
@@ -222,11 +280,6 @@ function TV3D() {
                 style={{ boxShadow: "0 0 8px rgba(212,176,97,0.95)" }}
               />
             </div>
-
-            {/* Brand badge */}
-            <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 font-mono text-[8px] md:text-[9px] uppercase tracking-[0.42em] text-ivory/35">
-              ◆ AMARA TV
-            </span>
           </div>
 
           {/* Stand */}

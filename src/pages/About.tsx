@@ -1088,7 +1088,7 @@ function NeonSign() {
           ].join(", "),
         }}
       >
-        Make the move.
+        Contact us.
       </motion.h2>
 
       <motion.h3

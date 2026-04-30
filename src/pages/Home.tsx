@@ -1,4 +1,4 @@
-import { motion, useAnimationControls } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import PageTransition from "../components/PageTransition";
@@ -175,18 +175,15 @@ function RocketCloser() {
   );
 }
 
-/* Rocket — real-time cursor-driven movement with occasional bursts.
-   No more constant lift loop. Idle: nearly still with quiet breathing.
-   On mouse move within the section: rocket leans toward the cursor
-   (rotate/translate). Every 14-22 seconds: a brief 'burst' kicks the
-   rocket up + scaled, then it settles. */
+/* Rocket — continuous gentle wobble + cursor-follow tilt.
+   The base motion.div applies a continuous wobble loop (always on).
+   The inner motion.svg adds a cursor-driven tilt on top, so the
+   rocket is always moving while also leaning toward the cursor. */
 function Rocket() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [tilt, setTilt] = useState({ rx: 0, ry: 0, x: 0, y: 0 });
-  const [thrust, setThrust] = useState(false);
-  const controls = useAnimationControls();
 
-  // Track cursor position relative to the rocket section
+  // Track cursor position relative to the section
   useEffect(() => {
     const section = wrapRef.current?.closest("section");
     if (!section) return;
@@ -194,12 +191,11 @@ function Rocket() {
       const rect = section!.getBoundingClientRect();
       const px = (e.clientX - rect.left) / rect.width - 0.5;
       const py = (e.clientY - rect.top) / rect.height - 0.5;
-      // Clamp influence so the rocket leans subtly, not violently
       setTilt({
-        rx: py * -8,
-        ry: px * 14,
-        x: px * 18,
-        y: py * 12,
+        rx: py * -6,
+        ry: px * 10,
+        x: px * 14,
+        y: py * 8,
       });
     }
     function onLeave() {
@@ -213,39 +209,6 @@ function Rocket() {
     };
   }, []);
 
-  // Periodic burst — every 14–22s, the rocket lifts + flares briefly
-  useEffect(() => {
-    let alive = true;
-    let timeout: ReturnType<typeof setTimeout>;
-    async function loop() {
-      if (!alive) return;
-      const wait = 14000 + Math.random() * 8000;
-      timeout = setTimeout(async () => {
-        if (!alive) return;
-        setThrust(true);
-        await controls.start({
-          y: -36,
-          scale: 1.06,
-          rotate: (Math.random() - 0.5) * 5,
-          transition: { duration: 0.55, ease: [0.2, 0.8, 0.2, 1] },
-        });
-        await controls.start({
-          y: 0,
-          scale: 1,
-          rotate: 0,
-          transition: { duration: 1.2, ease: "easeOut" },
-        });
-        setThrust(false);
-        loop();
-      }, wait);
-    }
-    loop();
-    return () => {
-      alive = false;
-      clearTimeout(timeout);
-    };
-  }, [controls]);
-
   return (
     <motion.div
       ref={wrapRef}
@@ -256,17 +219,29 @@ function Rocket() {
       className="relative w-48 sm:w-60 md:w-72 lg:w-80"
       style={{ perspective: 1200 }}
     >
-      <motion.svg
-        viewBox="0 0 240 460"
-        className="w-full h-auto drop-shadow-[0_0_50px_rgba(212,176,97,0.28)]"
-        animate={controls}
-        style={{
-          transform: `rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) translate3d(${tilt.x}px, ${tilt.y}px, 0)`,
-          transformStyle: "preserve-3d",
-          transition: "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)",
+      {/* Continuous wobble — always on */}
+      <motion.div
+        animate={{
+          y: [0, -12, -4, -10, 0],
+          rotate: [-2, 2, -1.2, 1.6, -2],
         }}
-        aria-hidden
+        transition={{
+          duration: 5.5,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
       >
+        {/* Inner layer adds cursor-follow tilt on top of the wobble */}
+        <motion.svg
+          viewBox="0 0 240 460"
+          className="w-full h-auto drop-shadow-[0_0_50px_rgba(212,176,97,0.28)]"
+          style={{
+            transform: `rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) translate3d(${tilt.x}px, ${tilt.y}px, 0)`,
+            transformStyle: "preserve-3d",
+            transition: "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)",
+          }}
+          aria-hidden
+        >
         <defs>
           <linearGradient id="rocketBody" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor="#f2ead7" />
@@ -345,22 +320,17 @@ function Rocket() {
           strokeWidth="2"
         />
 
-        {/* Exhaust — fully visible only during a burst, otherwise a
-            quiet pilot flame at low intensity. */}
+        {/* Exhaust flames — always flickering */}
         <motion.g
-          animate={
-            thrust
-              ? {
-                  scaleY: [0.85, 1.3, 1.0, 1.25, 1.0],
-                  opacity: [0.6, 1, 0.85, 1, 0.6],
-                }
-              : { scaleY: 0.45, opacity: 0.32 }
-          }
-          transition={
-            thrust
-              ? { duration: 0.5, repeat: Infinity, ease: "easeInOut" }
-              : { duration: 1.2, ease: "easeOut" }
-          }
+          animate={{
+            scaleY: [0.85, 1.2, 0.9, 1.15, 0.85],
+            opacity: [0.85, 1, 0.9, 1, 0.85],
+          }}
+          transition={{
+            duration: 0.55,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
           style={{ transformOrigin: "120px 334px" }}
         >
           <path
@@ -375,9 +345,10 @@ function Rocket() {
           />
         </motion.g>
       </motion.svg>
+      </motion.div>
 
-      {/* Rising sparks — only render during thrust */}
-      {thrust && <Sparks />}
+      {/* Rising sparks — always rendered, drifting around the rocket */}
+      <Sparks />
     </motion.div>
   );
 }
