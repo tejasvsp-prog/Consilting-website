@@ -276,28 +276,28 @@ function Rocket() {
    exhaust halo at the base of the rocket so the launch reads as
    bright + warm without making the rocket itself jittery. */
 function Sparks() {
-  // 14 small bright sparks (rocketSpark keyframe — short, fast)
+  // 8 small bright sparks (rocketSpark keyframe — slower, gentler)
   const sparks = useMemo(
     () =>
-      Array.from({ length: 14 }, (_, i) => ({
-        left: 30 + ((i * 11) % 40),
-        sx: ((i * 17) % 19) - 9 + "px",
-        delay: (i * 0.22).toFixed(2) + "s",
-        duration: (1.8 + ((i * 31) % 11) * 0.1).toFixed(2) + "s",
-        size: 1.5 + ((i * 7) % 3) * 0.7,
+      Array.from({ length: 8 }, (_, i) => ({
+        left: 34 + ((i * 13) % 32),
+        sx: ((i * 17) % 13) - 6 + "px",
+        delay: (i * 0.4).toFixed(2) + "s",
+        duration: (3 + ((i * 7) % 5) * 0.2).toFixed(2) + "s",
+        size: 1.2 + ((i * 5) % 3) * 0.4,
       })),
     []
   );
 
-  // 6 larger embers (rocketEmber keyframe — slower, longer rise)
+  // 3 larger embers — rare, soft
   const embers = useMemo(
     () =>
-      Array.from({ length: 6 }, (_, i) => ({
-        left: 32 + ((i * 19) % 36),
-        sx: ((i * 23) % 31) - 15 + "px",
-        delay: (i * 0.55 + 0.2).toFixed(2) + "s",
-        duration: (3.2 + ((i * 13) % 7) * 0.15).toFixed(2) + "s",
-        size: 3.5 + ((i * 11) % 4) * 0.6,
+      Array.from({ length: 3 }, (_, i) => ({
+        left: 38 + ((i * 19) % 24),
+        sx: ((i * 23) % 19) - 9 + "px",
+        delay: (i * 1.1 + 0.4).toFixed(2) + "s",
+        duration: (4.2 + ((i * 7) % 5) * 0.2).toFixed(2) + "s",
+        size: 2.4 + ((i * 5) % 3) * 0.4,
       })),
     []
   );
@@ -307,11 +307,11 @@ function Sparks() {
       {/* Exhaust halo — soft warm glow under the rocket */}
       <span
         aria-hidden
-        className="absolute left-1/2 -translate-x-1/2 top-0 w-32 h-20 rounded-[50%] pointer-events-none"
+        className="absolute left-1/2 -translate-x-1/2 top-0 w-28 h-16 rounded-[50%] pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse at center, rgba(255,250,236,0.35) 0%, rgba(212,176,97,0.25) 30%, transparent 70%)",
-          filter: "blur(8px)",
+            "radial-gradient(ellipse at center, rgba(255,250,236,0.22) 0%, rgba(212,176,97,0.16) 30%, transparent 70%)",
+          filter: "blur(10px)",
         }}
       />
 

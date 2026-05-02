@@ -56,12 +56,12 @@ export default function Hero() {
           <DrawWord
             text="Amara"
             startDelay={0.45}
-            drawDuration={1.6}
+            drawDuration={1.4}
             className="font-display font-light text-[24vw] md:text-[16vw] leading-[0.86] tracking-[-0.012em] text-ivory pl-6 md:pl-10 whitespace-nowrap"
           />
           <span
             aria-hidden
-            className="hidden md:block relative flex-1 h-px bg-gold ml-8 mr-0 overflow-visible opacity-0 animate-[fadeInUp_0.9s_ease-out_2.2s_forwards] origin-left"
+            className="hidden md:block relative flex-1 h-px bg-gold ml-8 mr-0 overflow-visible opacity-0 animate-[fadeInUp_0.9s_ease-out_1.95s_forwards] origin-left"
             style={{ transformOrigin: "left center" }}
           />
         </div>
@@ -70,7 +70,7 @@ export default function Hero() {
         <div className="flex items-center w-full mt-3 md:mt-6 justify-end">
           <span
             aria-hidden
-            className="hidden md:flex flex-1 items-center mr-8 ml-0 opacity-0 animate-[fadeInUp_0.9s_ease-out_2.4s_forwards]"
+            className="hidden md:flex flex-1 items-center mr-8 ml-0 opacity-0 animate-[fadeInUp_0.9s_ease-out_3.4s_forwards]"
           >
             <span className="relative flex-1 h-px bg-gold overflow-visible" />
             <ArrowTip />
@@ -79,8 +79,8 @@ export default function Hero() {
             text="Digital."
             italic
             gold
-            startDelay={2.0}
-            drawDuration={1.6}
+            startDelay={1.85}
+            drawDuration={1.4}
             className="font-display font-light italic text-[24vw] md:text-[16vw] leading-[0.86] tracking-[-0.012em] gold pr-6 md:pr-10 whitespace-nowrap"
           />
         </div>

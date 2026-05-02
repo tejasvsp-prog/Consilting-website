@@ -1,11 +1,13 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import PageTransition, { PageHeader } from "../components/PageTransition";
-import { Reveal } from "../components/Reveal";
+import PageTransition from "../components/PageTransition";
+import { Reveal, SplitText } from "../components/Reveal";
 import CtaStrip from "../sections/CtaStrip";
 
 type ClientCase = {
   client: string;
+  /** Short single-line tagline shown on the card */
+  tag: string;
   industry: string;
   location: string;
   scope: string[];
@@ -20,14 +22,16 @@ type ClientCase = {
 const clients: ClientCase[] = [
   {
     client: "Lansing Area Veterans Coalition",
+    tag: "Veterans coalition",
     industry: "Nonprofit · Veterans services",
     location: "Lansing, MI",
     scope: ["Website Development", "Website Maintenance"],
     story:
-      "A coalition serving Lansing-area veterans through outreach, advocacy, and direct support programs. We rebuilt the digital home so that the people who need help can find it in one click — and the volunteers and donors who power the mission have a clear, fast place to act.",
+      "A coalition serving Lansing-area veterans through outreach, advocacy, and direct support programs. We rebuilt the digital home so the people who need help can find it in one click — and the volunteers and donors who power the mission have a clear, fast place to act.",
   },
   {
     client: "Paws for a Cause MI",
+    tag: "Animal welfare",
     industry: "Nonprofit · Animal welfare",
     location: "Michigan",
     scope: ["Website Development", "Meta Ads", "Website Maintenance"],
@@ -37,6 +41,7 @@ const clients: ClientCase[] = [
   },
   {
     client: "Moten Consulting Group",
+    tag: "Consulting practice",
     industry: "Professional services · Consulting",
     location: "Michigan",
     scope: ["Website Development", "SEO"],
@@ -45,6 +50,7 @@ const clients: ClientCase[] = [
   },
   {
     client: "Mayuri Indian Restaurant",
+    tag: "Hospitality",
     industry: "Hospitality · Restaurant",
     location: "Michigan",
     scope: ["Website Development", "Meta Ads", "Website Maintenance"],
@@ -53,6 +59,7 @@ const clients: ClientCase[] = [
   },
   {
     client: "Holistic Manual Physical Therapy",
+    tag: "Specialty PT clinic",
     industry: "Healthcare · Physical therapy",
     location: "Michigan",
     scope: ["Website Development", "SEO", "Website Maintenance"],
@@ -64,64 +71,109 @@ const clients: ClientCase[] = [
 export default function Clients() {
   return (
     <PageTransition>
-      <PageHeader
-        tag="Clients"
-        title={
-          <>
-            Operators we've{" "}
-            <span className="gold italic">moved the line for.</span>
-          </>
-        }
-        subtitle="A working list of the brands and organizations we partner with — across nonprofits, restaurants, healthcare, and consulting. Different industries, same standard."
-      />
+      {/* HERO — bold left-aligned wordmark + supporting line */}
+      <section className="relative bg-midnight pt-40 md:pt-52 pb-24 md:pb-32 overflow-hidden">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -top-32 -left-32 w-[520px] h-[520px] rounded-full bg-gold/8 blur-[140px]"
+        />
+        <div className="mx-auto max-w-7xl px-6 md:px-10 relative">
+          <Reveal>
+            <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-gold mb-8">
+              <span className="inline-block size-1.5 rounded-full bg-gold mr-3 align-middle animate-[ledFlicker_2.2s_ease-in-out_infinite]" />
+              Clients
+            </p>
+          </Reveal>
 
-      <section className="section bg-midnight">
-        <div className="mx-auto max-w-7xl px-6 md:px-10">
-          <div className="flex items-end justify-between mb-12 flex-wrap gap-4">
-            <Reveal>
-              <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-gold">
-                ◆ Selected partners
+          <h1 className="font-display font-light text-[14vw] md:text-[12vw] leading-[0.88] tracking-[-0.025em] text-ivory uppercase">
+            <span className="block">
+              <SplitText text="OPERATORS" stagger={0.05} />
+            </span>
+            <span className="block gold italic normal-case">
+              <SplitText text="we move." stagger={0.05} delay={0.5} />
+            </span>
+          </h1>
+
+          <Reveal delay={0.9}>
+            <div className="mt-10 md:mt-14 max-w-2xl">
+              <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-ivory/55 leading-relaxed">
+                Detroit-based growth studio, working with operators across
+                nonprofit, hospitality, healthcare, and consulting.
               </p>
-            </Reveal>
-            <Reveal delay={0.15}>
-              <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-ivory/40">
-                {clients.length} active engagements
+              <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.28em] text-gold/70">
+                SEO · Web · Maintenance · Meta Ads.
               </p>
-            </Reveal>
+            </div>
+          </Reveal>
+
+          {/* Stat strip */}
+          <div className="mt-16 md:mt-20 grid grid-cols-3 gap-6 max-w-2xl border-t border-gold/15 pt-8">
+            {[
+              { v: `${clients.length}`, l: "Active engagements" },
+              { v: "92%", l: "Retention" },
+              { v: "MI", l: "Headquartered" },
+            ].map((s, i) => (
+              <Reveal key={s.l} delay={1 + i * 0.08}>
+                <div>
+                  <div className="font-display text-3xl md:text-4xl text-gold leading-none">
+                    {s.v}
+                  </div>
+                  <div className="mt-2 font-mono text-[9px] uppercase tracking-[0.28em] text-ivory/45">
+                    {s.l}
+                  </div>
+                </div>
+              </Reveal>
+            ))}
           </div>
+        </div>
+      </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      {/* CASCADING CLIENT ROW — five tall portrait cards at varying offsets */}
+      <section className="relative bg-midnight pb-24 md:pb-32 overflow-hidden">
+        <div className="mx-auto max-w-[1400px] px-6 md:px-10">
+          <CascadeRow clients={clients} />
+        </div>
+      </section>
+
+      {/* DETAIL LIST — full client write-ups below the cascade */}
+      <section className="bg-obsidian border-y border-gold/15 py-24 md:py-32">
+        <div className="mx-auto max-w-7xl px-6 md:px-10">
+          <Reveal>
+            <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-gold mb-10">
+              ◆ The work, in their words
+            </p>
+          </Reveal>
+          <ul className="divide-y divide-gold/15 border-y border-gold/15">
             {clients.map((c, i) => (
-              <motion.article
+              <motion.li
                 key={c.client}
-                initial={{ opacity: 0, y: 50 }}
+                initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-80px" }}
+                viewport={{ once: true, margin: "-50px" }}
                 transition={{
-                  duration: 0.85,
-                  delay: (i % 2) * 0.08,
+                  duration: 0.7,
+                  delay: i * 0.06,
                   ease: [0.2, 0.8, 0.2, 1],
                 }}
-                whileHover={{ y: -4 }}
-                className="card p-8 md:p-10 flex flex-col"
+                className="grid grid-cols-12 gap-6 md:gap-10 py-10 md:py-12 group"
               >
-                <div className="flex items-start justify-between mb-8 font-mono text-[10px] uppercase tracking-[0.28em] gap-4">
-                  <span className="text-ivory/40">{c.industry}</span>
-                  <span className="text-ivory/40 text-right shrink-0">
-                    {c.location}
-                  </span>
+                <div className="col-span-12 md:col-span-1 font-mono text-[11px] uppercase tracking-[0.32em] text-gold/70 pt-1">
+                  {String(i + 1).padStart(2, "0")}
                 </div>
-
-                <h3 className="font-display font-light text-3xl md:text-4xl text-ivory leading-[1.05] tracking-[-0.01em] mb-6">
-                  {c.client}
-                </h3>
-
-                <p className="text-ivory/70 leading-relaxed mb-8">
-                  {c.story}
-                </p>
-
-                <div className="mt-auto pt-6 border-t border-gold/15 flex items-center justify-between flex-wrap gap-4">
-                  <div className="flex flex-wrap gap-2">
+                <div className="col-span-12 md:col-span-4">
+                  <h3 className="font-display font-light text-2xl md:text-3xl text-ivory leading-tight tracking-[-0.005em] mb-3 transition-transform duration-500 group-hover:translate-x-1">
+                    {c.client}
+                  </h3>
+                  <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-ivory/45">
+                    {c.industry}
+                  </div>
+                  <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-ivory/35 mt-1">
+                    {c.location}
+                  </div>
+                </div>
+                <div className="col-span-12 md:col-span-7">
+                  <p className="text-ivory/70 leading-relaxed mb-6">{c.story}</p>
+                  <div className="flex flex-wrap items-center gap-2 gap-y-3">
                     {c.scope.map((s) => (
                       <span
                         key={s}
@@ -130,37 +182,35 @@ export default function Clients() {
                         {s}
                       </span>
                     ))}
+                    {c.url && (
+                      <a
+                        href={c.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="ml-auto inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.28em] font-medium text-gold border-b border-gold/40 pb-0.5 hover:gap-3 transition-all"
+                      >
+                        Visit site
+                        <span aria-hidden>↗</span>
+                      </a>
+                    )}
                   </div>
-                  {c.url && (
-                    <a
-                      href={c.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.28em] font-medium text-gold border-b border-gold/40 pb-0.5 hover:gap-3 transition-all"
-                    >
-                      Visit site
-                      <span aria-hidden>↗</span>
-                    </a>
-                  )}
                 </div>
-              </motion.article>
+              </motion.li>
             ))}
-          </div>
+          </ul>
 
           <Reveal delay={0.4}>
-            <div className="mt-16 card p-8 md:p-12 text-center">
-              <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-gold mb-4">
-                ◆ Want a deeper look?
-              </p>
-              <h3 className="font-display text-3xl md:text-5xl leading-tight mb-6">
-                Real numbers. Real screenshots. Real references.
-              </h3>
-              <p className="text-ivory/65 max-w-xl mx-auto mb-10">
-                On a discovery call, we walk through the work we did, the
-                metrics that moved, and the people you can call to ask about
-                us directly.
-              </p>
-              <div className="flex flex-wrap items-center justify-center gap-4">
+            <div className="mt-20 md:mt-24 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-gold/70 mb-3">
+                  Want a deeper look?
+                </p>
+                <h3 className="font-display font-light text-3xl md:text-5xl leading-tight tracking-[-0.01em] max-w-xl">
+                  Real numbers. Real screenshots.{" "}
+                  <span className="gold italic">Real references.</span>
+                </h3>
+              </div>
+              <div className="flex flex-wrap items-center gap-4">
                 <Link to="/contact" className="btn-gold">
                   Book a call
                   <span aria-hidden>→</span>
@@ -176,5 +226,108 @@ export default function Clients() {
 
       <CtaStrip />
     </PageTransition>
+  );
+}
+
+/* ─── CascadeRow — staggered portrait cards across the bottom of the
+   hero. Each card sits at a different vertical offset, fades up in
+   sequence, lifts slightly and gold-glows on hover. ──────────────── */
+function CascadeRow({ clients }: { clients: ClientCase[] }) {
+  // Vertical offsets in pixels — mirror the reference image cascade.
+  const offsets = [40, 96, 0, 72, 24];
+  return (
+    <div className="relative grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6 items-end pt-20 md:pt-24">
+      {/* Decorative gold rule above the cascade */}
+      <span
+        aria-hidden
+        className="absolute top-6 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent"
+      />
+      {clients.map((c, i) => (
+        <motion.div
+          key={c.client}
+          initial={{ opacity: 0, y: 60 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-120px" }}
+          transition={{
+            duration: 0.95,
+            delay: i * 0.12,
+            ease: [0.2, 0.8, 0.2, 1],
+          }}
+          style={{ transform: `translateY(${offsets[i % offsets.length]}px)` }}
+          className="group"
+        >
+          <ClientPortrait index={i} client={c} />
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+function ClientPortrait({
+  index,
+  client,
+}: {
+  index: number;
+  client: ClientCase;
+}) {
+  // Generate initials from the client name for the placeholder mark.
+  const initials = client.client
+    .replace(/[^A-Za-z\s]/g, "")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase();
+  return (
+    <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-gradient-to-b from-coal via-midnight to-obsidian border border-gold/20 transition-all duration-700 group-hover:border-gold/55 group-hover:-translate-y-2 shadow-[0_30px_60px_rgba(0,0,0,0.45)]">
+      {/* Subtle paper-grain */}
+      <span
+        aria-hidden
+        className="absolute inset-0 opacity-[0.05] mix-blend-overlay pointer-events-none"
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml;utf8,<svg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\")",
+        }}
+      />
+      {/* Hover glow */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -inset-x-12 -bottom-20 h-44 bg-gold/25 blur-3xl opacity-0 transition-opacity duration-700 group-hover:opacity-100"
+      />
+      {/* Top corner — index */}
+      <span className="absolute top-4 left-5 font-mono text-[10px] uppercase tracking-[0.28em] text-gold/70">
+        {String(index + 1).padStart(2, "0")}
+      </span>
+      <span className="absolute top-4 right-5 font-mono text-[10px] uppercase tracking-[0.28em] text-ivory/35">
+        {client.location.split(",")[0]}
+      </span>
+
+      {/* Logo placeholder — initials in serif gold */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.85 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 1, delay: 0.3 + index * 0.12, ease: [0.2, 0.8, 0.2, 1] }}
+          className="relative"
+        >
+          <span className="absolute inset-0 -m-6 rounded-full bg-gold/15 blur-2xl" />
+          <span className="relative font-display font-light text-7xl md:text-8xl text-ivory tracking-[-0.02em] transition-colors duration-700 group-hover:text-gold">
+            {initials}
+          </span>
+        </motion.div>
+      </div>
+
+      {/* Bottom — name + tag */}
+      <div className="absolute bottom-0 inset-x-0 p-5 md:p-6 border-t border-gold/15 bg-gradient-to-t from-midnight/95 to-transparent">
+        <div className="font-display text-base md:text-lg text-ivory leading-tight transition-transform duration-500 group-hover:translate-x-0.5">
+          {client.client}
+        </div>
+        <div className="mt-1 font-mono text-[9px] uppercase tracking-[0.28em] text-gold/70">
+          {client.tag}
+        </div>
+      </div>
+    </div>
   );
 }

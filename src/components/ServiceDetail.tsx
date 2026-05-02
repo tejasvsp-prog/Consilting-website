@@ -160,25 +160,71 @@ function BookSection({
           </h2>
         </Reveal>
 
-        <div
+        <motion.div
           className="relative mx-auto max-w-3xl"
           style={{ perspective: 2400 }}
+          initial={{ opacity: 0, y: 30, rotateX: -14 }}
+          whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+          viewport={{ once: true, margin: "-120px" }}
+          transition={{ duration: 1.1, ease: [0.7, 0, 0.3, 1] }}
         >
-          {/* Hardcover backplate (always visible behind the page) */}
-          <div className="relative h-[520px] md:h-[560px] rounded-r-2xl rounded-l-md bg-gradient-to-r from-coal via-midnight to-obsidian border border-gold/25 shadow-[0_30px_80px_rgba(0,0,0,0.55)] overflow-hidden">
+          {/* Stacked page-edge layers — sit just behind the open book to
+              suggest paper depth. Tiny vertical offsets read as a stack. */}
+          {[0, 1, 2, 3].map((i) => (
+            <span
+              key={i}
+              aria-hidden
+              className="absolute inset-0 rounded-r-2xl rounded-l-md border border-gold/15 bg-coal/90 pointer-events-none"
+              style={{
+                transform: `translate(${(i + 1) * 4}px, ${(i + 1) * 3}px)`,
+                opacity: 0.55 - i * 0.12,
+                zIndex: -i - 1,
+              }}
+            />
+          ))}
+
+          {/* Hardcover backplate */}
+          <div className="relative h-[540px] md:h-[580px] rounded-r-2xl rounded-l-md bg-gradient-to-r from-coal via-midnight to-obsidian border border-gold/25 shadow-[0_40px_90px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,250,236,0.04)] overflow-hidden">
+            {/* Subtle paper grain (SVG noise) */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 opacity-[0.06] mix-blend-overlay"
+              style={{
+                backgroundImage:
+                  "url(\"data:image/svg+xml;utf8,<svg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\")",
+              }}
+            />
+            {/* Inner page border — gives each page a printed-edge feel */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-5 md:inset-6 rounded-md border border-gold/10"
+            />
             {/* Spine highlight */}
             <span
               aria-hidden
-              className="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-gold/40 via-gold/15 to-gold/40"
+              className="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-gold/45 via-gold/15 to-gold/45"
             />
             <span
               aria-hidden
-              className="absolute left-2 top-0 bottom-0 w-px bg-gold/20"
+              className="absolute left-2 top-0 bottom-0 w-px bg-gold/30"
             />
-            {/* Page edge stack on right */}
+            {/* Spine inner shadow — hint of curved page near binding */}
             <span
               aria-hidden
-              className="absolute right-0 top-3 bottom-3 w-1.5 rounded-l-sm bg-[repeating-linear-gradient(90deg,rgba(212,176,97,0.18)_0_1px,transparent_1px_3px)]"
+              className="pointer-events-none absolute left-2 top-0 bottom-0 w-12 bg-gradient-to-r from-black/55 to-transparent"
+            />
+            {/* Page edge stack on right (multi-layer for depth) */}
+            <span
+              aria-hidden
+              className="absolute right-0 top-3 bottom-3 w-1.5 rounded-l-sm bg-[repeating-linear-gradient(90deg,rgba(212,176,97,0.22)_0_1px,transparent_1px_3px)]"
+            />
+            <span
+              aria-hidden
+              className="absolute right-1.5 top-4 bottom-4 w-px bg-gold/15"
+            />
+            <span
+              aria-hidden
+              className="absolute right-2 top-5 bottom-5 w-px bg-gold/10"
             />
             {/* Soft inner glow */}
             <span
@@ -282,7 +328,7 @@ function BookSection({
               />
             ))}
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -368,28 +414,9 @@ function ProcessJourney({
               </motion.span>
             ))}
 
-            {/* Traveling spark */}
-            <motion.span
-              aria-hidden
-              className="absolute top-0 -translate-y-1/2 size-2 rounded-full bg-ivory"
-              initial={{ left: "0%", opacity: 0 }}
-              whileInView={{
-                left: ["0%", "100%"],
-                opacity: [0, 1, 1, 0],
-              }}
-              viewport={{ once: false, margin: "-100px" }}
-              transition={{
-                duration: 5,
-                delay: 1.5,
-                repeat: Infinity,
-                ease: "linear",
-                times: [0, 0.05, 0.95, 1],
-              }}
-              style={{
-                boxShadow:
-                  "0 0 12px #fffaec, 0 0 28px rgba(212,176,97,0.8), 0 0 50px rgba(212,176,97,0.4)",
-              }}
-            />
+            {/* Robot walker — moves node to node along the beam, pausing
+                at each step. Subtle bounce on the y-axis, soft halo trail. */}
+            <RobotWalker />
           </div>
 
           {/* Step cards */}
@@ -673,5 +700,66 @@ function ChapterRail({
       </div>
       <style>{`@keyframes chapterDraw { to { transform: scaleX(1); } }`}</style>
     </div>
+  );
+}
+
+/* ─── RobotWalker ──────────────────────────────────────────────────
+   A tiny line-art robot that walks the process beam, pausing at
+   each of the three nodes (16.667 / 50 / 83.333 %). Soft gold halo
+   follows it for a "trail" feel; subtle y-bobble reads as steps. */
+function RobotWalker() {
+  // 12s loop: hold → glide → hold → glide → hold → glide back to start.
+  const stops = ["16.667%", "16.667%", "50%", "50%", "83.333%", "83.333%", "16.667%"];
+  const times = [0, 0.18, 0.32, 0.48, 0.62, 0.78, 1];
+  return (
+    <motion.div
+      aria-hidden
+      className="absolute -top-7 left-0 -translate-x-1/2"
+      initial={{ left: "16.667%" }}
+      animate={{
+        left: stops,
+        y: [0, -2, 0, -2, 0, -2, 0],
+      }}
+      transition={{
+        duration: 12,
+        repeat: Infinity,
+        ease: [0.65, 0, 0.35, 1],
+        times,
+      }}
+    >
+      <span className="relative block">
+        {/* Soft halo behind robot */}
+        <span
+          aria-hidden
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-gold/25 blur-xl"
+        />
+        {/* Subtle bounce on the body itself for a "step" feel */}
+        <motion.svg
+          width="30"
+          height="42"
+          viewBox="0 0 30 42"
+          aria-hidden
+          className="relative drop-shadow-[0_0_10px_rgba(212,176,97,0.55)]"
+          animate={{ y: [0, -1.2, 0] }}
+          transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut" }}
+        >
+          {/* Antenna */}
+          <line x1="15" y1="2" x2="15" y2="6" stroke="#D4B061" strokeWidth="1" strokeLinecap="round" />
+          <circle cx="15" cy="1.5" r="1.4" fill="#D4B061" />
+          {/* Head */}
+          <rect x="5" y="6" width="20" height="13" rx="3" fill="#0B0A09" stroke="#D4B061" strokeWidth="1.1" />
+          {/* Eyes */}
+          <circle cx="10.5" cy="12.5" r="1.4" fill="#D4B061" />
+          <circle cx="19.5" cy="12.5" r="1.4" fill="#D4B061" />
+          {/* Body */}
+          <rect x="3.5" y="20.5" width="23" height="15" rx="3" fill="#0B0A09" stroke="#D4B061" strokeWidth="1.1" />
+          {/* Core */}
+          <circle cx="15" cy="28" r="2.2" fill="#D4B061" />
+          {/* Feet */}
+          <rect x="7" y="36" width="6" height="3" rx="1" fill="#0B0A09" stroke="#D4B061" strokeWidth="0.9" />
+          <rect x="17" y="36" width="6" height="3" rx="1" fill="#0B0A09" stroke="#D4B061" strokeWidth="0.9" />
+        </motion.svg>
+      </span>
+    </motion.div>
   );
 }
