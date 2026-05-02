@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import PageTransition, { PageHeader } from "./PageTransition";
 import { Reveal } from "./Reveal";
-import { services } from "../sections/Services";
 
 export type ServiceDetailProps = {
   number: string;
@@ -20,8 +19,6 @@ export type ServiceDetailProps = {
 };
 
 export default function ServiceDetail(p: ServiceDetailProps) {
-  const others = services.filter((s) => s.to !== `/services/${p.slug}`);
-
   return (
     <PageTransition>
       <PageHeader
@@ -128,64 +125,27 @@ export default function ServiceDetail(p: ServiceDetailProps) {
         </div>
       </section>
 
-      {/* 05 — Continue */}
-      <ChapterRail number="05" label="Continue" bg="midnight" />
-      <section className="bg-midnight pb-28 md:pb-32">
-        <div className="mx-auto max-w-7xl px-6 md:px-10">
-          <Reveal>
-            <h2 className="font-display font-light text-5xl md:text-7xl leading-[1.02] tracking-[-0.015em] mb-14 md:mb-20">
-              Other <span className="gold italic">services.</span>
-            </h2>
-          </Reveal>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {others.map((s) => (
-              <Link
-                key={s.t}
-                to={s.to}
-                className="card relative p-8 md:p-10 group focus:outline-none focus:ring-2 focus:ring-gold/40 overflow-hidden"
-              >
-                <span
-                  aria-hidden
-                  className="absolute top-0 left-0 h-px w-0 bg-gradient-to-r from-transparent via-gold to-transparent transition-all duration-700 group-hover:w-full"
-                />
-                <p className="font-mono text-xs uppercase tracking-[0.28em] text-gold mb-6">
-                  {s.n}
-                </p>
-                <h3 className="font-display text-3xl md:text-4xl text-ivory leading-tight mb-4 transition-transform duration-500 group-hover:translate-x-1">
-                  {s.t}
-                </h3>
-                <p className="text-ivory/60 text-sm leading-relaxed">
-                  {s.short}
-                </p>
-                <span className="mt-8 inline-flex items-center gap-3 text-[11px] uppercase tracking-[0.24em] font-medium text-gold">
-                  Read more
-                  <span
-                    aria-hidden
-                    className="transition-transform duration-300 group-hover:translate-x-2"
-                  >
-                    →
-                  </span>
-                </span>
-              </Link>
-            ))}
-          </div>
-
-          {/* Soft contact link — non-pushy, replaces the big CTA */}
-          <div className="mt-20 md:mt-24 pt-8 border-t border-gold/15 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <span className="font-mono text-[10px] uppercase tracking-[0.32em] text-ivory/40">
-              Service · {p.number} of 04
-            </span>
-            <Link
-              to="/contact"
-              className="group inline-flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.28em] text-ivory/70 hover:text-gold transition-colors"
+      {/* 05 — Back to services */}
+      <section className="bg-midnight pb-28 md:pb-32 pt-24 md:pt-32">
+        <div className="mx-auto max-w-7xl px-6 md:px-10 flex flex-col items-center gap-6">
+          <span className="font-mono text-[10px] uppercase tracking-[0.32em] text-ivory/40">
+            Service · {p.number} of 04
+          </span>
+          <Link
+            to="/services"
+            className="group inline-flex items-center gap-4 px-8 md:px-10 py-5 rounded-full border border-gold/40 bg-midnight/60 text-ivory hover:text-gold hover:border-gold transition-all duration-500"
+          >
+            <span
+              aria-hidden
+              className="transition-transform duration-500 group-hover:-translate-x-1.5"
             >
-              <span className="size-1.5 rounded-full bg-gold animate-[ledFlicker_2.2s_ease-in-out_infinite]" />
-              Have questions? Talk to us
-              <span className="transition-transform duration-300 group-hover:translate-x-1.5">
-                →
-              </span>
-            </Link>
-          </div>
+              ←
+            </span>
+            <span className="font-mono text-[11px] uppercase tracking-[0.28em]">
+              Back to all services
+            </span>
+            <span className="size-1.5 rounded-full bg-gold animate-[ledFlicker_2.2s_ease-in-out_infinite]" />
+          </Link>
         </div>
       </section>
     </PageTransition>

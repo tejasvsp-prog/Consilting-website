@@ -140,6 +140,12 @@ body {
 .word-draw {
   display: inline-block;
   clip-path: inset(0 100% -10% 0);
+  /* Baseline shadow matches the 0% keyframe of wordGlowPulse so the
+     glow doesn't pop in the instant the pulse starts. */
+  text-shadow:
+    0 0 18px rgba(212, 176, 97, 0.45),
+    0 0 42px rgba(212, 176, 97, 0.28),
+    0 0 90px rgba(212, 176, 97, 0.16);
   animation:
     wordReveal var(--draw-dur, 1.6s)
       cubic-bezier(0.7, 0, 0.3, 1)
