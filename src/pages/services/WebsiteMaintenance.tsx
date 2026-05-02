@@ -8,30 +8,32 @@ export default function WebsiteMaintenance() {
       number="03"
       slug="website-maintenance"
       name="Website Maintenance"
-      tagline="A managed retainer for the site you already have. Updates, security, monitoring, performance, and same-week content edits — handled."
-      intro="Your website is a living asset. Plugins drift out of date. SSL certificates expire. Performance degrades. Pages 404. Content gets stale. Most businesses don't notice until it costs them — a Google ranking, a sale, a security breach. We're the team you call so you never have to."
+      tagline="Your site, never the reason something broke."
+      hook="Sites don't fail loudly. They erode quietly."
+      problem="Plugins drift. SSL certificates expire. Performance degrades. By the time someone notices, you've already lost the lead, the deal, or the ranking."
+      intro="We sit on top of your stack — updates, monitoring, performance, security, and same-week edits. You stop seeing it. That's the goal."
       why={[
-        "A site that goes down at 9pm Friday costs more than a year of maintenance. Insurance matters.",
-        "WordPress plugins, SSL certificates, and CMS versions need attention monthly. Nobody on your team has time.",
-        "Performance silently degrades. Without monitoring, you only learn when rankings drop or conversions fall.",
-        "Content edits that take you a week to schedule we can ship in 24 hours. That's leverage.",
+        "A site down at 9pm Friday costs more than a year of maintenance. Insurance matters.",
+        "Plugins, SSLs, and CMS versions need attention monthly. Nobody on your team has time.",
+        "Performance silently degrades. Without monitoring, you only learn when rankings drop.",
+        "Edits that take a week to schedule, we ship in 24 hours. That's leverage.",
       ]}
       deliverables={[
         {
           t: "Monthly updates & backups",
-          d: "Plugins, themes, CMS, and frameworks updated and tested. Daily backups stored offsite for 90 days.",
+          d: "Plugins, themes, CMS, frameworks updated and tested. Daily backups offsite for 90 days.",
         },
         {
           t: "Uptime monitoring",
-          d: "60-second checks across 14 global regions. We're alerted before you are, and we fix it before you wake up.",
+          d: "60-second checks across 14 regions. We're alerted before you are. Fixed before you wake up.",
         },
         {
           t: "Performance tracking",
-          d: "Core Web Vitals, real-user metrics, monthly performance review. Speed regressions get caught early.",
+          d: "Core Web Vitals, real-user metrics, monthly review. Speed regressions get caught early.",
         },
         {
           t: "Security & SSL",
-          d: "Vulnerability scans, malware monitoring, SSL renewals, firewall tuning. We patch CVEs within 48 hours of disclosure.",
+          d: "Vulnerability scans, malware monitoring, SSL renewals, firewall tuning. CVEs patched in 48h.",
         },
         {
           t: "Content edits",
@@ -39,30 +41,30 @@ export default function WebsiteMaintenance() {
         },
         {
           t: "Quarterly review",
-          d: "Performance report, security report, recommendations for the next quarter. One call, one document, no fluff.",
+          d: "Performance, security, recommendations. One call, one document, no fluff.",
         },
       ]}
       process={[
         {
-          n: "Phase 1 · 2 weeks",
+          n: "01",
           t: "Onboarding audit",
-          d: "Full audit of the existing site. Security, performance, SEO health, accessibility. We fix anything critical before billing starts.",
+          d: "Full audit of the existing site. Security, performance, SEO, accessibility. Critical fixes ship before billing.",
         },
         {
-          n: "Phase 2 · ongoing",
+          n: "02",
           t: "Managed retainer",
-          d: "Monthly maintenance, content edits, monitoring, support. One Slack channel, one email, one monthly invoice.",
+          d: "Monthly maintenance, content edits, monitoring, support. One channel, one invoice.",
         },
         {
-          n: "Phase 3 · quarterly",
+          n: "03",
           t: "Strategic review",
-          d: "We surface what's slowing down, what's breaking, and what the next quarter's improvements should be.",
+          d: "We surface what's slowing down, what's breaking, and what next quarter should improve.",
         },
       ]}
       faqs={[
         {
           q: "What sites do you maintain?",
-          a: "Anything modern: WordPress, Webflow, Shopify, Next.js, custom React, headless setups. If it's older or hand-rolled in PHP, we'll audit it first.",
+          a: "Anything modern: WordPress, Webflow, Shopify, Next.js, custom React, headless setups. If it's older or hand-rolled in PHP, we audit first.",
         },
         {
           q: "How fast is your turnaround on edits?",
@@ -70,7 +72,7 @@ export default function WebsiteMaintenance() {
         },
         {
           q: "What if my site goes down?",
-          a: "We're already on it. Uptime monitoring alerts us at 60-second granularity. Most outages are resolved before you'd notice.",
+          a: "We're already on it. Uptime monitoring alerts at 60-second granularity. Most outages are resolved before you'd notice.",
         },
         {
           q: "What's the minimum?",
@@ -79,10 +81,11 @@ export default function WebsiteMaintenance() {
       ]}
       resultStat={[
         { value: "99.98%", label: "Tracked uptime" },
-        { value: "24h", label: "Avg. edit turnaround" },
-        { value: "<48h", label: "CVE patch window" },
-        { value: "60s", label: "Monitor granularity" },
+        { value: "24", label: "Hour edit turnaround" },
+        { value: "48", label: "Hour CVE patch window" },
+        { value: "60", label: "Second monitor checks" },
       ]}
+      proofQuote="The best maintenance is the kind you forget you're paying for. That's the bar."
     />
   );
 }

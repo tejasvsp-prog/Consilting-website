@@ -8,34 +8,36 @@ export default function MetaAds() {
       number="04"
       slug="meta-ads"
       name="Meta Ads"
-      tagline="Facebook and Instagram performance, run by people who read your P&L. Creative-led campaigns built to scale spend without breaking CPA."
-      intro="Meta Ads aren't broken — most accounts are. We rebuild them: tracking that actually fires, creative that actually performs, structure that actually scales. Then we sit on the line every week, P&L open, and tune until the cost per acquisition stops surprising you."
+      tagline="Facebook and Instagram performance, run by people who read your P&L."
+      hook="We engineer ad accounts that print."
+      problem="Most accounts have broken pixels, bloated structures, and creative that hasn't been tested in months. The algorithm can't help you when you're feeding it noise."
+      intro="We rebuild tracking, simplify structure, and ship a creative pipeline tuned to your P&L. Then we tune until cost per acquisition stops surprising you."
       why={[
-        "Most ad accounts have broken tracking. iOS 14, ad blockers, missing CAPI — we fix this before we touch creative.",
+        "iOS, ad blockers, missing CAPI — most tracking is broken before creative hits the feed.",
         "Creative is 80% of performance. We run a testing pipeline, not a one-off campaign.",
-        "Account structure decides what scales. We use simplified, machine-friendly setups — not 47 ad sets.",
-        "Reporting tied to Meta's interface lies. We tie ads to your CRM, your shop, your real revenue.",
+        "Account structure decides what scales. We use simplified, machine-friendly setups.",
+        "Meta's interface lies. We tie ads to your CRM, your shop, your real revenue.",
       ]}
       deliverables={[
         {
           t: "Account audit & rebuild",
-          d: "Pixel, CAPI, conversions API, attribution windows. Every leak found, every signal sent server-side.",
+          d: "Pixel, CAPI, conversions API, attribution. Every leak found, every signal sent server-side.",
         },
         {
           t: "Creative pipeline",
-          d: "5–15 new ad concepts a month, scripted, edited, and shipped. Static, video, UGC, founder-led.",
+          d: "5–15 new ad concepts a month, scripted, edited, shipped. Static, video, UGC, founder-led.",
         },
         {
           t: "Campaign architecture",
-          d: "Simplified ASC, CBO, and consolidated targeting structures that let the algorithm do its job.",
+          d: "Simplified ASC, CBO, and consolidated targeting structures that let the algorithm work.",
         },
         {
           t: "Funnel page work",
-          d: "Landing page tests, offer iteration, post-click experience. The ad isn't the funnel — the funnel is the funnel.",
+          d: "Landing tests, offer iteration, post-click experience. The ad isn't the funnel — the funnel is.",
         },
         {
           t: "Weekly P&L reporting",
-          d: "Spend, CPA, ROAS, blended CAC, contribution margin. Read in five minutes, decide in fifteen.",
+          d: "Spend, CPA, ROAS, blended CAC, contribution margin. Read in five, decide in fifteen.",
         },
         {
           t: "Strategy on speed dial",
@@ -44,19 +46,19 @@ export default function MetaAds() {
       ]}
       process={[
         {
-          n: "Phase 1 · weeks 1–2",
+          n: "01",
           t: "Audit & foundation",
           d: "Tracking rebuild, account audit, creative brief, offer review. Spend continues uninterrupted.",
         },
         {
-          n: "Phase 2 · weeks 3–6",
+          n: "02",
           t: "Test & validate",
-          d: "5–10 concepts in market, 3–5 audiences, conversion-event budget. We isolate winners fast.",
+          d: "5–10 concepts in market, 3–5 audiences, conversion-event budget. Winners isolated fast.",
         },
         {
-          n: "Phase 3 · ongoing",
+          n: "03",
           t: "Scale & compound",
-          d: "Winners scale, creative library grows, structure tightens. Every month, lower CPA or more spend.",
+          d: "Winners scale, creative library grows, structure tightens. Lower CPA or more spend, monthly.",
         },
       ]}
       faqs={[
@@ -66,7 +68,7 @@ export default function MetaAds() {
         },
         {
           q: "Do you handle creative production?",
-          a: "Concepting, scripting, editing — yes. We work with your existing footage or shoot UGC and founder-led video. Studio commercials we sub out to a partner.",
+          a: "Concepting, scripting, editing — yes. We work with your existing footage or shoot UGC and founder-led video. Studio commercials we sub out.",
         },
         {
           q: "Will I keep my ad account?",
@@ -78,11 +80,12 @@ export default function MetaAds() {
         },
       ]}
       resultStat={[
-        { value: "4.2×", label: "Avg. blended ROAS" },
-        { value: "−41%", label: "Avg. CPA reduction" },
-        { value: "3.5×", label: "Spend scaled, 60d" },
-        { value: "Weekly", label: "P&L reporting" },
+        { value: "4.2", label: "Avg. blended ROAS" },
+        { value: "-41%", label: "Avg. CPA reduction" },
+        { value: "3.5", label: "Spend scaled, 60d" },
+        { value: "15", label: "Concepts tested / mo" },
       ]}
+      proofQuote="A media account is a system, not a campaign. We engineer it to win — then we tune it weekly until it does."
     />
   );
 }
