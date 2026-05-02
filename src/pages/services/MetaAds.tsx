@@ -8,10 +8,9 @@ export default function MetaAds() {
       number="04"
       slug="meta-ads"
       name="Meta Ads"
+      shortName="Meta ads"
       tagline="Facebook and Instagram performance, run by people who read your P&L."
-      hook="We engineer ad accounts that print."
-      problem="Most accounts have broken pixels, bloated structures, and creative that hasn't been tested in months. The algorithm can't help you when you're feeding it noise."
-      intro="We rebuild tracking, simplify structure, and ship a creative pipeline tuned to your P&L. Then we tune until cost per acquisition stops surprising you."
+      intro="Meta ads are the ads people see on Facebook and Instagram. We run yours end to end — who they reach, what they say, how the budget is spent, and how every dollar in turns into more than a dollar back. We rebuild your tracking, simplify your account, and ship new creative every week so the algorithm always has something fresh to work with."
       why={[
         "iOS, ad blockers, missing CAPI — most tracking is broken before creative hits the feed.",
         "Creative is 80% of performance. We run a testing pipeline, not a one-off campaign.",
@@ -85,7 +84,6 @@ export default function MetaAds() {
         { value: "3.5", label: "Spend scaled, 60d" },
         { value: "15", label: "Concepts tested / mo" },
       ]}
-      proofQuote="A media account is a system, not a campaign. We engineer it to win — then we tune it weekly until it does."
     />
   );
 }

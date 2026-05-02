@@ -8,10 +8,9 @@ export default function WebsiteMaintenance() {
       number="03"
       slug="website-maintenance"
       name="Website Maintenance"
+      shortName="maintenance"
       tagline="Your site, never the reason something broke."
-      hook="Sites don't fail loudly. They erode quietly."
-      problem="Plugins drift. SSL certificates expire. Performance degrades. By the time someone notices, you've already lost the lead, the deal, or the ranking."
-      intro="We sit on top of your stack — updates, monitoring, performance, security, and same-week edits. You stop seeing it. That's the goal."
+      intro="Website maintenance is everything that keeps your site running after launch. Updates, backups, security patches, uptime monitoring, and quick edits whenever you need to swap copy or add a page. We handle all of it — quietly, in the background — so you stop thinking about your website and get to think about your business."
       why={[
         "A site down at 9pm Friday costs more than a year of maintenance. Insurance matters.",
         "Plugins, SSLs, and CMS versions need attention monthly. Nobody on your team has time.",
@@ -85,7 +84,6 @@ export default function WebsiteMaintenance() {
         { value: "48", label: "Hour CVE patch window" },
         { value: "60", label: "Second monitor checks" },
       ]}
-      proofQuote="The best maintenance is the kind you forget you're paying for. That's the bar."
     />
   );
 }

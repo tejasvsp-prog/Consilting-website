@@ -8,10 +8,9 @@ export default function WebsiteDevelopment() {
       number="02"
       slug="website-development"
       name="Website Development"
+      shortName="web development"
       tagline="Hand-built sites that load in a second and convert in three."
-      hook="A website isn't a brochure. It's the hardest-working salesperson you'll ever hire."
-      problem="Most agency sites are slow, brittle, and built for the agency. You inherit a maintenance bill, a 4-second LCP, and a CMS your team can't touch."
-      intro="We hand-build in React, Next.js, and Tailwind. Sub-2-second loads. Conversion-tested patterns. A CMS your marketers can run without raising a ticket."
+      intro="Web development is the actual building of your website — the part your customers see, click, and judge you by. We design it, code it from scratch, and make it fast enough that nobody bounces while it loads. You get a site your team can update without raising a ticket, and the whole thing — the code, the CMS, the keys — belongs to you."
       why={[
         "Every extra second of load time costs 7% of conversions. We refuse to ship slow.",
         "Visually clever and commercially dead is a real category. We test, not guess.",
@@ -85,7 +84,6 @@ export default function WebsiteDevelopment() {
         { value: "100", label: "Lighthouse SEO" },
         { value: "30", label: "Days post-launch support" },
       ]}
-      proofQuote="A site that earns the click, holds the visitor, and moves them to convert. Anything less is decoration."
     />
   );
 }

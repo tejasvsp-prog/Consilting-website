@@ -8,10 +8,9 @@ export default function Seo() {
       number="01"
       slug="seo"
       name="Search Engine Optimization"
+      shortName="SEO"
       tagline="Own the queries that make money. Engineer the rankings that survive every algorithm update."
-      hook="We don't chase traffic. We capture buyers."
-      problem="Most SEO is theater. Vanity keywords, disposable blogs, backlinks from sites no one reads. You pay every month. Your pipeline doesn't move."
-      intro="We start with the queries your buyers actually type, then engineer everything — the stack, the content, the links — to own them. Slower at the start. Unstoppable after."
+      intro="SEO is how your website shows up at the top of Google when someone searches for what you do. Done right, it brings in new customers every day for years — without paying for a single ad. Done wrong, it's a recurring bill with nothing to show for it. We do it right: figure out exactly what your buyers are typing, build pages that genuinely answer them, and earn the trust signals that get you ranked first."
       why={[
         "Organic is the cheapest channel you'll ever own. We treat it that way.",
         "Algorithm updates don't move us when we're already the canonical answer.",
@@ -85,7 +84,6 @@ export default function Seo() {
         { value: "<1.8s", label: "Median LCP" },
         { value: "92%", label: "Client retention" },
       ]}
-      proofQuote="Every page we ship is engineered to rank, convert, and outlive the next algorithm update."
     />
   );
 }

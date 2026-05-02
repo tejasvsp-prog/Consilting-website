@@ -1,38 +1,27 @@
-import {
-  AnimatePresence,
-  animate,
-  motion,
-  useInView,
-  useMotionValue,
-  useSpring,
-} from "framer-motion";
+import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
-  useEffect,
-  useRef,
   useState,
+  useRef,
   type MouseEvent as ReactMouseEvent,
 } from "react";
 import PageTransition, { PageHeader } from "./PageTransition";
-import { Reveal, SplitText } from "./Reveal";
+import { Reveal } from "./Reveal";
 
 export type ServiceDetailProps = {
   number: string;
   slug: string;
   name: string;
+  /** Short name shown in "What is X?" — e.g. "SEO". Falls back to name. */
+  shortName?: string;
   tagline: string;
+  /** Plain-English explanation that opens the page. */
   intro: string;
   why: string[];
   deliverables: { t: string; d: string }[];
   process: { n: string; t: string; d: string }[];
   faqs: { q: string; a: string }[];
   resultStat: { value: string; label: string }[];
-  /* HOOK → PROBLEM → AUTHORITY → SOLUTION → PROOF → OFFER → CLOSE
-     The fields below add the new narrative beats. All optional so
-     existing pages still render if they aren't filled in yet. */
-  hook?: string;
-  problem?: string;
-  proofQuote?: string;
   Visual?: () => JSX.Element;
 };
 
@@ -50,7 +39,20 @@ export default function ServiceDetail(p: ServiceDetailProps) {
           </>
         }
         subtitle={p.tagline}
-      />
+      >
+        <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl">
+          {p.resultStat.map((r) => (
+            <div key={r.label}>
+              <div className="font-display text-3xl md:text-4xl text-gold">
+                {r.value}
+              </div>
+              <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.24em] text-ivory/50">
+                {r.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </PageHeader>
 
       {/* Visual band */}
       {p.Visual && (
@@ -63,250 +65,521 @@ export default function ServiceDetail(p: ServiceDetailProps) {
         </section>
       )}
 
-      {/* HOOK — the knockout sentence */}
-      {p.hook && <HookSection text={p.hook} />}
+      {/* 01 — What is [Name]? */}
+      <ChapterRail number="01" label="What it is" bg="midnight" />
+      <WhatIsSection shortName={p.shortName ?? p.name} explanation={p.intro} />
 
-      {/* PROBLEM — what's broken */}
-      {p.problem && <ProblemSection text={p.problem} />}
+      {/* 02 — Book: Deliverables + Approach combined */}
+      <ChapterRail number="02" label="The playbook" bg="obsidian" />
+      <BookSection deliverables={p.deliverables} why={p.why} />
 
-      {/* 01 — In short (authority + intro) */}
-      <ChapterRail number="01" label="In short" bg="midnight" />
-      <section className="bg-midnight pb-28 md:pb-40">
-        <div className="mx-auto max-w-7xl px-6 md:px-10">
-          <Reveal>
-            <h2 className="font-display font-light text-5xl md:text-7xl leading-[1.02] tracking-[-0.015em] mb-12 md:mb-16">
-              The <span className="gold italic">approach.</span>
-            </h2>
-          </Reveal>
-
-          <Reveal as="p" className="font-display font-light text-2xl md:text-3xl leading-[1.4] text-ivory/85 tracking-[-0.005em] max-w-4xl">
-            {p.intro}
-          </Reveal>
-
-          <div className="mt-20 md:mt-24 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
-            {p.why.map((w, i) => (
-              <Principle key={w} index={i} text={w} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 02 — What you get */}
-      <ChapterRail number="02" label="What you get" bg="obsidian" />
-      <section className="bg-obsidian pb-28 md:pb-40 border-b border-gold/15">
-        <div className="mx-auto max-w-7xl px-6 md:px-10">
-          <Reveal>
-            <h2 className="font-display font-light text-5xl md:text-7xl leading-[1.02] tracking-[-0.015em] mb-14 md:mb-20">
-              The <span className="gold italic">deliverables.</span>
-            </h2>
-          </Reveal>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-            {p.deliverables.map((d, i) => (
-              <DeliverableCard key={d.t} index={i} title={d.t} body={d.d} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 03 — Process */}
+      {/* 03 — How it runs */}
       <ChapterRail number="03" label="Process" bg="midnight" />
-      <section className="bg-midnight pb-28 md:pb-40">
-        <div className="mx-auto max-w-7xl px-6 md:px-10">
-          <Reveal>
-            <h2 className="font-display font-light text-5xl md:text-7xl leading-[1.02] tracking-[-0.015em] mb-14 md:mb-20">
-              How it <span className="gold italic">runs.</span>
-            </h2>
-          </Reveal>
-          <ProcessTrack items={p.process} />
-        </div>
-      </section>
+      <ProcessJourney items={p.process} />
 
-      {/* 04 — Proof */}
-      <ChapterRail number="04" label="Proof" bg="obsidian" />
-      <ProofSection stats={p.resultStat} quote={p.proofQuote} />
+      {/* 04 — FAQ */}
+      <ChapterRail number="04" label="Questions" bg="obsidian" />
+      <FaqPanel faqs={p.faqs} />
 
-      {/* 05 — FAQ */}
-      <ChapterRail number="05" label="FAQ" bg="midnight" />
-      <section className="bg-midnight pb-28 md:pb-40">
-        <div className="mx-auto max-w-7xl px-6 md:px-10">
-          <Reveal>
-            <h2 className="font-display font-light text-5xl md:text-7xl leading-[1.02] tracking-[-0.015em] mb-14 md:mb-20">
-              Common <span className="gold italic">questions.</span>
-            </h2>
-          </Reveal>
-          <FaqList faqs={p.faqs} />
-        </div>
-      </section>
-
-      {/* CLOSE — magnetic back-to-services */}
+      {/* CLOSE */}
       <CloseSection number={p.number} />
     </PageTransition>
   );
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   HookSection — the knockout sentence right after the visual.
-   Word-by-word reveal, italic accent on the closing fragment.
+   01 · WHAT IT IS
+   Plain-English explanation. No jargon. A single big paragraph
+   underneath a stark "What is X?" heading. A gold rule draws
+   underneath on enter.
 ───────────────────────────────────────────────────────────────── */
-function HookSection({ text }: { text: string }) {
-  // Split on first period to highlight the closer in italic gold.
-  const parts = text.split(/\.(?!\d)/).filter(Boolean);
-  const head = parts[0]?.trim();
-  const tail = parts.slice(1).join(".").trim();
+function WhatIsSection({
+  shortName,
+  explanation,
+}: {
+  shortName: string;
+  explanation: string;
+}) {
   return (
-    <section className="relative bg-midnight py-24 md:py-40 overflow-hidden">
-      {/* Soft gold horizon */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -bottom-32 left-1/2 -translate-x-1/2 w-[120%] h-[260px] bg-gold/10 blur-[120px] rounded-full"
-      />
-      <div className="mx-auto max-w-7xl px-6 md:px-10 relative">
-        <div className="font-display font-light text-[14vw] md:text-[7vw] leading-[0.98] tracking-[-0.02em] text-ivory">
-          <SplitText text={head ? `${head}.` : ""} stagger={0.05} />
-          {tail && (
-            <span className="block gold italic mt-2 md:mt-4">
-              <SplitText text={`${tail}.`} stagger={0.05} delay={0.4} />
-            </span>
-          )}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ─────────────────────────────────────────────────────────────────
-   ProblemSection — eyebrow "The problem" + a heavy italic statement.
-   Gold rule draws under it on enter.
-───────────────────────────────────────────────────────────────── */
-function ProblemSection({ text }: { text: string }) {
-  return (
-    <section className="bg-obsidian border-y border-gold/15 py-24 md:py-32">
+    <section className="bg-midnight pb-28 md:pb-40">
       <div className="mx-auto max-w-5xl px-6 md:px-10">
         <Reveal>
-          <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-gold/80 mb-8">
-            ◆ The problem
-          </p>
-        </Reveal>
-        <Reveal as="p" delay={0.1} className="font-display font-light italic text-3xl md:text-5xl leading-[1.18] text-ivory/85 tracking-[-0.01em]">
-          {text}
+          <h2 className="font-display font-light text-5xl md:text-7xl leading-[1.02] tracking-[-0.015em] mb-12">
+            What is <span className="gold italic">{shortName}?</span>
+          </h2>
         </Reveal>
         <motion.span
           aria-hidden
           initial={{ scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
           viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 1.1, ease: [0.7, 0, 0.3, 1], delay: 0.2 }}
+          transition={{ duration: 1.1, ease: [0.7, 0, 0.3, 1] }}
           style={{ transformOrigin: "left" }}
-          className="block mt-10 h-px max-w-[280px] bg-gradient-to-r from-gold via-gold/60 to-transparent"
+          className="block mb-12 h-px max-w-[280px] bg-gradient-to-r from-gold via-gold/60 to-transparent"
         />
+        <Reveal as="p" delay={0.15} className="font-display font-light text-2xl md:text-[1.85rem] leading-[1.45] text-ivory/85 tracking-[-0.005em]">
+          {explanation}
+        </Reveal>
       </div>
     </section>
   );
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   ProofSection — animated count-up stats + closer statement.
+   02 · BOOK
+   Combines deliverables (the "what") with the approach bullets
+   (the "why"). Each deliverable is one chapter of the book. Pages
+   flip with a 3D rotateY animation. Click the right edge to flip
+   forward, the left edge to flip back, or use the bottom dots.
 ───────────────────────────────────────────────────────────────── */
-function ProofSection({
-  stats,
-  quote,
+const pageVariants = {
+  enter: (d: number) => ({
+    rotateY: d > 0 ? -85 : 85,
+    x: d > 0 ? 30 : -30,
+    opacity: 0,
+  }),
+  center: { rotateY: 0, x: 0, opacity: 1 },
+  exit: (d: number) => ({
+    rotateY: d > 0 ? 85 : -85,
+    x: d > 0 ? -30 : 30,
+    opacity: 0,
+  }),
+};
+
+function BookSection({
+  deliverables,
+  why,
 }: {
-  stats: { value: string; label: string }[];
-  quote?: string;
+  deliverables: { t: string; d: string }[];
+  why: string[];
 }) {
+  const [page, setPage] = useState(0);
+  const [dir, setDir] = useState<1 | -1>(1);
+  const total = deliverables.length;
+
+  function go(next: number) {
+    if (next < 0 || next >= total || next === page) return;
+    setDir(next > page ? 1 : -1);
+    setPage(next);
+  }
+  const flip = (d: 1 | -1) => go(page + d);
+
+  return (
+    <section className="bg-obsidian pb-28 md:pb-40 border-b border-gold/15">
+      <div className="mx-auto max-w-6xl px-6 md:px-10">
+        <Reveal>
+          <h2 className="font-display font-light text-5xl md:text-7xl leading-[1.02] tracking-[-0.015em] mb-14 md:mb-20">
+            The <span className="gold italic">playbook.</span>
+          </h2>
+        </Reveal>
+
+        <div
+          className="relative mx-auto max-w-3xl"
+          style={{ perspective: 2400 }}
+        >
+          {/* Hardcover backplate (always visible behind the page) */}
+          <div className="relative h-[520px] md:h-[560px] rounded-r-2xl rounded-l-md bg-gradient-to-r from-coal via-midnight to-obsidian border border-gold/25 shadow-[0_30px_80px_rgba(0,0,0,0.55)] overflow-hidden">
+            {/* Spine highlight */}
+            <span
+              aria-hidden
+              className="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-gold/40 via-gold/15 to-gold/40"
+            />
+            <span
+              aria-hidden
+              className="absolute left-2 top-0 bottom-0 w-px bg-gold/20"
+            />
+            {/* Page edge stack on right */}
+            <span
+              aria-hidden
+              className="absolute right-0 top-3 bottom-3 w-1.5 rounded-l-sm bg-[repeating-linear-gradient(90deg,rgba(212,176,97,0.18)_0_1px,transparent_1px_3px)]"
+            />
+            {/* Soft inner glow */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -bottom-32 left-1/2 -translate-x-1/2 w-[80%] h-[260px] bg-gold/8 blur-[100px] rounded-full"
+            />
+
+            {/* Animated page */}
+            <AnimatePresence mode="wait" custom={dir} initial={false}>
+              <motion.div
+                key={page}
+                custom={dir}
+                variants={pageVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.75, ease: [0.7, 0, 0.3, 1] }}
+                style={{
+                  transformOrigin: dir > 0 ? "left center" : "right center",
+                  transformStyle: "preserve-3d",
+                }}
+                className="absolute inset-0 p-10 md:p-16 flex flex-col"
+              >
+                <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.32em] text-ivory/40 mb-10">
+                  <span className="text-gold">
+                    Chapter {String(page + 1).padStart(2, "0")}
+                  </span>
+                  <span>
+                    {String(page + 1).padStart(2, "0")} /{" "}
+                    {String(total).padStart(2, "0")}
+                  </span>
+                </div>
+                <h3 className="font-display font-light text-3xl md:text-5xl tracking-[-0.01em] text-ivory mb-6 leading-[1.1] max-w-xl">
+                  {deliverables[page].t}
+                </h3>
+                <p className="text-ivory/75 leading-relaxed text-base md:text-lg max-w-xl">
+                  {deliverables[page].d}
+                </p>
+                <div className="mt-auto pt-8 border-t border-gold/20 max-w-xl">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-gold/70 mb-3">
+                    In our approach
+                  </p>
+                  <p className="font-display italic text-lg md:text-xl text-ivory/80 leading-relaxed">
+                    {why[page % Math.max(why.length, 1)]}
+                  </p>
+                </div>
+                <span
+                  aria-hidden
+                  className="absolute bottom-5 right-6 text-gold/30 text-2xl select-none"
+                >
+                  ❦
+                </span>
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Click zones for flipping */}
+            <button
+              type="button"
+              onClick={() => flip(-1)}
+              disabled={page === 0}
+              aria-label="Previous page"
+              className="absolute left-2 top-0 bottom-0 w-[18%] focus:outline-none disabled:cursor-default group"
+            >
+              <span
+                aria-hidden
+                className="absolute left-3 top-1/2 -translate-y-1/2 size-11 rounded-full border border-gold/40 grid place-items-center text-gold opacity-0 group-hover:opacity-100 group-disabled:opacity-0 transition-all duration-300 bg-midnight/80 backdrop-blur-sm group-hover:-translate-x-0.5 group-hover:-translate-y-1/2"
+              >
+                ←
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => flip(1)}
+              disabled={page === total - 1}
+              aria-label="Next page"
+              className="absolute right-0 top-0 bottom-0 w-[18%] focus:outline-none disabled:cursor-default group"
+            >
+              <span
+                aria-hidden
+                className="absolute right-3 top-1/2 -translate-y-1/2 size-11 rounded-full border border-gold/40 grid place-items-center text-gold opacity-0 group-hover:opacity-100 group-disabled:opacity-0 transition-all duration-300 bg-midnight/80 backdrop-blur-sm group-hover:translate-x-0.5 group-hover:-translate-y-1/2"
+              >
+                →
+              </span>
+            </button>
+          </div>
+
+          {/* Bottom controls — page dots */}
+          <div className="mt-10 flex items-center justify-center gap-3">
+            {Array.from({ length: total }).map((_, i) => (
+              <button
+                key={i}
+                onClick={() => go(i)}
+                aria-label={`Go to chapter ${i + 1}`}
+                className={`h-1.5 rounded-full transition-all duration-500 ${
+                  i === page
+                    ? "w-10 bg-gold"
+                    : "w-1.5 bg-gold/30 hover:bg-gold/60 hover:w-3"
+                }`}
+              />
+            ))}
+          </div>
+          <div className="mt-3 text-center font-mono text-[10px] uppercase tracking-[0.32em] text-ivory/40">
+            Click the page edges, or use the dots
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   03 · PROCESS — How it runs
+   A horizontal "energy track" beam that draws across on viewport
+   entry, three glowing nodes that pulse rings continuously, a
+   traveling spark that loops, and three step cards that fade up
+   in sequence as the beam reaches each node.
+───────────────────────────────────────────────────────────────── */
+function ProcessJourney({
+  items,
+}: {
+  items: { n: string; t: string; d: string }[];
+}) {
+  return (
+    <section className="bg-midnight pb-28 md:pb-40">
+      <div className="mx-auto max-w-7xl px-6 md:px-10">
+        <Reveal>
+          <h2 className="font-display font-light text-5xl md:text-7xl leading-[1.02] tracking-[-0.015em] mb-14 md:mb-20">
+            How it <span className="gold italic">runs.</span>
+          </h2>
+        </Reveal>
+
+        <div className="relative pt-16 md:pt-24">
+          {/* Animated beam — desktop only */}
+          <div className="hidden md:block absolute left-0 right-0 top-10 pointer-events-none">
+            {/* The beam line, draws left → right on enter */}
+            <motion.span
+              aria-hidden
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 1.6, ease: [0.7, 0, 0.3, 1] }}
+              style={{ transformOrigin: "left" }}
+              className="block h-px w-full bg-gradient-to-r from-gold/80 via-gold to-gold/80"
+            />
+
+            {/* Three glowing nodes with pulsing rings */}
+            {[16.667, 50, 83.333].map((pos, i) => (
+              <motion.span
+                key={i}
+                initial={{ scale: 0, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{
+                  delay: 0.4 + i * 0.45,
+                  duration: 0.5,
+                  ease: [0.2, 1.4, 0.4, 1],
+                }}
+                className="absolute top-0 -translate-y-1/2 -translate-x-1/2 size-3 rounded-full bg-gold"
+                style={{
+                  left: `${pos}%`,
+                  boxShadow:
+                    "0 0 14px rgba(212,176,97,0.95), 0 0 32px rgba(212,176,97,0.55)",
+                }}
+              >
+                {/* Continuous pulse rings */}
+                <motion.span
+                  aria-hidden
+                  className="absolute inset-0 rounded-full border border-gold"
+                  animate={{ scale: [1, 3], opacity: [0.6, 0] }}
+                  transition={{
+                    duration: 2.4,
+                    delay: 1 + i * 0.3,
+                    repeat: Infinity,
+                    ease: "easeOut",
+                  }}
+                />
+                <motion.span
+                  aria-hidden
+                  className="absolute inset-0 rounded-full border border-gold"
+                  animate={{ scale: [1, 3], opacity: [0.6, 0] }}
+                  transition={{
+                    duration: 2.4,
+                    delay: 2 + i * 0.3,
+                    repeat: Infinity,
+                    ease: "easeOut",
+                  }}
+                />
+              </motion.span>
+            ))}
+
+            {/* Traveling spark */}
+            <motion.span
+              aria-hidden
+              className="absolute top-0 -translate-y-1/2 size-2 rounded-full bg-ivory"
+              initial={{ left: "0%", opacity: 0 }}
+              whileInView={{
+                left: ["0%", "100%"],
+                opacity: [0, 1, 1, 0],
+              }}
+              viewport={{ once: false, margin: "-100px" }}
+              transition={{
+                duration: 5,
+                delay: 1.5,
+                repeat: Infinity,
+                ease: "linear",
+                times: [0, 0.05, 0.95, 1],
+              }}
+              style={{
+                boxShadow:
+                  "0 0 12px #fffaec, 0 0 28px rgba(212,176,97,0.8), 0 0 50px rgba(212,176,97,0.4)",
+              }}
+            />
+          </div>
+
+          {/* Step cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 relative z-10">
+            {items.map((s, i) => (
+              <motion.article
+                key={s.t}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{
+                  delay: 0.6 + i * 0.45,
+                  duration: 0.8,
+                  ease: [0.2, 0.8, 0.2, 1],
+                }}
+                className="relative bg-midnight border border-gold/15 rounded-2xl p-7 md:p-10 transition-all duration-500 hover:border-gold/45 hover:-translate-y-1 group overflow-hidden"
+              >
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute -top-1/2 -right-20 w-72 h-72 rounded-full bg-gold/15 blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                />
+                <div className="relative flex items-baseline justify-between mb-8">
+                  <span className="font-display italic text-6xl md:text-7xl text-gold/85 leading-none">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-ivory/40">
+                    Step
+                  </span>
+                </div>
+                <h3 className="relative font-display text-2xl md:text-3xl text-ivory mb-4 transition-transform duration-500 group-hover:translate-x-1">
+                  {s.t}
+                </h3>
+                <p className="relative text-ivory/65 leading-relaxed text-sm md:text-[15px]">
+                  {s.d}
+                </p>
+              </motion.article>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   04 · FAQ — scrolling list of questions, animated answer panel
+   Left column: vertically scrollable list of questions inside a
+   capped-height container. Click highlights the question and the
+   right column cross-fades to its answer with a blur+slide reveal.
+───────────────────────────────────────────────────────────────── */
+function FaqPanel({ faqs }: { faqs: { q: string; a: string }[] }) {
+  const [active, setActive] = useState(0);
   return (
     <section className="bg-obsidian pb-28 md:pb-40 border-b border-gold/15">
       <div className="mx-auto max-w-7xl px-6 md:px-10">
         <Reveal>
           <h2 className="font-display font-light text-5xl md:text-7xl leading-[1.02] tracking-[-0.015em] mb-14 md:mb-20">
-            The <span className="gold italic">numbers.</span>
+            Common <span className="gold italic">questions.</span>
           </h2>
         </Reveal>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-y-12 gap-x-8 md:gap-x-10">
-          {stats.map((s, i) => (
-            <StatBlock key={s.label} index={i} value={s.value} label={s.label} />
-          ))}
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-14 items-start">
+          {/* Scrolling questions list */}
+          <div className="md:col-span-5">
+            <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.28em] text-gold/60 mb-5">
+              <span className="size-1.5 rounded-full bg-gold animate-[ledFlicker_2.2s_ease-in-out_infinite]" />
+              {faqs.length} questions · click to read
+            </div>
+            <div className="relative">
+              {/* Top + bottom fade overlays */}
+              <span
+                aria-hidden
+                className="pointer-events-none absolute top-0 left-0 right-3 h-8 bg-gradient-to-b from-obsidian to-transparent z-10"
+              />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute bottom-0 left-0 right-3 h-8 bg-gradient-to-t from-obsidian to-transparent z-10"
+              />
+              <ul className="max-h-[480px] overflow-y-auto pr-3 space-y-2 no-scrollbar">
+                {faqs.map((f, i) => {
+                  const isActive = i === active;
+                  return (
+                    <li key={f.q}>
+                      <button
+                        type="button"
+                        onClick={() => setActive(i)}
+                        className={`relative w-full text-left p-5 rounded-xl border transition-all duration-500 group overflow-hidden ${
+                          isActive
+                            ? "border-gold/60 bg-midnight/85"
+                            : "border-gold/15 bg-midnight/40 hover:border-gold/40"
+                        }`}
+                      >
+                        {isActive && (
+                          <motion.span
+                            layoutId="faq-active"
+                            aria-hidden
+                            transition={{ duration: 0.5, ease: [0.7, 0, 0.3, 1] }}
+                            className="absolute left-0 top-0 bottom-0 w-[3px] bg-gold"
+                          />
+                        )}
+                        <div className="flex items-center gap-4">
+                          <span
+                            className={`font-mono text-[10px] uppercase tracking-[0.28em] transition-colors shrink-0 ${
+                              isActive ? "text-gold" : "text-gold/50"
+                            }`}
+                          >
+                            {String(i + 1).padStart(2, "0")}
+                          </span>
+                          <span
+                            className={`font-display text-base md:text-lg leading-snug transition-colors ${
+                              isActive
+                                ? "text-ivory"
+                                : "text-ivory/75 group-hover:text-ivory"
+                            }`}
+                          >
+                            {f.q}
+                          </span>
+                          <span
+                            aria-hidden
+                            className={`ml-auto text-gold transition-all duration-500 shrink-0 ${
+                              isActive
+                                ? "translate-x-0 opacity-100"
+                                : "-translate-x-2 opacity-0 group-hover:opacity-60 group-hover:translate-x-0"
+                            }`}
+                          >
+                            →
+                          </span>
+                        </div>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </div>
 
-        {quote && (
-          <Reveal delay={0.2}>
-            <blockquote className="mt-24 md:mt-32 max-w-4xl font-display font-light italic text-2xl md:text-4xl leading-[1.25] text-ivory/85 tracking-[-0.01em]">
-              <span aria-hidden className="gold mr-1">"</span>
-              {quote}
-              <span aria-hidden className="gold ml-1">"</span>
-            </blockquote>
-          </Reveal>
-        )}
+          {/* Answer panel */}
+          <div className="md:col-span-7 relative min-h-[420px] md:min-h-[480px]">
+            <span
+              aria-hidden
+              className="absolute -top-1 left-0 right-0 h-px bg-gradient-to-r from-gold/70 via-gold/40 to-transparent"
+            />
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={active}
+                initial={{ opacity: 0, x: 24, filter: "blur(8px)" }}
+                animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, x: -24, filter: "blur(8px)" }}
+                transition={{ duration: 0.55, ease: [0.7, 0, 0.3, 1] }}
+                className="pt-10"
+              >
+                <div className="flex items-baseline gap-5 mb-8">
+                  <span className="font-display italic text-6xl md:text-7xl text-gold/85 leading-none">
+                    {String(active + 1).padStart(2, "0")}
+                  </span>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-ivory/40">
+                    Question
+                  </span>
+                </div>
+                <h3 className="font-display font-light text-3xl md:text-4xl text-ivory leading-tight mb-8 max-w-2xl tracking-[-0.005em]">
+                  {faqs[active].q}
+                </h3>
+                <p className="text-ivory/75 leading-relaxed text-base md:text-lg max-w-2xl">
+                  {faqs[active].a}
+                </p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
       </div>
     </section>
   );
 }
 
-function StatBlock({
-  value,
-  label,
-  index,
-}: {
-  value: string;
-  label: string;
-  index: number;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.8, delay: index * 0.08, ease: [0.2, 0.8, 0.2, 1] }}
-      className="relative"
-    >
-      <span
-        aria-hidden
-        className="absolute -top-6 left-0 h-px w-full bg-gradient-to-r from-gold/70 via-gold/30 to-transparent"
-      />
-      <div className="font-display font-light text-5xl md:text-7xl text-gold leading-none tracking-[-0.01em]">
-        <CountValue value={value} />
-      </div>
-      <div className="mt-4 font-mono text-[10px] md:text-[11px] uppercase tracking-[0.28em] text-ivory/55">
-        {label}
-      </div>
-    </motion.div>
-  );
-}
-
-/* CountValue — parses leading numeric portion of a stat string and
-   counts it up from 0 → target when in view. Falls back to a plain
-   fade if the value isn't numeric (e.g. "Top 3", "Weekly"). */
-function CountValue({ value }: { value: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-30px" });
-  const match = value.match(/^([^\d-]*-?)(\d+\.?\d*)(.*)$/);
-  const motionVal = useMotionValue(0);
-
-  useEffect(() => {
-    if (!inView || !match) return;
-    const target = parseFloat(match[2]);
-    const decimals = (match[2].split(".")[1] || "").length;
-    const controls = animate(motionVal, target, {
-      duration: 1.6,
-      ease: [0.2, 0.8, 0.2, 1],
-    });
-    const unsub = motionVal.on("change", (v) => {
-      if (!ref.current) return;
-      ref.current.textContent = `${match[1]}${v.toFixed(decimals)}${match[3]}`;
-    });
-    return () => {
-      controls.stop();
-      unsub();
-    };
-  }, [inView, motionVal, match]);
-
-  if (!match) return <span ref={ref}>{value}</span>;
-  return <span ref={ref}>{`${match[1]}0${match[3]}`}</span>;
-}
-
 /* ─────────────────────────────────────────────────────────────────
-   CloseSection — magnetic back-to-services pill.
+   CLOSE — magnetic back-to-services pill
 ───────────────────────────────────────────────────────────────── */
 function CloseSection({ number }: { number: string }) {
   return (
@@ -406,7 +679,10 @@ function ChapterRail({
           <span
             aria-hidden
             className="block flex-1 max-w-[220px] h-px origin-left bg-gradient-to-r from-gold/70 via-gold/40 to-transparent"
-            style={{ transform: "scaleX(0)", animation: "chapterDraw 1s cubic-bezier(0.7,0,0.3,1) forwards" }}
+            style={{
+              transform: "scaleX(0)",
+              animation: "chapterDraw 1s cubic-bezier(0.7,0,0.3,1) forwards",
+            }}
           />
           <span className="font-mono text-[11px] uppercase tracking-[0.32em] text-ivory/55">
             {label}
@@ -415,213 +691,5 @@ function ChapterRail({
       </div>
       <style>{`@keyframes chapterDraw { to { transform: scaleX(1); } }`}</style>
     </div>
-  );
-}
-
-/* ─── Principle row ─────────────────────────────────────────────── */
-function Principle({ index, text }: { index: number; text: string }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 14 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.7, delay: index * 0.06, ease: [0.2, 0.8, 0.2, 1] }}
-      className="flex items-start gap-6 py-5 border-b border-gold/10 group"
-    >
-      <span className="font-mono text-[11px] uppercase tracking-[0.32em] text-gold/70 pt-1 w-6 shrink-0">
-        {String(index + 1).padStart(2, "0")}
-      </span>
-      <p className="text-ivory/75 leading-relaxed text-base md:text-lg transition-colors group-hover:text-ivory">
-        {text}
-      </p>
-    </motion.div>
-  );
-}
-
-/* ─── DeliverableCard — cursor-tracking spotlight + hover-lift ──── */
-function DeliverableCard({
-  index,
-  title,
-  body,
-}: {
-  index: number;
-  title: string;
-  body: string;
-}) {
-  const ref = useRef<HTMLElement>(null);
-  const onMove = (e: ReactMouseEvent<HTMLElement>) => {
-    const rect = ref.current?.getBoundingClientRect();
-    if (!rect || !ref.current) return;
-    ref.current.style.setProperty("--mx", `${e.clientX - rect.left}px`);
-    ref.current.style.setProperty("--my", `${e.clientY - rect.top}px`);
-  };
-  return (
-    <motion.article
-      ref={ref}
-      onMouseMove={onMove}
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ delay: (index % 4) * 0.06, duration: 0.7 }}
-      className="relative bg-midnight border border-gold/12 rounded-2xl p-7 md:p-10 overflow-hidden group transition-all duration-500 hover:border-gold/40 hover:-translate-y-1"
-    >
-      {/* Cursor spotlight (only visible on hover) */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-        style={{
-          background:
-            "radial-gradient(320px circle at var(--mx) var(--my), rgba(212,176,97,0.16), transparent 60%)",
-        }}
-      />
-      {/* Top-edge fill rail */}
-      <span
-        aria-hidden
-        className="absolute top-0 left-0 h-px w-0 bg-gradient-to-r from-gold/70 via-gold to-gold/70 transition-all duration-700 group-hover:w-full"
-      />
-      <span
-        aria-hidden
-        className="absolute top-5 right-6 font-mono text-[10px] uppercase tracking-[0.28em] text-gold/40"
-      >
-        {String(index + 1).padStart(2, "0")}
-      </span>
-
-      <h3 className="relative font-display text-2xl md:text-3xl text-ivory mb-3 transition-transform duration-500 group-hover:translate-x-1">
-        {title}
-      </h3>
-      <p className="relative text-ivory/65 leading-relaxed text-sm md:text-[15px]">
-        {body}
-      </p>
-      <span
-        aria-hidden
-        className="absolute bottom-6 right-6 text-gold opacity-0 -translate-x-2 transition-all duration-500 group-hover:opacity-100 group-hover:translate-x-0"
-      >
-        →
-      </span>
-    </motion.article>
-  );
-}
-
-/* ─── ProcessTrack ──────────────────────────────────────────────── */
-function ProcessTrack({
-  items,
-}: {
-  items: { n: string; t: string; d: string }[];
-}) {
-  return (
-    <div className="relative">
-      <div className="hidden md:block absolute left-0 right-0 top-14 h-px pointer-events-none">
-        <span
-          aria-hidden
-          className="block w-full h-full bg-gradient-to-r from-transparent via-gold/35 to-transparent"
-        />
-        <motion.span
-          aria-hidden
-          className="absolute top-1/2 -translate-y-1/2 size-2 rounded-full bg-gold"
-          style={{
-            boxShadow:
-              "0 0 12px rgba(212,176,97,0.85), 0 0 28px rgba(212,176,97,0.5)",
-          }}
-          animate={{ left: ["2%", "98%"] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 relative z-10">
-        {items.map((s, i) => (
-          <motion.article
-            key={s.t}
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ delay: i * 0.12, duration: 0.8 }}
-            className="relative bg-midnight border border-gold/15 rounded-2xl p-7 md:p-10 transition-all duration-500 hover:border-gold/40 hover:-translate-y-1 group"
-          >
-            <span
-              aria-hidden
-              className="hidden md:block absolute -top-1 left-1/2 -translate-x-1/2 size-2 rounded-full bg-gold border-2 border-midnight"
-            />
-            <div className="flex items-baseline justify-between mb-8">
-              <span className="font-display italic text-6xl md:text-7xl text-gold/85 leading-none">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-ivory/40">
-                Step
-              </span>
-            </div>
-            <h3 className="font-display text-2xl md:text-3xl text-ivory mb-4 transition-transform duration-500 group-hover:translate-x-1">
-              {s.t}
-            </h3>
-            <p className="text-ivory/65 leading-relaxed text-sm md:text-[15px]">
-              {s.d}
-            </p>
-          </motion.article>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ─── FaqList ──────────────────────────────────────────────────── */
-function FaqList({ faqs }: { faqs: { q: string; a: string }[] }) {
-  const [open, setOpen] = useState<number | null>(0);
-  return (
-    <ul className="border-t border-gold/15">
-      {faqs.map((f, i) => {
-        const isOpen = open === i;
-        return (
-          <motion.li
-            key={f.q}
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{ delay: i * 0.05, duration: 0.6 }}
-            className="border-b border-gold/15"
-          >
-            <button
-              type="button"
-              onClick={() => setOpen(isOpen ? null : i)}
-              className="w-full flex items-center justify-between gap-6 py-7 md:py-8 text-left group focus:outline-none"
-              aria-expanded={isOpen}
-            >
-              <span className="flex items-baseline gap-5 md:gap-7 flex-1">
-                <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-gold/60 shrink-0 hidden md:inline">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <span className="font-display text-xl md:text-3xl text-ivory leading-tight transition-colors group-hover:text-gold">
-                  {f.q}
-                </span>
-              </span>
-              <motion.span
-                aria-hidden
-                animate={{ rotate: isOpen ? 45 : 0 }}
-                transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
-                className="shrink-0 grid place-items-center size-9 rounded-full border border-gold/30 text-gold"
-              >
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path d="M7 1v12M1 7h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
-              </motion.span>
-            </button>
-            <AnimatePresence initial={false}>
-              {isOpen && (
-                <motion.div
-                  key="content"
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
-                  className="overflow-hidden"
-                >
-                  <p className="pb-7 md:pb-8 md:pl-[68px] pr-12 text-ivory/70 leading-relaxed md:text-lg max-w-3xl">
-                    {f.a}
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.li>
-        );
-      })}
-    </ul>
   );
 }
