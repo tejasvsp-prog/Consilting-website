@@ -20,27 +20,39 @@ export default function Seo() {
       deliverables={[
         {
           t: "Technical foundation",
-          d: "Crawl, index, schema, internal links, Core Web Vitals — audited, then shipped.",
+          d: "A crawled, indexed, properly-schema'd site with Core Web Vitals tuned and internal linking restructured.",
+          approach:
+            "We approach this by crawling the site end to end, then shipping a prioritized fix list — schema, internal links, Core Web Vitals — sorted by traffic impact.",
         },
         {
           t: "Intent map",
-          d: "Every priority keyword tied to a buyer stage, a target page, and a conversion event.",
+          d: "Every priority keyword tied to a buyer stage, a target page, and a measurable conversion event.",
+          approach:
+            "We approach this by mining your CRM and sales calls for the exact phrases buyers use, then mapping every keyword to a target page and a conversion event.",
         },
         {
           t: "Content engine",
-          d: "Briefs, drafts, edits, publishing. Two to eight pieces a month, all on-brief.",
+          d: "Two to eight new pieces every month — briefed, drafted, edited, and published on a fixed cadence.",
+          approach:
+            "We approach this by writing the briefs, drafting the pieces, and shipping on a fixed cadence — edited against your brand voice, published without you chasing us.",
         },
         {
           t: "Programmatic at scale",
-          d: "Service × geography, product × use-case, comparison pages — built once, scaled to hundreds.",
+          d: "Service × geography, product × use-case, and comparison pages built once and scaled to hundreds.",
+          approach:
+            "We approach this by building one high-converting template and feeding it from a structured dataset, so an hour of work scales to hundreds of indexed pages.",
         },
         {
           t: "Earned links",
-          d: "Original data, tools, and stories that pull links from sites that actually move rankings.",
+          d: "Backlinks from sites that actually move rankings — earned with research, tools, and digital PR.",
+          approach:
+            "We approach this by publishing original research, free tools, and data stories worth linking to, then pitching them to journalists already covering your space.",
         },
         {
           t: "Revenue reporting",
-          d: "Rank tracking is table stakes. We report leads, deals, and revenue — every month.",
+          d: "A monthly report tying organic sessions to leads, deals, and dollars — not just rankings.",
+          approach:
+            "We approach this by tying every organic session back to your CRM through server-side tracking, so you see exactly which pages produce revenue.",
         },
       ]}
       process={[

@@ -20,27 +20,39 @@ export default function MetaAds() {
       deliverables={[
         {
           t: "Account audit & rebuild",
-          d: "Pixel, CAPI, conversions API, attribution. Every leak found, every signal sent server-side.",
+          d: "A clean pixel, CAPI, and attribution stack — every leak fixed, every signal sent server-side.",
+          approach:
+            "We approach this by auditing pixels, CAPI, and attribution end to end, then routing every conversion server-side so the algorithm gets clean signal.",
         },
         {
           t: "Creative pipeline",
-          d: "5–15 new ad concepts a month, scripted, edited, shipped. Static, video, UGC, founder-led.",
+          d: "5–15 new ad concepts every month — static, video, UGC, founder-led — scripted, edited, shipped.",
+          approach:
+            "We approach this by scripting, editing, and shipping new concepts every week based on what's actually winning, not what looked good in a deck.",
         },
         {
           t: "Campaign architecture",
-          d: "Simplified ASC, CBO, and consolidated targeting structures that let the algorithm work.",
+          d: "A simplified ASC + consolidated structure that lets Meta's algorithm spend efficiently.",
+          approach:
+            "We approach this by simplifying to ASC and consolidated targeting that lets the algorithm spend efficiently instead of fighting it.",
         },
         {
           t: "Funnel page work",
-          d: "Landing tests, offer iteration, post-click experience. The ad isn't the funnel — the funnel is.",
+          d: "Landing-page tests, offer iteration, and post-click experience tuned with the same rigor as the ad.",
+          approach:
+            "We approach this by treating the landing page, offer, and post-click experience as part of the campaign — testing them with the same rigor as the ad itself.",
         },
         {
           t: "Weekly P&L reporting",
-          d: "Spend, CPA, ROAS, blended CAC, contribution margin. Read in five, decide in fifteen.",
+          d: "Spend, CPA, ROAS, blended CAC, and contribution margin — read in five minutes, decide in fifteen.",
+          approach:
+            "We approach this by reporting in dollars: spend, CPA, ROAS, blended CAC, contribution margin — read in five, decide in fifteen.",
         },
         {
           t: "Strategy on speed dial",
-          d: "Slack channel for the team, a real person who picks up. No ticket queues.",
+          d: "A shared Slack channel and a real strategist who picks up. No ticket queues, no junior handoffs.",
+          approach:
+            "We approach this by pairing your account with a senior strategist on Slack — no ticket queues, no junior account managers.",
         },
       ]}
       process={[

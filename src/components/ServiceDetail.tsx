@@ -18,7 +18,7 @@ export type ServiceDetailProps = {
   /** Plain-English explanation that opens the page. */
   intro: string;
   why: string[];
-  deliverables: { t: string; d: string }[];
+  deliverables: { t: string; d: string; approach?: string }[];
   process: { n: string; t: string; d: string }[];
   faqs: { q: string; a: string }[];
   resultStat: { value: string; label: string }[];
@@ -54,24 +54,13 @@ export default function ServiceDetail(p: ServiceDetailProps) {
         </div>
       </PageHeader>
 
-      {/* Visual band */}
-      {p.Visual && (
-        <section className="bg-midnight pt-2 pb-16 md:pb-20">
-          <div className="mx-auto max-w-7xl px-6 md:px-10">
-            <Reveal>
-              <p.Visual />
-            </Reveal>
-          </div>
-        </section>
-      )}
-
       {/* 01 — What is [Name]? */}
       <ChapterRail number="01" label="What it is" bg="midnight" />
       <WhatIsSection shortName={p.shortName ?? p.name} explanation={p.intro} />
 
-      {/* 02 — Book: Deliverables + Approach combined */}
-      <ChapterRail number="02" label="The playbook" bg="obsidian" />
-      <BookSection deliverables={p.deliverables} why={p.why} />
+      {/* 02 — Deliverables (book) */}
+      <ChapterRail number="02" label="Deliverables" bg="obsidian" />
+      <BookSection deliverables={p.deliverables} />
 
       {/* 03 — How it runs */}
       <ChapterRail number="03" label="Process" bg="midnight" />
@@ -148,10 +137,8 @@ const pageVariants = {
 
 function BookSection({
   deliverables,
-  why,
 }: {
-  deliverables: { t: string; d: string }[];
-  why: string[];
+  deliverables: { t: string; d: string; approach?: string }[];
 }) {
   const [page, setPage] = useState(0);
   const [dir, setDir] = useState<1 | -1>(1);
@@ -169,7 +156,7 @@ function BookSection({
       <div className="mx-auto max-w-6xl px-6 md:px-10">
         <Reveal>
           <h2 className="font-display font-light text-5xl md:text-7xl leading-[1.02] tracking-[-0.015em] mb-14 md:mb-20">
-            The <span className="gold italic">playbook.</span>
+            The <span className="gold italic">deliverables.</span>
           </h2>
         </Reveal>
 
@@ -217,7 +204,7 @@ function BookSection({
               >
                 <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.32em] text-ivory/40 mb-10">
                   <span className="text-gold">
-                    Chapter {String(page + 1).padStart(2, "0")}
+                    Deliverable {String(page + 1).padStart(2, "0")}
                   </span>
                   <span>
                     {String(page + 1).padStart(2, "0")} /{" "}
@@ -230,14 +217,16 @@ function BookSection({
                 <p className="text-ivory/75 leading-relaxed text-base md:text-lg max-w-xl">
                   {deliverables[page].d}
                 </p>
-                <div className="mt-auto pt-8 border-t border-gold/20 max-w-xl">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-gold/70 mb-3">
-                    In our approach
-                  </p>
-                  <p className="font-display italic text-lg md:text-xl text-ivory/80 leading-relaxed">
-                    {why[page % Math.max(why.length, 1)]}
-                  </p>
-                </div>
+                {deliverables[page].approach && (
+                  <div className="mt-auto pt-8 border-t border-gold/20 max-w-xl">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-gold/70 mb-3">
+                      Our approach
+                    </p>
+                    <p className="font-display italic text-lg md:text-xl text-ivory/80 leading-relaxed">
+                      {deliverables[page].approach}
+                    </p>
+                  </div>
+                )}
                 <span
                   aria-hidden
                   className="absolute bottom-5 right-6 text-gold/30 text-2xl select-none"
@@ -292,9 +281,6 @@ function BookSection({
                 }`}
               />
             ))}
-          </div>
-          <div className="mt-3 text-center font-mono text-[10px] uppercase tracking-[0.32em] text-ivory/40">
-            Click the page edges, or use the dots
           </div>
         </div>
       </div>
@@ -468,10 +454,6 @@ function FaqPanel({ faqs }: { faqs: { q: string; a: string }[] }) {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-14 items-start">
           {/* Scrolling questions list */}
           <div className="md:col-span-5">
-            <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.28em] text-gold/60 mb-5">
-              <span className="size-1.5 rounded-full bg-gold animate-[ledFlicker_2.2s_ease-in-out_infinite]" />
-              {faqs.length} questions · click to read
-            </div>
             <div className="relative">
               {/* Top + bottom fade overlays */}
               <span
@@ -665,13 +647,13 @@ function ChapterRail({
   const bgClass = bg === "midnight" ? "bg-midnight" : "bg-obsidian";
   return (
     <div className={bgClass}>
-      <div className="mx-auto max-w-7xl px-6 md:px-10 pt-24 md:pt-32">
+      <div className="mx-auto max-w-7xl px-6 md:px-10 pt-20 md:pt-28 pb-2 md:pb-3">
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
-          className="flex items-center gap-5 mb-10 md:mb-14"
+          className="flex items-center gap-5"
         >
           <span className="font-mono text-[11px] uppercase tracking-[0.32em] text-gold">
             {number}

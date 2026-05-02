@@ -20,27 +20,39 @@ export default function WebsiteMaintenance() {
       deliverables={[
         {
           t: "Monthly updates & backups",
-          d: "Plugins, themes, CMS, frameworks updated and tested. Daily backups offsite for 90 days.",
+          d: "Plugins, themes, CMS, and frameworks updated and tested. Daily backups stored offsite for 90 days.",
+          approach:
+            "We approach this by patching on a tested staging copy first, then promoting to production with daily backups stored offsite for ninety days.",
         },
         {
           t: "Uptime monitoring",
-          d: "60-second checks across 14 regions. We're alerted before you are. Fixed before you wake up.",
+          d: "60-second uptime checks across 14 regions. We're alerted before you are.",
+          approach:
+            "We approach this by running 60-second health checks across fourteen regions and paging the on-call team the moment anything fails.",
         },
         {
           t: "Performance tracking",
-          d: "Core Web Vitals, real-user metrics, monthly review. Speed regressions get caught early.",
+          d: "Core Web Vitals, real-user metrics, and a monthly performance review with regressions flagged.",
+          approach:
+            "We approach this by sampling real-user metrics, comparing every release against the last, and flagging regressions before they hit your rankings.",
         },
         {
           t: "Security & SSL",
-          d: "Vulnerability scans, malware monitoring, SSL renewals, firewall tuning. CVEs patched in 48h.",
+          d: "Vulnerability scans, malware monitoring, SSL renewals, and firewall tuning. CVEs patched in 48h.",
+          approach:
+            "We approach this by running weekly vulnerability scans, renewing SSLs ahead of expiry, and patching disclosed CVEs within forty-eight hours.",
         },
         {
           t: "Content edits",
-          d: "Copy changes, image swaps, new pages, blog posts. Most requests turned around in 24 hours.",
+          d: "Copy changes, image swaps, new pages, and blog posts shipped within 24 business hours.",
+          approach:
+            "We approach this by giving you one Slack channel and one email — most copy, image, and page edits ship the same business day.",
         },
         {
           t: "Quarterly review",
-          d: "Performance, security, recommendations. One call, one document, no fluff.",
+          d: "A performance + security report and a punch list for next quarter — one call, one document.",
+          approach:
+            "We approach this by surfacing what's slowing down, what's breaking, and what to fix next — one call, one document, no fluff.",
         },
       ]}
       process={[

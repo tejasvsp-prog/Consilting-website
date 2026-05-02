@@ -20,27 +20,39 @@ export default function WebsiteDevelopment() {
       deliverables={[
         {
           t: "Discovery & wireframes",
-          d: "We map your funnel before we map a page. Every section ties to a moment and a goal.",
+          d: "A funnel-mapped sitemap and wireframes, signed off before a single pixel of design happens.",
+          approach:
+            "We approach this by mapping your funnel before opening Figma, so every section ties to a specific user moment and a measurable goal.",
         },
         {
           t: "Conversion-first design",
-          d: "Custom design in Figma. Every component judged on speed, clarity, friction, and trust.",
+          d: "Custom design in Figma — every component judged on speed, clarity, friction, and trust.",
+          approach:
+            "We approach this by judging every component on speed, clarity, friction, and trust — in that order — before it gets a coat of paint.",
         },
         {
           t: "Hand-coded build",
-          d: "React + Next.js + Tailwind. No drag-and-drop bloat. Sub-2-second LCP shipped to prod.",
+          d: "A production site in React, Next.js, and Tailwind, with a sub-2-second LCP shipped to prod.",
+          approach:
+            "We approach this by writing every line in React, Next.js, and Tailwind — no drag-and-drop bloat, no plugin tax, no shortcuts on performance.",
         },
         {
           t: "Headless CMS",
-          d: "Sanity, Contentful, or Payload — picked for your team's literacy. They ship without us.",
+          d: "A Sanity, Contentful, or Payload setup your marketers can run without raising a ticket.",
+          approach:
+            "We approach this by picking the CMS for your team's literacy, then building editor schemas your marketers can actually use day one.",
         },
         {
           t: "Integrations",
-          d: "CRM, booking, payments, email, analytics, server-side tracking. Wired up properly the first time.",
+          d: "CRM, booking, payments, email, analytics, and server-side tracking — wired up properly the first time.",
+          approach:
+            "We approach this by wiring CRM, payments, email, and server-side tracking properly the first time — not as a launch-week scramble.",
         },
         {
           t: "Launch & handoff",
-          d: "QA, accessibility checks, redirects, sitemaps, training. We don't disappear at launch.",
+          d: "QA, accessibility, redirects, sitemaps, training videos, and 30 days of post-launch support.",
+          approach:
+            "We approach this by handling QA, accessibility, redirects, sitemaps, and training — then staying close for thirty days after launch.",
         },
       ]}
       process={[
