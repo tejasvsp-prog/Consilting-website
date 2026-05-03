@@ -7,10 +7,20 @@ import {
 import { useMemo, useRef } from "react";
 
 /**
- * Hero — Amara / Digital split-line typography. Two staggered rows
- * of huge serif display, joined by gold horizontal rules with a
- * traveling spark dot. The wordmark draws in letter-by-letter and
- * then a luminous shine sweeps across each line.
+ * Hero — Amara / Digital split-line typography.
+ *
+ * The wordmark animation is a single shared timeline:
+ *   1. A continuous gold beam traces left → right across the entire
+ *      hero, with a bright leading dot.
+ *   2. The dot crosses Amara first; Amara reveals via clip-path and
+ *      flashes brighter as the beam passes.
+ *   3. The dot keeps moving and crosses Digital; Digital reveals and
+ *      flashes the same way.
+ *   4. After the beam exits, both words settle into a soft gold
+ *      glow that pulses gently.
+ *
+ * Every step runs on pure CSS so it fires on first paint regardless
+ * of tab focus, route changes, or React/framer-motion mount timing.
  */
 export default function Hero() {
   const ref = useRef<HTMLDivElement>(null);
@@ -50,39 +60,44 @@ export default function Hero() {
         </span>
       </motion.div>
 
-      <motion.div style={{ y: yShift, opacity }} className="w-full">
-        {/* Top row: Amara + horizontal rule with traveling spark */}
+      <motion.div style={{ y: yShift, opacity }} className="relative w-full">
+        {/* Top row: Amara */}
         <div className="flex items-center w-full">
-          <DrawWord
-            text="Amara"
-            startDelay={0.45}
-            drawDuration={1.4}
-            className="font-display font-light text-[24vw] md:text-[16vw] leading-[0.86] tracking-[-0.012em] text-ivory pl-6 md:pl-10 whitespace-nowrap"
-          />
+          <span
+            aria-label="Amara"
+            className="hero-word hero-word--amara font-display font-light text-[24vw] md:text-[16vw] leading-[0.86] tracking-[-0.012em] text-ivory pl-6 md:pl-10 whitespace-nowrap"
+          >
+            Amara
+          </span>
           <span
             aria-hidden
-            className="hidden md:block relative flex-1 h-px bg-gold ml-8 mr-0 overflow-visible opacity-0 animate-[fadeInUp_0.9s_ease-out_1.95s_forwards] origin-left"
-            style={{ transformOrigin: "left center" }}
+            className="hidden md:block flex-1 h-px bg-gold/40 ml-8 origin-left scale-x-0 animate-[heroRule_0.9s_cubic-bezier(0.7,0,0.3,1)_2.0s_forwards]"
           />
         </div>
 
-        {/* Bottom row: arrow rule + Digital, right-aligned */}
+        {/* Bottom row: Digital, right-aligned */}
         <div className="flex items-center w-full mt-3 md:mt-6 justify-end">
           <span
             aria-hidden
-            className="hidden md:flex flex-1 items-center mr-8 ml-0 opacity-0 animate-[fadeInUp_0.9s_ease-out_3.4s_forwards]"
+            className="hidden md:flex flex-1 items-center mr-8"
           >
-            <span className="relative flex-1 h-px bg-gold overflow-visible" />
+            <span className="flex-1 h-px bg-gold/40 origin-left scale-x-0 animate-[heroRule_0.9s_cubic-bezier(0.7,0,0.3,1)_3.4s_forwards]" />
             <ArrowTip />
           </span>
-          <DrawWord
-            text="Digital."
-            italic
-            gold
-            startDelay={1.85}
-            drawDuration={1.4}
-            className="font-display font-light italic text-[24vw] md:text-[16vw] leading-[0.86] tracking-[-0.012em] gold pr-6 md:pr-10 whitespace-nowrap"
-          />
+          <span
+            aria-label="Digital."
+            className="hero-word hero-word--digital font-display font-light italic text-[24vw] md:text-[16vw] leading-[0.86] tracking-[-0.012em] gold pr-6 md:pr-10 whitespace-nowrap"
+          >
+            Digital.
+          </span>
+        </div>
+
+        {/* Single global tracer — runs left-to-right across the entire
+            hero. Renders only on md+ where the split layout makes
+            sense; on mobile the words stack and the tracer is moot. */}
+        <div className="hero-tracer hidden md:block" aria-hidden>
+          <span className="hero-tracer__line" />
+          <span className="hero-tracer__dot" />
         </div>
       </motion.div>
 
@@ -100,7 +115,7 @@ export default function Hero() {
       <motion.p
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.9, duration: 0.7 }}
+        transition={{ delay: 3.0, duration: 0.7 }}
         className="absolute bottom-24 md:bottom-28 left-6 md:left-10 max-w-xs font-display text-2xl md:text-3xl text-ivory leading-tight z-20"
       >
         We engineer{" "}
@@ -111,7 +126,7 @@ export default function Hero() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 2.0, duration: 1 }}
+        transition={{ delay: 3.2, duration: 1 }}
         className="absolute left-1/2 -translate-x-1/2 bottom-8 flex flex-col items-center gap-3 text-ivory/35 z-20"
       >
         <span className="font-mono text-[10px] uppercase tracking-[0.32em]">
@@ -124,53 +139,6 @@ export default function Hero() {
         />
       </motion.div>
     </section>
-  );
-}
-
-
-/* ─── DrawWord — CSS-driven light-beam draw + glow ─────────────
-   Text reveals left -> right via a clip-path animation. A bright
-   vertical beam travels in sync with the clip edge — reads as a
-   beam of light tracing the letters. After the draw completes,
-   the text softly pulses with a gold halo. All animations run via
-   pure CSS so they fire on first paint regardless of tab focus,
-   viewport entry, or framer-motion mount timing. */
-function DrawWord({
-  text,
-  italic,
-  gold,
-  startDelay = 0,
-  drawDuration = 1.6,
-  className,
-}: {
-  text: string;
-  italic?: boolean;
-  gold?: boolean;
-  startDelay?: number;
-  drawDuration?: number;
-  className?: string;
-}) {
-  return (
-    <span
-      className={`relative inline-block isolate ${className ?? ""}`}
-      style={
-        {
-          "--draw-delay": `${startDelay}s`,
-          "--draw-dur": `${drawDuration}s`,
-        } as React.CSSProperties
-      }
-      aria-label={text}
-    >
-      <span
-        aria-hidden
-        className={`word-draw ${italic ? "italic" : ""} ${
-          gold ? "gold" : "text-ivory"
-        }`}
-      >
-        {text}
-      </span>
-      <span aria-hidden className="word-beam" />
-    </span>
   );
 }
 

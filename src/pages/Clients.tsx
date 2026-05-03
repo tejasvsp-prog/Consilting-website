@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import PageTransition from "../components/PageTransition";
-import { Reveal, SplitText } from "../components/Reveal";
+import { Reveal } from "../components/Reveal";
 import CtaStrip from "../sections/CtaStrip";
 
 type ClientCase = {
@@ -85,46 +85,60 @@ export default function Clients() {
             </p>
           </Reveal>
 
-          <h1 className="font-display font-light text-[14vw] md:text-[12vw] leading-[0.88] tracking-[-0.025em] text-ivory uppercase">
-            <span className="block">
-              <SplitText text="OPERATORS" stagger={0.05} />
-            </span>
-            <span className="block gold italic normal-case">
-              <SplitText text="we move." stagger={0.05} delay={0.5} />
-            </span>
-          </h1>
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: [0.2, 0.8, 0.2, 1] }}
+            className="font-display font-light text-[18vw] md:text-[12vw] leading-[0.88] tracking-[-0.025em] text-ivory uppercase"
+          >
+            <span className="block">Operators</span>
+            <motion.span
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.25, ease: [0.2, 0.8, 0.2, 1] }}
+              className="block gold italic normal-case"
+            >
+              we move.
+            </motion.span>
+          </motion.h1>
 
-          <Reveal delay={0.9}>
-            <div className="mt-10 md:mt-14 max-w-2xl">
-              <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-ivory/55 leading-relaxed">
-                Detroit-based growth studio, working with operators across
-                nonprofit, hospitality, healthcare, and consulting.
-              </p>
-              <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.28em] text-gold/70">
-                SEO · Web · Maintenance · Meta Ads.
-              </p>
-            </div>
-          </Reveal>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
+            className="mt-10 md:mt-14 max-w-2xl"
+          >
+            <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-ivory/55 leading-relaxed">
+              Detroit-based growth studio, working with operators across
+              nonprofit, hospitality, healthcare, and consulting.
+            </p>
+            <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.28em] text-gold/70">
+              SEO · Web · Maintenance · Meta Ads.
+            </p>
+          </motion.div>
 
           {/* Stat strip */}
-          <div className="mt-16 md:mt-20 grid grid-cols-3 gap-6 max-w-2xl border-t border-gold/15 pt-8">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.8, ease: [0.2, 0.8, 0.2, 1] }}
+            className="mt-16 md:mt-20 grid grid-cols-3 gap-6 max-w-2xl border-t border-gold/15 pt-8"
+          >
             {[
               { v: `${clients.length}`, l: "Active engagements" },
               { v: "92%", l: "Retention" },
               { v: "MI", l: "Headquartered" },
-            ].map((s, i) => (
-              <Reveal key={s.l} delay={1 + i * 0.08}>
-                <div>
-                  <div className="font-display text-3xl md:text-4xl text-gold leading-none">
-                    {s.v}
-                  </div>
-                  <div className="mt-2 font-mono text-[9px] uppercase tracking-[0.28em] text-ivory/45">
-                    {s.l}
-                  </div>
+            ].map((s) => (
+              <div key={s.l}>
+                <div className="font-display text-3xl md:text-4xl text-gold leading-none">
+                  {s.v}
                 </div>
-              </Reveal>
+                <div className="mt-2 font-mono text-[9px] uppercase tracking-[0.28em] text-ivory/45">
+                  {s.l}
+                </div>
+              </div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -231,12 +245,13 @@ export default function Clients() {
 
 /* ─── CascadeRow — staggered portrait cards across the bottom of the
    hero. Each card sits at a different vertical offset, fades up in
-   sequence, lifts slightly and gold-glows on hover. ──────────────── */
+   sequence, lifts slightly and gold-glows on hover. Cascade is
+   desktop-only; on tablet/mobile cards align flat for readability. */
 function CascadeRow({ clients }: { clients: ClientCase[] }) {
-  // Vertical offsets in pixels — mirror the reference image cascade.
-  const offsets = [40, 96, 0, 72, 24];
+  // Vertical offsets in pixels — desktop only. Tablet/mobile flatten.
+  const offsets = [32, 72, 0, 56, 16];
   return (
-    <div className="relative grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6 items-end pt-20 md:pt-24">
+    <div className="relative grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-5 lg:gap-6 items-end pt-20 md:pt-24">
       {/* Decorative gold rule above the cascade */}
       <span
         aria-hidden
@@ -253,8 +268,10 @@ function CascadeRow({ clients }: { clients: ClientCase[] }) {
             delay: i * 0.12,
             ease: [0.2, 0.8, 0.2, 1],
           }}
-          style={{ transform: `translateY(${offsets[i % offsets.length]}px)` }}
-          className="group"
+          className="group cascade-card"
+          style={
+            { "--cascade-y": `${offsets[i % offsets.length]}px` } as React.CSSProperties
+          }
         >
           <ClientPortrait index={i} client={c} />
         </motion.div>
@@ -280,7 +297,7 @@ function ClientPortrait({
     .join("")
     .toUpperCase();
   return (
-    <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-gradient-to-b from-coal via-midnight to-obsidian border border-gold/20 transition-all duration-700 group-hover:border-gold/55 group-hover:-translate-y-2 shadow-[0_30px_60px_rgba(0,0,0,0.45)]">
+    <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-gradient-to-b from-coal via-midnight to-obsidian border border-gold/20 transition-all duration-700 group-hover:border-gold/55 group-hover:-translate-y-2 shadow-[0_30px_60px_rgba(0,0,0,0.45)] flex flex-col">
       {/* Subtle paper-grain */}
       <span
         aria-hidden
@@ -295,36 +312,46 @@ function ClientPortrait({
         aria-hidden
         className="pointer-events-none absolute -inset-x-12 -bottom-20 h-44 bg-gold/25 blur-3xl opacity-0 transition-opacity duration-700 group-hover:opacity-100"
       />
-      {/* Top corner — index */}
-      <span className="absolute top-4 left-5 font-mono text-[10px] uppercase tracking-[0.28em] text-gold/70">
-        {String(index + 1).padStart(2, "0")}
-      </span>
-      <span className="absolute top-4 right-5 font-mono text-[10px] uppercase tracking-[0.28em] text-ivory/35">
-        {client.location.split(",")[0]}
-      </span>
 
-      {/* Logo placeholder — initials in serif gold */}
-      <div className="absolute inset-0 flex items-center justify-center">
+      {/* Top meta strip */}
+      <div className="relative z-10 flex items-center justify-between px-4 md:px-5 pt-4 md:pt-5">
+        <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-gold/70">
+          {String(index + 1).padStart(2, "0")}
+        </span>
+        <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-ivory/35">
+          {client.location.split(",")[0]}
+        </span>
+      </div>
+
+      {/* Monogram zone — fills the space between meta and name plate */}
+      <div className="relative z-10 flex-1 grid place-items-center px-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.85 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1, delay: 0.3 + index * 0.12, ease: [0.2, 0.8, 0.2, 1] }}
+          transition={{
+            duration: 1,
+            delay: 0.3 + index * 0.12,
+            ease: [0.2, 0.8, 0.2, 1],
+          }}
           className="relative"
         >
-          <span className="absolute inset-0 -m-6 rounded-full bg-gold/15 blur-2xl" />
-          <span className="relative font-display font-light text-7xl md:text-8xl text-ivory tracking-[-0.02em] transition-colors duration-700 group-hover:text-gold">
+          <span
+            aria-hidden
+            className="absolute inset-0 -m-6 rounded-full bg-gold/15 blur-2xl"
+          />
+          <span className="relative font-display font-light text-5xl md:text-6xl lg:text-7xl text-ivory tracking-[-0.02em] transition-colors duration-700 group-hover:text-gold">
             {initials}
           </span>
         </motion.div>
       </div>
 
-      {/* Bottom — name + tag */}
-      <div className="absolute bottom-0 inset-x-0 p-5 md:p-6 border-t border-gold/15 bg-gradient-to-t from-midnight/95 to-transparent">
-        <div className="font-display text-base md:text-lg text-ivory leading-tight transition-transform duration-500 group-hover:translate-x-0.5">
+      {/* Name plate — name + tag, fixed height so cards align */}
+      <div className="relative z-10 px-4 md:px-5 py-4 md:py-5 border-t border-gold/15 bg-gradient-to-t from-midnight/95 via-midnight/75 to-transparent min-h-[88px] md:min-h-[96px]">
+        <div className="font-display text-sm md:text-base text-ivory leading-tight line-clamp-2 transition-transform duration-500 group-hover:translate-x-0.5">
           {client.client}
         </div>
-        <div className="mt-1 font-mono text-[9px] uppercase tracking-[0.28em] text-gold/70">
+        <div className="mt-1.5 font-mono text-[9px] uppercase tracking-[0.28em] text-gold/70 truncate">
           {client.tag}
         </div>
       </div>

@@ -125,38 +125,26 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ─── Wordmark light-beam draw ─────────────────────────────────────
-   The .word-draw layer is clipped from the right (invisible), then
-   reveals left -> right. A separate .word-beam element travels in
-   sync with the clip edge, so it reads as a beam of light tracing
-   the letters. After the draw completes, .word-glow keeps the text
-   softly pulsing. */
-@keyframes wordReveal {
-  from { clip-path: inset(0 100% -10% 0); }
-  to   { clip-path: inset(0 -2% -10% 0); }
-}
-.word-draw {
-  display: inline-block;
-  clip-path: inset(0 100% -10% 0);
-  /* Baseline shadow matches the 0% keyframe of wordGlowPulse so the
-     glow doesn't pop in the instant the pulse starts. */
-  text-shadow:
-    0 0 18px rgba(212, 176, 97, 0.45),
-    0 0 42px rgba(212, 176, 97, 0.28),
-    0 0 90px rgba(212, 176, 97, 0.16);
-  animation:
-    wordReveal var(--draw-dur, 1.6s)
-      cubic-bezier(0.7, 0, 0.3, 1)
-      var(--draw-delay, 0s) forwards,
-    /* As the beam passes, the text briefly brightens — peaks at the
-       midpoint of the reveal — then settles back to the steady glow. */
-    wordFlash var(--draw-dur, 1.6s) ease-in-out
-      var(--draw-delay, 0s) 1,
-    wordGlowPulse 5s ease-in-out
-      calc(var(--draw-delay, 0s) + var(--draw-dur, 1.6s)) infinite;
+/* ─── Hero wordmark — shared timeline ──────────────────────────────
+   ONE timeline drives the entire intro animation:
+
+   t = 0.45s   beam dot enters from far left, line begins drawing
+   t = 0.55s   Amara starts revealing from left to right
+   t = 1.85s   Amara reveal complete — settles into baseline glow
+   t = 1.95s   Digital starts revealing from left to right
+   t = 3.25s   Digital reveal complete
+   t = 3.30s   beam dot exits at far right, line fully drawn
+
+   After 3.3s both words pulse softly via wordGlowPulse. Everything
+   uses pure CSS so it fires on first paint regardless of focus,
+   route changes, or framer-motion mount order. */
+
+@keyframes heroWordReveal {
+  from { clip-path: inset(0 100% -12% 0); }
+  to   { clip-path: inset(0 -2% -12% 0); }
 }
 
-@keyframes wordFlash {
+@keyframes heroWordFlash {
   0%, 100% {
     text-shadow:
       0 0 18px rgba(212, 176, 97, 0.45),
@@ -165,9 +153,9 @@ body {
   }
   55% {
     text-shadow:
-      0 0 30px rgba(255, 250, 236, 0.92),
-      0 0 70px rgba(255, 250, 236, 0.55),
-      0 0 130px rgba(212, 176, 97, 0.5);
+      0 0 38px rgba(255, 250, 236, 1),
+      0 0 90px rgba(255, 250, 236, 0.7),
+      0 0 160px rgba(212, 176, 97, 0.6);
   }
 }
 
@@ -186,35 +174,113 @@ body {
   }
 }
 
-@keyframes beamSweep {
-  0%   { left: 0%;   opacity: 0; }
-  6%   { opacity: 1; }
-  92%  { opacity: 1; }
-  100% { left: 100%; opacity: 0; }
+/* Both words: hidden via clip-path at first, share the same baseline
+   glow, then run reveal + flash + pulse on their staggered offsets. */
+.hero-word {
+  display: inline-block;
+  clip-path: inset(0 100% -12% 0);
+  text-shadow:
+    0 0 18px rgba(212, 176, 97, 0.45),
+    0 0 42px rgba(212, 176, 97, 0.28),
+    0 0 90px rgba(212, 176, 97, 0.16);
 }
-.word-beam {
+
+.hero-word--amara {
+  animation:
+    heroWordReveal 1.3s cubic-bezier(0.7, 0, 0.3, 1) 0.55s forwards,
+    heroWordFlash  1.3s ease-in-out                  0.55s 1,
+    wordGlowPulse  5s   ease-in-out                  1.85s infinite;
+}
+
+.hero-word--digital {
+  animation:
+    heroWordReveal 1.3s cubic-bezier(0.7, 0, 0.3, 1) 1.95s forwards,
+    heroWordFlash  1.3s ease-in-out                  1.95s 1,
+    wordGlowPulse  5s   ease-in-out                  3.25s infinite;
+}
+
+/* Single global tracer beam — runs from far left to far right of the
+   wordmark area, between the two text rows. The line draws scaleX
+   left-origin over the whole timeline; a bright leading dot pilots
+   the line from 0% to 100%. */
+.hero-tracer {
   position: absolute;
-  top: -4%;
-  bottom: -4%;
-  width: 4px;
-  margin-left: -2px;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 1px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes heroTraceLine {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+.hero-tracer__line {
+  position: absolute;
+  inset: 0;
   background: linear-gradient(
-    to bottom,
+    90deg,
     transparent 0%,
-    rgba(255, 250, 236, 0.9) 30%,
-    #fffaec 50%,
-    rgba(255, 250, 236, 0.9) 70%,
+    rgba(212, 176, 97, 0.35) 12%,
+    rgba(212, 176, 97, 0.7) 50%,
+    rgba(212, 176, 97, 0.35) 88%,
     transparent 100%
   );
+  transform-origin: left center;
+  transform: scaleX(0);
+  animation: heroTraceLine 2.85s cubic-bezier(0.7, 0, 0.3, 1) 0.45s forwards;
+}
+
+@keyframes heroTraceDot {
+  0%   { left: 0%;   opacity: 0; }
+  4%   { opacity: 1; }
+  96%  { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
+}
+
+.hero-tracer__dot {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-left: -6px;
+  margin-top: -6px;
+  background: #fffaec;
   box-shadow:
-    0 0 14px rgba(255, 250, 236, 0.95),
-    0 0 36px rgba(255, 250, 236, 0.7),
-    0 0 70px rgba(212, 176, 97, 0.55);
+    0 0 14px rgba(255, 250, 236, 1),
+    0 0 36px rgba(255, 250, 236, 0.85),
+    0 0 80px rgba(212, 176, 97, 0.65),
+    0 0 140px rgba(212, 176, 97, 0.4);
   opacity: 0;
-  animation: beamSweep var(--draw-dur, 1.6s)
-    cubic-bezier(0.7, 0, 0.3, 1)
-    var(--draw-delay, 0s) forwards;
-  pointer-events: none;
+  animation: heroTraceDot 2.85s cubic-bezier(0.7, 0, 0.3, 1) 0.45s forwards;
+}
+
+@keyframes heroRule {
+  from { transform: scaleX(0); opacity: 0; }
+  to   { transform: scaleX(1); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-word,
+  .hero-tracer__line,
+  .hero-tracer__dot {
+    animation: none;
+  }
+  .hero-word { clip-path: none; }
+  .hero-tracer__line { transform: scaleX(1); }
+}
+
+/* Clients cascade — vertical offset only applies on lg+ where the
+   layout has room to breathe. Mobile/tablet keep cards flat. */
+@media (min-width: 1024px) {
+  .cascade-card {
+    transform: translateY(var(--cascade-y, 0));
+  }
 }
 
 /* ─── LED-edge glass face for the services cube ───────────────── */
