@@ -44,19 +44,17 @@ export function RouteCurtain() {
       {variant === "sweep" && <SweepCurtain />}
       {variant === "wipe" && <WipeCurtain />}
       {variant === "iris" && <IrisCurtain />}
-      {variant === "mosaic" && <MosaicCurtain />}
     </div>
   );
 }
 
-type Variant = "panels" | "split" | "sweep" | "wipe" | "iris" | "mosaic";
+type Variant = "panels" | "split" | "sweep" | "wipe" | "iris";
 
 function pickVariant(path: string): Variant {
   if (path === "/") return "panels";
   if (path === "/about") return "split";
   if (path === "/services") return "sweep";
   if (path.startsWith("/services/")) return "wipe";
-  if (path === "/clients") return "mosaic";
   if (path === "/contact") return "iris";
   return "panels";
 }
@@ -237,51 +235,6 @@ function IrisCurtain() {
         />
       </motion.div>
       <BrandFlash duration={1.3} times={[0, 0.42, 0.48, 0.55, 0.62]} />
-    </>
-  );
-}
-
-/* ── Clients: grid of midnight tiles fade in/out in a wave ─ */
-function MosaicCurtain() {
-  const cols = 8;
-  const rows = 5;
-  const tiles = Array.from({ length: cols * rows });
-  return (
-    <>
-      <div
-        className="absolute inset-0 grid"
-        style={{
-          gridTemplateColumns: `repeat(${cols}, 1fr)`,
-          gridTemplateRows: `repeat(${rows}, 1fr)`,
-        }}
-      >
-        {tiles.map((_, i) => {
-          const row = Math.floor(i / cols);
-          const col = i % cols;
-          // Diagonal wave: tiles in the top-left fire first
-          const stagger = (row + col) * 0.035;
-          // Gold accent on every 7th tile for variety
-          const isGold = i % 7 === 3;
-          return (
-            <motion.div
-              key={i}
-              style={{ background: isGold ? "#d4b061" : "#0b0a09" }}
-              initial={{ opacity: 0, scale: 0.4 }}
-              animate={{
-                opacity: [0, 1, 1, 0],
-                scale: [0.4, 1, 1, 0.4],
-              }}
-              transition={{
-                duration: 1.4,
-                times: [0, 0.36, 0.52, 1],
-                delay: stagger,
-                ease: COVER_EASE,
-              }}
-            />
-          );
-        })}
-      </div>
-      <BrandFlash duration={1.4} times={[0, 0.46, 0.52, 0.6, 0.7]} />
     </>
   );
 }

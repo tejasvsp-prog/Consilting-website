@@ -19,7 +19,6 @@ import Seo from "./pages/services/Seo";
 import WebsiteDevelopment from "./pages/services/WebsiteDevelopment";
 import WebsiteMaintenance from "./pages/services/WebsiteMaintenance";
 import MetaAds from "./pages/services/MetaAds";
-import Clients from "./pages/Clients";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
@@ -83,7 +82,6 @@ export default function App() {
               element={<WebsiteMaintenance />}
             />
             <Route path="/services/meta-ads" element={<MetaAds />} />
-            <Route path="/clients" element={<Clients />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/book" element={<Navigate to="/contact" replace />} />
             <Route path="*" element={<NotFound />} />

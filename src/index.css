@@ -275,13 +275,6 @@ body {
   .hero-tracer__line { transform: scaleX(1); }
 }
 
-/* Clients cascade — vertical offset only applies on lg+ where the
-   layout has room to breathe. Mobile/tablet keep cards flat. */
-@media (min-width: 1024px) {
-  .cascade-card {
-    transform: translateY(var(--cascade-y, 0));
-  }
-}
 
 /* ─── LED-edge glass face for the services cube ───────────────── */
 .cube-led-face {

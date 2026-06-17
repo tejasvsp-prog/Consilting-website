@@ -5,7 +5,6 @@ const siteLinks = [
   { to: "/", label: "Home" },
   { to: "/about", label: "About" },
   { to: "/services", label: "Services" },
-  { to: "/clients", label: "Clients" },
   { to: "/contact", label: "Book a Demo" },
 ];
 

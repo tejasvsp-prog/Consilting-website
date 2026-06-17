@@ -6,7 +6,6 @@ import Wordmark from "./Wordmark";
 const links = [
   { to: "/about", label: "About" },
   { to: "/services", label: "Services" },
-  { to: "/clients", label: "Clients" },
 ];
 
 const PHONE_DISPLAY = "(517) 329-5868";
